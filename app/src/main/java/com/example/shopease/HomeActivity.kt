@@ -3,6 +3,10 @@ package com.example.shopease
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.shopease.HomeFragment
+import com.example.shopease.ProfileFragment
+import com.example.shopease.SettingsFragment
+
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : AppCompatActivity() {
