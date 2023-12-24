@@ -1,4 +1,3 @@
-// src/main/java/com/example/myloginapp/RegisterActivity.kt
 package com.example.shopease
 
 import android.content.Intent

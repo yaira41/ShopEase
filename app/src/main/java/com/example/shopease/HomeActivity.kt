@@ -1,4 +1,3 @@
-// src/main/java/com/example/myloginapp/HomeActivity.kt
 package com.example.shopease
 
 import android.os.Bundle

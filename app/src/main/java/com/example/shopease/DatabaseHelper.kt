@@ -1,4 +1,3 @@
-// src/main/java/com/example/myloginapp/DatabaseHelper.kt
 package com.example.shopease
 
 import android.content.ContentValues

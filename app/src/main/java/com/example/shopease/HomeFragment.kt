@@ -1,4 +1,3 @@
-// src/main/java/com/example/myloginapp/HomeFragment.kt
 package com.example.myloginapp
 
 import android.os.Bundle
