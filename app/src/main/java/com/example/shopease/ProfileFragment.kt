@@ -14,7 +14,7 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as AppCompatActivity?)?.supportActionBar?.title = "Profile"
+        (activity as HomeActivity?)?.updateTitle("Profile")
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 }

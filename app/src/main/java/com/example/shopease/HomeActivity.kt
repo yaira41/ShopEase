@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
 
     private lateinit var bottomNavigation: BottomNavigationView
 
@@ -65,6 +65,12 @@ class HomeActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             loadFragment(HomeFragment())
         }
+    }
+
+    override fun updateTitle(title: String) {
+        // Update the title in your custom upper navigation bar
+        val fragmentTitle: TextView = findViewById(R.id.title)
+        fragmentTitle.text = title
     }
 
     private fun loadFragment(fragment: Fragment) {

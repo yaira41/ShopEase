@@ -15,7 +15,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
 
     ): View? {
-        (activity as AppCompatActivity?)?.supportActionBar?.title = "Home"
+        (activity as HomeActivity?)?.updateTitle("Home")
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 }

@@ -13,7 +13,7 @@ class FriendsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as AppCompatActivity?)?.supportActionBar?.title = "Friends"
+        (activity as HomeActivity?)?.updateTitle("Friends")
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 }

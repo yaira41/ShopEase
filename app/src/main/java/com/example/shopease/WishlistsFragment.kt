@@ -13,7 +13,7 @@ class WishlistsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as AppCompatActivity?)?.supportActionBar?.title = "Wishlists"
+        (activity as HomeActivity?)?.updateTitle("Wishlists")
         return inflater.inflate(R.layout.fragment_wishlists, container, false)
     }
 }
