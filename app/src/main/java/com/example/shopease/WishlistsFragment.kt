@@ -6,15 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.shopease.R
 
-class SettingsFragment : Fragment() {
+class WishlistsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as AppCompatActivity?)?.supportActionBar?.title = "Settings"
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+        (activity as AppCompatActivity?)?.supportActionBar?.title = "Wishlists"
+        return inflater.inflate(R.layout.fragment_wishlists, container, false)
     }
 }

@@ -1,15 +1,14 @@
-<!-- res/menu/bottom_navigation_menu.xml -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_wishlist"
+        android:icon="@drawable/wishlist_icon"
+        android:title="Wishlists" />
     <item
         android:id="@+id/action_home"
         android:icon="@drawable/home_icon"
-        android:title="Home"/>
+        android:title="Home" />
     <item
-        android:id="@+id/action_profile"
-        android:icon="@drawable/profile_icon"
-        android:title="Profile"/>
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/settings_icon"
-        android:title="Settings"/>
+        android:id="@+id/action_friends"
+        android:icon="@drawable/freinds_icon"
+        android:title="Friends" />
 </menu>
