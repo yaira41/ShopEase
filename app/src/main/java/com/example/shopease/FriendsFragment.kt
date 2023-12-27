@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 
-class FreindsFragment : Fragment() {
+class FriendsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as AppCompatActivity?)?.supportActionBar?.title = "Settings"
+        (activity as AppCompatActivity?)?.supportActionBar?.title = "Friends"
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 }

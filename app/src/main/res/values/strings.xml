@@ -1,6 +1,8 @@
 <!-- res/values/strings.xml -->
 <resources>
     <string name="home_activity_title">Home</string>
+    <string name="wishlists_activity_title">Wishlists</string>
+    <string name="friends_activity_title">Friends</string>
     <string name="login_activity_title">Login</string>
     <string name="register_activity_title">Register</string>
     <string name="app_name">ShopEase</string>
