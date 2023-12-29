@@ -2,6 +2,7 @@ package com.example.shopease
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -23,24 +24,10 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
         // Set custom upper navigation bar as the support action bar
         supportActionBar?.setDisplayShowCustomEnabled(true)
         supportActionBar?.customView = customUpperNavBar
-        val btnBack: ImageButton = customUpperNavBar.findViewById(R.id.btnBack)
-        val title: TextView = customUpperNavBar.findViewById(R.id.title)
-        val btnProfile: ImageButton = customUpperNavBar.findViewById(R.id.btnProfile)
 
-        // Set button click listeners or handle them as needed
-        btnBack.setOnClickListener {
-            finish()
-        }
-
-        btnProfile.setOnClickListener {
-            loadFragment(ProfileFragment())
-        }
-
-        // Set the title
-        title.text = "Your Fragment Title"
         bottomNavigation = findViewById(R.id.bottomNavigation)
-
         bottomNavigation.setOnNavigationItemSelectedListener { menuItem ->
+
             when (menuItem.itemId) {
                 R.id.action_wishlist -> {
                     loadFragment(WishlistsFragment())
@@ -61,10 +48,8 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
             }
         }
 
-        // Load the initial fragment
-        if (savedInstanceState == null) {
-            loadFragment(HomeFragment())
-        }
+        // Set the "Home" item as the default selected item
+        bottomNavigation.selectedItemId = R.id.action_home
     }
 
     override fun updateTitle(title: String) {
@@ -75,7 +60,15 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
 
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
+            .replace(R.id.fragmentContainer, fragment).addToBackStack(null)
             .commit()
+    }
+
+    fun onProfileButtonClick(view: View) {
+        loadFragment(ProfileFragment())
+    }
+
+    fun onBackButtonClick() {
+        finish()
     }
 }

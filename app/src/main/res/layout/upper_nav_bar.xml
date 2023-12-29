@@ -16,6 +16,7 @@
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:padding="8dp"
         android:scaleType="fitCenter"
+        android:onClick="onProfileButtonClick"
         android:src="@drawable/profile_icon" />
 
     <!-- Title -->
@@ -38,6 +39,7 @@
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:padding="8dp"
         android:scaleType="fitCenter"
+        android:onClick="onBackButtonClick"
         android:src="@drawable/back_icon" />
 
 </RelativeLayout>
