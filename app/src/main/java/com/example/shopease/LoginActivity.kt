@@ -37,10 +37,8 @@ class LoginActivity : AppCompatActivity() {
             // Login successful, navigate to HomeActivity
             Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
             // Pass the data as extras in the Intent
-            intent.putExtra("USERNAME_KEY", username)
-            val email = dbHelper.getEmailByUsername(username)
-            intent.putExtra("EMAIL_KEY", email)
-            navigateToHomeActivity()
+            val email = dbHelper.getEmailByUsername(username).toString()
+            navigateToHomeActivity(email, username)
         } else {
             Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show()
         }
@@ -52,8 +50,10 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun navigateToHomeActivity() {
+    private fun navigateToHomeActivity(email: String, username: String) {
         val intent = Intent(this, HomeActivity::class.java)
+        intent.putExtra("USERNAME_KEY", username)
+        intent.putExtra("EMAIL_KEY", email)
         startActivity(intent)
         finish()
     }

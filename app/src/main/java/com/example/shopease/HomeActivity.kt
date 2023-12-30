@@ -4,11 +4,9 @@ import ProfileFragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
@@ -21,8 +19,7 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
         // Inflate the custom upper navigation bar layout
         val inflater = LayoutInflater.from(this)
         val customUpperNavBar = inflater.inflate(R.layout.upper_nav_bar, null)
-        val username = intent.getStringExtra("USERNAME_KEY")
-        val email = intent.getStringExtra("EMAIL_KEY")
+
         // Set custom upper navigation bar as the support action bar
         supportActionBar?.setDisplayShowCustomEnabled(true)
         supportActionBar?.customView = customUpperNavBar
@@ -79,7 +76,15 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
     }
 
     fun onProfileButtonClick(view: View) {
-        loadFragment(ProfileFragment())
+        val profileFragment = ProfileFragment()
+        val username = intent.getStringExtra("USERNAME_KEY")
+        val email = intent.getStringExtra("EMAIL_KEY")
+        // Create a Bundle and add data to it
+        val bundle = Bundle()
+        bundle.putString("USERNAME_KEY", username)
+        bundle.putString("EMAIL_KEY", email)
+
+        loadFragment(profileFragment, bundle)
     }
 
     fun onBackButtonClick() {
