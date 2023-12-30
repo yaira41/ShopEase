@@ -58,10 +58,22 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
         fragmentTitle.text = title
     }
 
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment).addToBackStack(null)
-            .commit()
+    fun loadFragment(fragment: Fragment, args: Bundle? = null, addToBackStack: Boolean = true) {
+        val transaction = supportFragmentManager.beginTransaction()
+
+        // Set arguments if provided
+        fragment.arguments = args
+
+        // Replace the existing fragment with the new one
+        transaction.replace(R.id.fragmentContainer, fragment)
+
+        // Add to back stack if needed
+        if (addToBackStack) {
+            transaction.addToBackStack(null)
+        }
+
+        // Commit the transaction
+        transaction.commit()
     }
 
     fun onProfileButtonClick(view: View) {

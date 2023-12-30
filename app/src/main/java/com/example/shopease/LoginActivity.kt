@@ -36,6 +36,10 @@ class LoginActivity : AppCompatActivity() {
         if (dbHelper.isValidLogin(username, password)) {
             // Login successful, navigate to HomeActivity
             Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+            // Pass the data as extras in the Intent
+            intent.putExtra("USERNAME", username)
+            val email = dbHelper.getEmailByUsername(username)
+            intent.putExtra("EMAIL", email)
             navigateToHomeActivity()
         } else {
             Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show()
