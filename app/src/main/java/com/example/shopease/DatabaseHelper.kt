@@ -86,4 +86,23 @@ class DatabaseHelper(context: Context) :
 
         return email
     }
+
+    fun updatePassword(username: String, newPassword: String): Boolean {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(COLUMN_PASSWORD, newPassword)
+
+        // Update the password based on the username
+        val rowsAffected = db.update(
+            TABLE_USERS,
+            values,
+            "$COLUMN_USERNAME = ?",
+            arrayOf(username)
+        )
+
+        db.close()
+
+        // Return true if the password was successfully updated
+        return rowsAffected > 0
+    }
 }
