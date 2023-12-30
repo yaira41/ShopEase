@@ -1,6 +1,7 @@
 <!-- res/layout/fragment_profile.xml -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -14,42 +15,41 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- First TextView -->
+
     <TextView
         android:id="@+id/usernameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="269dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="208dp"
         android:text="First Text"
-        app:layout_constraintBottom_toTopOf="@id/emailTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.422"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/upperNavbar"
-        app:layout_constraintVertical_bias="0.5" />
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/upperNavbar" />
 
-    <!-- Second TextView -->
     <TextView
         android:id="@+id/emailTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="269dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="28dp"
         android:text="Second Text"
-        app:layout_constraintBottom_toTopOf="@id/changePasswordButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.414"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/usernameTextView"
-        app:layout_constraintVertical_bias="0.5" />
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
 
-    <!-- Button -->
     <Button
         android:id="@+id/changePasswordButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="24dp"
         android:text="Change Password"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/emailTextView"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toBottomOf="@+id/emailTextView"
+        app:layout_constraintVertical_bias="0.07" />
 </androidx.constraintlayout.widget.ConstraintLayout>
