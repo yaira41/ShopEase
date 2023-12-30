@@ -21,7 +21,8 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
         // Inflate the custom upper navigation bar layout
         val inflater = LayoutInflater.from(this)
         val customUpperNavBar = inflater.inflate(R.layout.upper_nav_bar, null)
-
+        val username = intent.getStringExtra("USERNAME_KEY")
+        val email = intent.getStringExtra("EMAIL_KEY")
         // Set custom upper navigation bar as the support action bar
         supportActionBar?.setDisplayShowCustomEnabled(true)
         supportActionBar?.customView = customUpperNavBar

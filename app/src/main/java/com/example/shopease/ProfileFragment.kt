@@ -19,17 +19,13 @@ class ProfileFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         usernameTextView = view.findViewById(R.id.usernameTextView)
         emailTextView = view.findViewById(R.id.emailTextView)
         changePasswordButton = view.findViewById(R.id.changePasswordButton)
-
-        // Replace these values with the actual username and email
-        val username = arguments?.getString("USERNAME")
-        val email = arguments?.getString("EMAIL")
 
         // Set username and email in the UI
         usernameTextView.text = "Username: $username"
