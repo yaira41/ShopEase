@@ -1,3 +1,4 @@
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.shopease.DatabaseHelper
 import com.example.shopease.R
 
 // Inside your ProfileFragment class
@@ -16,6 +18,9 @@ class ProfileFragment : Fragment() {
     private lateinit var usernameTextView: TextView
     private lateinit var emailTextView: TextView
     private lateinit var changePasswordButton: Button
+    private lateinit var dbHelper: DatabaseHelper
+    private var username: String? = null
+    private var email: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,9 +33,9 @@ class ProfileFragment : Fragment() {
         changePasswordButton = view.findViewById(R.id.changePasswordButton)
 
         // Replace these values with the actual username and email
-        val username = arguments?.getString("USERNAME_KEY")
-        val email = arguments?.getString("EMAIL_KEY")
-
+        username = arguments?.getString("USERNAME_KEY")
+        email = arguments?.getString("EMAIL_KEY")
+        dbHelper = DatabaseHelper(this.requireContext())
         // Set username and email in the UI
         usernameTextView.text = "Username: $username"
         emailTextView.text = "Email: $email"
@@ -56,10 +61,8 @@ class ProfileFragment : Fragment() {
                 val newPassword = newPasswordEditText.text.toString()
                 val confirmNewPassword = confirmNewPasswordEditText.text.toString()
 
-                // Check if passwords match
-                if (newPassword == confirmNewPassword) {
-                    // Update password in the database (you should implement this part)
-                    // For demonstration purposes, we'll just show a toast message
+                if (newPassword == confirmNewPassword && dbHelper.updatePassword(
+                        username.toString(),  newPassword)) {
                     Toast.makeText(
                         requireContext(),
                         "Password changed successfully",
