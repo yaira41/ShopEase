@@ -1,13 +1,12 @@
 package com.example.shopease
 
+import ProfileFragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
@@ -58,14 +57,34 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
         fragmentTitle.text = title
     }
 
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment).addToBackStack(null)
-            .commit()
+    fun loadFragment(fragment: Fragment, args: Bundle? = null, addToBackStack: Boolean = true) {
+        val transaction = supportFragmentManager.beginTransaction()
+
+        // Set arguments if provided
+        fragment.arguments = args
+
+        // Replace the existing fragment with the new one
+        transaction.replace(R.id.fragmentContainer, fragment)
+
+        // Add to back stack if needed
+        if (addToBackStack) {
+            transaction.addToBackStack(null)
+        }
+
+        // Commit the transaction
+        transaction.commit()
     }
 
     fun onProfileButtonClick(view: View) {
-        loadFragment(ProfileFragment())
+        val profileFragment = ProfileFragment()
+        val username = intent.getStringExtra("USERNAME_KEY")
+        val email = intent.getStringExtra("EMAIL_KEY")
+        // Create a Bundle and add data to it
+        val bundle = Bundle()
+        bundle.putString("USERNAME_KEY", username)
+        bundle.putString("EMAIL_KEY", email)
+
+        loadFragment(profileFragment, bundle)
     }
 
     fun onBackButtonClick() {
