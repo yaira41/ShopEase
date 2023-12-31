@@ -3,11 +3,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <TextView
-        android:id="@+id/textViewHome"
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wishlists Fragment Content"
-        android:textSize="18sp"
-        android:layout_centerInParent="true"/>
+        android:layout_marginTop="20dp"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:hint="הרשימות שלי"
+        android:padding="10dp" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView"
+        android:layout_marginTop="34dp"
+        android:layout_alignParentEnd="true"
+        android:onClick="onMyShopListButtonClick"
+        android:text="רשימת הקניות שלי" />
+
 </RelativeLayout>
