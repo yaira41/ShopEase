@@ -64,65 +64,61 @@ class DatabaseHelper(context: Context) :
 
         // Insert the user into the Users table
         val result = db.insert(TABLE_USERS, null, values)
-
-        // Close the database
         db.close()
 
         return result
     }
 
-    db.insert(TABLE_USERS, null, values)
-    db.close()
-}
 
-fun isValidLogin(username: String, password: String): Boolean {
-    // Check if the username and password match a user in the database
-    val db = readableDatabase
-    val query =
-        "SELECT * FROM $TABLE_USERS WHERE $COLUMN_USERNAME = ? AND $COLUMN_PASSWORD = ?"
-    val cursor: Cursor = db.rawQuery(query, arrayOf(username, password))
-    val result = cursor.count > 0
-    cursor.close()
-    return result
-}
-
-fun getEmailByUsername(username: String): String? {
-    val db = readableDatabase
-    val columns = arrayOf(COLUMN_EMAIL)
-    val selection = "$COLUMN_USERNAME = ?"
-    val selectionArgs = arrayOf(username)
-
-    val cursor: Cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null)
-
-    var email: String? = null
-
-    if (cursor.moveToFirst()) {
-        val columnIndex = cursor.getColumnIndex(COLUMN_EMAIL)
-        email = cursor.getString(columnIndex)
+    fun isValidLogin(username: String, password: String): Boolean {
+        // Check if the username and password match a user in the database
+        val db = readableDatabase
+        val query =
+            "SELECT * FROM $TABLE_USERS WHERE $COLUMN_USERNAME = ? AND $COLUMN_PASSWORD = ?"
+        val cursor: Cursor = db.rawQuery(query, arrayOf(username, password))
+        val result = cursor.count > 0
+        cursor.close()
+        return result
     }
 
-    cursor.close()
-    db.close()
+    fun getEmailByUsername(username: String): String? {
+        val db = readableDatabase
+        val columns = arrayOf(COLUMN_EMAIL)
+        val selection = "$COLUMN_USERNAME = ?"
+        val selectionArgs = arrayOf(username)
 
-    return email
-}
+        val cursor: Cursor =
+            db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null)
 
-fun updatePassword(username: String, newPassword: String): Boolean {
-    val db = this.writableDatabase
-    val values = ContentValues()
-    values.put(COLUMN_PASSWORD, newPassword)
+        var email: String? = null
 
-    // Update the password based on the username
-    val rowsAffected = db.update(
-        TABLE_USERS,
-        values,
-        "$COLUMN_USERNAME = ?",
-        arrayOf(username)
-    )
+        if (cursor.moveToFirst()) {
+            val columnIndex = cursor.getColumnIndex(COLUMN_EMAIL)
+            email = cursor.getString(columnIndex)
+        }
 
-    db.close()
+        cursor.close()
+        db.close()
 
-    // Return true if the password was successfully updated
-    return rowsAffected > 0
-}
+        return email
+    }
+
+    fun updatePassword(username: String, newPassword: String): Boolean {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(COLUMN_PASSWORD, newPassword)
+
+        // Update the password based on the username
+        val rowsAffected = db.update(
+            TABLE_USERS,
+            values,
+            "$COLUMN_USERNAME = ?",
+            arrayOf(username)
+        )
+
+        db.close()
+
+        // Return true if the password was successfully updated
+        return rowsAffected > 0
+    }
 }
