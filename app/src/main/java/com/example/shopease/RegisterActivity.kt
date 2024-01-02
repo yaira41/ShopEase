@@ -40,13 +40,14 @@ class RegisterActivity : AppCompatActivity() {
         databaseHelper = DatabaseHelper(this)
 
         // Initialize image picker launcher
-        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val selectedImageUri = result.data?.data
-                // Set the selected image to the ImageView
-                imageProfile.setImageURI(selectedImageUri)
+        imagePickerLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val selectedImageUri = result.data?.data
+                    // Set the selected image to the ImageView
+                    imageProfile.setImageURI(selectedImageUri)
+                }
             }
-        }
     }
 
     fun onSelectImageClick(view: View) {
@@ -60,7 +61,7 @@ class RegisterActivity : AppCompatActivity() {
         val password = passwordEditText.text.toString()
 
         // Check if registration is valid
-        if (isRegistrationValid(username, email, password)) {
+        if (isRegistrationValid(username, email)) {
             // Convert the image to a byte array
             val imageByteArray = convertImageToByteArray()
 
@@ -81,7 +82,7 @@ class RegisterActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun isRegistrationValid(username: String, email: String, password: String): Boolean {
+    private fun isRegistrationValid(username: String, email: String): Boolean {
         // Check if the email is valid
         if (!isValidEmail(email)) {
             return false
@@ -108,7 +109,7 @@ class RegisterActivity : AppCompatActivity() {
         // Convert the image to a byte array (you need to implement this based on your requirements)
         // For demonstration purposes, let's assume you have a function that converts an image URI to a byte array
         val selectedImageUri = getSelectedImageUri()
-        return uriToByteArray(selectedImageUri)
+        return uriToByteArray(selectedImageUri) ?: getDefaultProfileImage()
     }
 
     private fun getSelectedImageUri(): Uri? {
@@ -131,5 +132,14 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
         return null
+    }
+
+    private fun getDefaultProfileImage(): ByteArray? {
+        // Provide a default image if no profile image is selected
+        val drawable = resources.getDrawable(R.drawable.profile_icon, theme)
+        val bitmap = (drawable as android.graphics.drawable.BitmapDrawable).bitmap
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        return byteArrayOutputStream.toByteArray()
     }
 }
