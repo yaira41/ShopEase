@@ -1,5 +1,6 @@
 package com.example.shopease
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
@@ -18,12 +19,13 @@ class DatabaseHelper(context: Context) :
         const val COLUMN_EMAIL = "email"
         const val COLUMN_USERNAME = "username"
         const val COLUMN_PASSWORD = "password"
+        const val COLUMN_PROFILE_IMAGE = "profileImage"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
         val createUserTable =
             "CREATE TABLE $TABLE_USERS ($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "$COLUMN_EMAIL TEXT, $COLUMN_USERNAME TEXT, $COLUMN_PASSWORD TEXT)"
+                    "$COLUMN_EMAIL TEXT, $COLUMN_USERNAME TEXT, $COLUMN_PASSWORD TEXT, $COLUMN_PROFILE_IMAGE BLOB)"
 
         db?.execSQL(createUserTable)
     }
@@ -32,28 +34,42 @@ class DatabaseHelper(context: Context) :
         // Upgrade policy if needed in the future
     }
 
-    fun isUserRegistered(username: String): Boolean {
-        // Check if the username already exists in the database
+    fun isUsernameExists(username: String): Boolean {
         val db = readableDatabase
-        val query = "SELECT * FROM $TABLE_USERS WHERE $COLUMN_USERNAME = ?"
-        val cursor = db.rawQuery(query, arrayOf(username))
-        val result = cursor.count > 0
+        val cursor: Cursor =
+            db.rawQuery("SELECT 1 FROM $TABLE_USERS WHERE $COLUMN_USERNAME = ?", arrayOf(username))
+        val exists = cursor.moveToFirst()
         cursor.close()
+        db.close()
+        return exists
+    }
+
+    fun isEmailExists(email: String): Boolean {
+        val db = readableDatabase
+        val cursor: Cursor =
+            db.rawQuery("SELECT 1 FROM $TABLE_USERS WHERE $COLUMN_EMAIL = ?", arrayOf(email))
+        val exists = cursor.moveToFirst()
+        cursor.close()
+        db.close()
+        return exists
+    }
+
+    fun addUser(username: String, email: String, password: String, profileImage: ByteArray?): Long {
+        val db = writableDatabase
+        val values = ContentValues()
+
+        values.put(COLUMN_USERNAME, username)
+        values.put(COLUMN_EMAIL, email)
+        values.put(COLUMN_PASSWORD, password)
+        values.put(COLUMN_PROFILE_IMAGE, profileImage)
+
+        // Insert the user into the Users table
+        val result = db.insert(TABLE_USERS, null, values)
+        db.close()
+
         return result
     }
 
-    fun saveUserData(email: String, username: String, password: String) {
-        // Save user data in the database
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_EMAIL, email)
-            put(COLUMN_USERNAME, username)
-            put(COLUMN_PASSWORD, password)
-        }
-
-        db.insert(TABLE_USERS, null, values)
-        db.close()
-    }
 
     fun isValidLogin(username: String, password: String): Boolean {
         // Check if the username and password match a user in the database
@@ -72,7 +88,8 @@ class DatabaseHelper(context: Context) :
         val selection = "$COLUMN_USERNAME = ?"
         val selectionArgs = arrayOf(username)
 
-        val cursor: Cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null)
+        val cursor: Cursor =
+            db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null)
 
         var email: String? = null
 
@@ -85,6 +102,31 @@ class DatabaseHelper(context: Context) :
         db.close()
 
         return email
+    }
+
+    @SuppressLint("Range")
+    fun getUserByUsername(username: String): User? {
+        val db = readableDatabase
+        val columns = arrayOf(COLUMN_USERNAME, COLUMN_EMAIL, COLUMN_PROFILE_IMAGE)
+        val selection = "$COLUMN_USERNAME = ?"
+        val selectionArgs = arrayOf(username)
+
+        val cursor: Cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null)
+
+        var user: User? = null
+
+        if (cursor.moveToFirst()) {
+            val userEmail = cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL))
+            val userProfileImage = cursor.getBlob(cursor.getColumnIndex(COLUMN_PROFILE_IMAGE))
+
+            // Create a User object with the retrieved information
+            user = User(username, userEmail, userProfileImage)
+        }
+
+        cursor.close()
+        db.close()
+
+        return user
     }
 
     fun updatePassword(username: String, newPassword: String): Boolean {

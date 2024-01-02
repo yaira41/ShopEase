@@ -33,14 +33,22 @@ class LoginActivity : AppCompatActivity() {
         val username = usernameEditText.text.toString()
         val password = passwordEditText.text.toString()
 
+        // Check if the login is valid
         if (dbHelper.isValidLogin(username, password)) {
-            // Login successful, navigate to HomeActivity
-            Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-            // Pass the data as extras in the Intent
-            val email = dbHelper.getEmailByUsername(username).toString()
-            navigateToHomeActivity(email, username)
+            // Fetch user information from the database
+            val user = dbHelper.getUserByUsername(username)
+
+            if (user != null) {
+                // Login successful
+                Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
+                navigateToHomeActivity(user)
+            } else {
+                // Login failed
+                Toast.makeText(this, "Invalid Username or Password", Toast.LENGTH_SHORT).show()
+            }
         } else {
-            Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show()
+            // Login is not valid
+            Toast.makeText(this, "Invalid Login Information", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -50,10 +58,13 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun navigateToHomeActivity(email: String, username: String) {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.putExtra("USERNAME_KEY", username)
-        intent.putExtra("EMAIL_KEY", email)
+    private fun navigateToHomeActivity(user: User) {
+        // Pass user information to HomeActivity
+        val intent = Intent(this, HomeActivity::class.java).apply {
+            putExtra("USERNAME_KEY", user.username)
+            putExtra("EMAIL_KEY", user.email)
+            putExtra("PROFILE_IMAGE_KEY", user.profileImage)
+        }
         startActivity(intent)
         finish()
     }
