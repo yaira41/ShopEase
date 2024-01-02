@@ -32,14 +32,22 @@ class DatabaseHelper(context: Context) :
         // Upgrade policy if needed in the future
     }
 
-    fun isUserRegistered(username: String): Boolean {
-        // Check if the username already exists in the database
+    fun isUsernameExists(username: String): Boolean {
         val db = readableDatabase
-        val query = "SELECT * FROM $TABLE_USERS WHERE $COLUMN_USERNAME = ?"
-        val cursor = db.rawQuery(query, arrayOf(username))
-        val result = cursor.count > 0
+        val cursor: Cursor = db.rawQuery("SELECT 1 FROM $TABLE_USERS WHERE $COLUMN_USERNAME = ?", arrayOf(username))
+        val exists = cursor.moveToFirst()
         cursor.close()
-        return result
+        db.close()
+        return exists
+    }
+
+    fun isEmailExists(email: String): Boolean {
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery("SELECT 1 FROM $TABLE_USERS WHERE $COLUMN_EMAIL = ?", arrayOf(email))
+        val exists = cursor.moveToFirst()
+        cursor.close()
+        db.close()
+        return exists
     }
 
     fun saveUserData(email: String, username: String, password: String) {
