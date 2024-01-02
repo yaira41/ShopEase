@@ -78,6 +78,7 @@ class RegisterActivity : AppCompatActivity() {
             // Registration is not valid
             Toast.makeText(this, "Invalid Registration Information", Toast.LENGTH_SHORT).show()
         }
+        finish()
     }
 
     private fun isRegistrationValid(username: String, email: String, password: String): Boolean {

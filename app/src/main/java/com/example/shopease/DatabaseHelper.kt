@@ -1,5 +1,6 @@
 package com.example.shopease
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
@@ -101,6 +102,31 @@ class DatabaseHelper(context: Context) :
         db.close()
 
         return email
+    }
+
+    @SuppressLint("Range")
+    fun getUserByUsername(username: String): User? {
+        val db = readableDatabase
+        val columns = arrayOf(COLUMN_USERNAME, COLUMN_EMAIL, COLUMN_PROFILE_IMAGE)
+        val selection = "$COLUMN_USERNAME = ?"
+        val selectionArgs = arrayOf(username)
+
+        val cursor: Cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null)
+
+        var user: User? = null
+
+        if (cursor.moveToFirst()) {
+            val userEmail = cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL))
+            val userProfileImage = cursor.getBlob(cursor.getColumnIndex(COLUMN_PROFILE_IMAGE))
+
+            // Create a User object with the retrieved information
+            user = User(username, userEmail, userProfileImage)
+        }
+
+        cursor.close()
+        db.close()
+
+        return user
     }
 
     fun updatePassword(username: String, newPassword: String): Boolean {
