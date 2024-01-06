@@ -1,3 +1,5 @@
+package com.example.shopease
+
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,11 +12,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.example.shopease.DatabaseHelper
-import com.example.shopease.HomeActivity
-import com.example.shopease.R
+import com.example.shopease.Utils.hashPassword
 
-// Inside your ProfileFragment class
 class ProfileFragment : Fragment() {
 
     private lateinit var usernameTextView: TextView
@@ -43,7 +42,7 @@ class ProfileFragment : Fragment() {
         email = arguments?.getString("EMAIL_KEY")
         imageProfile = arguments?.getByteArray("PROFILE_IMAGE_KEY")
 
-        dbHelper = DatabaseHelper(this.requireContext())
+        dbHelper = DatabaseHelper()
         // Set username and email in the UI
         usernameTextView.text = "Username: $username"
         emailTextView.text = "Email: $email"
@@ -70,16 +69,16 @@ class ProfileFragment : Fragment() {
                 val newPassword = newPasswordEditText.text.toString()
                 val confirmNewPassword = confirmNewPasswordEditText.text.toString()
 
-                if (newPassword == confirmNewPassword && dbHelper.updatePassword(
-                        username.toString(),  newPassword)) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Password changed successfully",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                if (newPassword == confirmNewPassword) {
+                    dbHelper.updatePassword(username.toString(),  hashPassword(newPassword)) {success ->
+                        if(success) {
+                            Toast.makeText(requireContext(), "Password changed successfully",
+                                Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 } else {
-                    Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(requireContext(),
+                        "Passwords do not match", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)

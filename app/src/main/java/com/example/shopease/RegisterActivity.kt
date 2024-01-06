@@ -1,5 +1,6 @@
 package com.example.shopease
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.shopease.Utils.hashPassword
 import java.io.ByteArrayOutputStream
 
 class RegisterActivity : AppCompatActivity() {
@@ -37,7 +39,7 @@ class RegisterActivity : AppCompatActivity() {
         imageProfile = findViewById(R.id.imageProfile)
         btnSelectImage = findViewById(R.id.btnSelectImage)
 
-        databaseHelper = DatabaseHelper(this)
+        databaseHelper = DatabaseHelper()
 
         // Initialize image picker launcher
         imagePickerLauncher =
@@ -66,23 +68,22 @@ class RegisterActivity : AppCompatActivity() {
             val imageByteArray = convertImageToByteArray()
 
             // Call your addUser function to save the user to the database
-            val result = databaseHelper.addUser(username, email, password, imageByteArray)
+//            val user = User(username, email, hashPassword(password), imageByteArray)
+            databaseHelper.addUser(username, email, imageByteArray, hashPassword(password)) { success ->
+                if (success) {
+                    Toast.makeText(this, "Registration Successful", Toast.LENGTH_SHORT).show()
 
-            if (result != -1L) {
-                // Registration successful
-                Toast.makeText(this, "Registration Successful", Toast.LENGTH_SHORT).show()
-            } else {
-                // Registration failed
-                Toast.makeText(this, "Registration Failed", Toast.LENGTH_SHORT).show()
+                } else {
+                    // Registration failed
+                    Toast.makeText(this, "Registration Failed", Toast.LENGTH_SHORT).show()
+                }
             }
-        } else {
-            // Registration is not valid
-            Toast.makeText(this, "Invalid Registration Information", Toast.LENGTH_SHORT).show()
+            finish()
         }
-        finish()
     }
 
     private fun isRegistrationValid(username: String, email: String): Boolean {
+        var result = true
         // Check if the email is valid
         if (!isValidEmail(email)) {
             return false
@@ -94,11 +95,18 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         // Check if the username and email do not already exist in the database
-        if (databaseHelper.isUsernameExists(username) || databaseHelper.isEmailExists(email)) {
-            return false
+        databaseHelper.isUsernameExists(username) { exist ->
+            if (exist) {
+                result = false
+            }
+        }
+        databaseHelper.isEmailExists(email) { exist ->
+            if (exist) {
+                result = false
+            }
         }
 
-        return true
+        return result
     }
 
     private fun isValidEmail(email: String): Boolean {
@@ -118,7 +126,8 @@ class RegisterActivity : AppCompatActivity() {
         return drawable?.bitmap?.let { bitmap ->
             val bytes = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes)
-            val path = MediaStore.Images.Media.insertImage(contentResolver, bitmap, "Title", null)
+            val path =
+                MediaStore.Images.Media.insertImage(contentResolver, bitmap, "Title", null)
             Uri.parse(path)
         }
     }
@@ -134,6 +143,7 @@ class RegisterActivity : AppCompatActivity() {
         return null
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun getDefaultProfileImage(): ByteArray? {
         // Provide a default image if no profile image is selected
         val drawable = resources.getDrawable(R.drawable.profile_icon, theme)

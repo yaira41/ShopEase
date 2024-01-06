@@ -1,6 +1,5 @@
 package com.example.shopease
 
-import ProfileFragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

@@ -7,6 +7,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.shopease.Utils.base64ToByteArray
+import com.example.shopease.Utils.hashPassword
 
 class LoginActivity : AppCompatActivity() {
 
@@ -26,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.loginButton)
         signupButton = findViewById(R.id.signupButton)
 
-        dbHelper = DatabaseHelper(this)
+        dbHelper = DatabaseHelper()
     }
 
     fun onLoginButtonClick(view: View) {
@@ -34,22 +36,21 @@ class LoginActivity : AppCompatActivity() {
         val password = passwordEditText.text.toString()
 
         // Check if the login is valid
-        if (dbHelper.isValidLogin(username, password)) {
+        dbHelper.isValidLogin(username, hashPassword(password), object : LoginCallback {
             // Fetch user information from the database
-            val user = dbHelper.getUserByUsername(username)
-
-            if (user != null) {
-                // Login successful
-                Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
-                navigateToHomeActivity(user)
-            } else {
-                // Login failed
-                Toast.makeText(this, "Invalid Username or Password", Toast.LENGTH_SHORT).show()
+            override fun onLoginResult(user: User?) {
+                if (user != null) {
+                    // Login successful, user object is not null
+                    // You can access user properties here
+                    showToast("Login successful. Welcome, ${user.username}!")
+                    navigateToHomeActivity(user)
+                    finish()
+                } else {
+                    // Login failed, user object is null
+                    showToast("Invalid login credentials.")
+                }
             }
-        } else {
-            // Login is not valid
-            Toast.makeText(this, "Invalid Login Information", Toast.LENGTH_SHORT).show()
-        }
+        })
     }
 
     fun onSignUpButtonClick(view: View) {
@@ -58,14 +59,17 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun navigateToHomeActivity(user: User) {
+    fun navigateToHomeActivity(user: User) {
         // Pass user information to HomeActivity
         val intent = Intent(this, HomeActivity::class.java).apply {
             putExtra("USERNAME_KEY", user.username)
             putExtra("EMAIL_KEY", user.email)
-            putExtra("PROFILE_IMAGE_KEY", user.profileImage)
+            putExtra("PROFILE_IMAGE_KEY", base64ToByteArray(user.profileImage))
         }
         startActivity(intent)
         finish()
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
