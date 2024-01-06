@@ -7,6 +7,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.shopease.Utils.base64ToByteArray
+import com.example.shopease.Utils.hashPassword
 
 class LoginActivity : AppCompatActivity() {
 
@@ -26,22 +28,29 @@ class LoginActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.loginButton)
         signupButton = findViewById(R.id.signupButton)
 
-        dbHelper = DatabaseHelper(this)
+        dbHelper = DatabaseHelper()
     }
 
     fun onLoginButtonClick(view: View) {
         val username = usernameEditText.text.toString()
         val password = passwordEditText.text.toString()
 
-        if (dbHelper.isValidLogin(username, password)) {
-            // Login successful, navigate to HomeActivity
-            Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-            // Pass the data as extras in the Intent
-            val email = dbHelper.getEmailByUsername(username).toString()
-            navigateToHomeActivity(email, username)
-        } else {
-            Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show()
-        }
+        // Check if the login is valid
+        dbHelper.isValidLogin(username, hashPassword(password), object : LoginCallback {
+            // Fetch user information from the database
+            override fun onLoginResult(user: User?) {
+                if (user != null) {
+                    // Login successful, user object is not null
+                    // You can access user properties here
+                    showToast("Login successful. Welcome, ${user.username}!")
+                    navigateToHomeActivity(user)
+                    finish()
+                } else {
+                    // Login failed, user object is null
+                    showToast("Invalid login credentials.")
+                }
+            }
+        })
     }
 
     fun onSignUpButtonClick(view: View) {
@@ -50,11 +59,17 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun navigateToHomeActivity(email: String, username: String) {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.putExtra("USERNAME_KEY", username)
-        intent.putExtra("EMAIL_KEY", email)
+    fun navigateToHomeActivity(user: User) {
+        // Pass user information to HomeActivity
+        val intent = Intent(this, HomeActivity::class.java).apply {
+            putExtra("USERNAME_KEY", user.username)
+            putExtra("EMAIL_KEY", user.email)
+            putExtra("PROFILE_IMAGE_KEY", base64ToByteArray(user.profileImage))
+        }
         startActivity(intent)
         finish()
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

@@ -1,43 +1,61 @@
-<!-- res/layout/activity_register.xml -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".RegisterActivity">
+
+    <EditText
+        android:id="@+id/usernameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Username"/>
 
     <EditText
         android:id="@+id/emailEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/usernameEditText"
+        android:layout_marginTop="16dp"
         android:hint="Email"
-        android:layout_marginTop="50dp"
-        android:padding="10dp"/>
+        android:inputType="textEmailAddress"/>
 
     <EditText
-        android:id="@+id/usernameRegisterEditText"
+        android:id="@+id/passwordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/emailEditText"
-        android:layout_marginTop="20dp"
-        android:hint="Username"
-        android:padding="10dp"/>
-
-    <EditText
-        android:id="@+id/passwordRegisterEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/usernameRegisterEditText"
-        android:layout_marginTop="20dp"
+        android:layout_below="@+id/emailEditText"
+        android:layout_marginTop="16dp"
         android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="10dp"/>
+        android:inputType="textPassword"/>
+
+    <ImageView
+        android:id="@+id/imageProfile"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/passwordEditText"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/profile_icon"
+        android:contentDescription="Profile Image"/>
 
     <Button
-        android:id="@+id/registerButton"
+        android:id="@+id/btnSelectImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/passwordRegisterEditText"
-        android:layout_marginTop="20dp"
+        android:layout_below="@+id/imageProfile"
+        android:layout_marginTop="8dp"
+        android:layout_centerHorizontal="true"
+        android:text="Select Image"
+        android:onClick="onSelectImageClick"/>
+
+    <Button
+        android:id="@+id/btnRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnSelectImage"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
         android:text="Register"
-        android:onClick="onRegisterButtonClick"/>
+        android:onClick="onRegisterClick"/>
 </RelativeLayout>

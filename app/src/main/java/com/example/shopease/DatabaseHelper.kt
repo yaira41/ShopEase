@@ -1,108 +1,165 @@
 package com.example.shopease
 
-import android.content.ContentValues
-import android.content.Context
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
+import com.example.shopease.Utils.byteArrayToBase64
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 
-class DatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
-    companion object {
-        const val DATABASE_VERSION = 1
-        const val DATABASE_NAME = "shopease.db"
+class DatabaseHelper {
 
-        const val TABLE_USERS = "users"
-        const val COLUMN_ID = "id"
-        const val COLUMN_EMAIL = "email"
-        const val COLUMN_USERNAME = "username"
-        const val COLUMN_PASSWORD = "password"
+    private val databaseReference: DatabaseReference = FirebaseDatabase.getInstance().reference
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    fun isUsernameExists(username: String, callback: (Boolean) -> Unit) {
+        val usersRef = databaseReference.child("users")
+        usersRef.orderByChild("username").equalTo(username)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    callback(snapshot.exists())
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(
+                        "FirebaseHelper",
+                        "Error checking username existence",
+                        error.toException()
+                    )
+                    callback(false)
+                }
+            })
     }
 
-    override fun onCreate(db: SQLiteDatabase?) {
-        val createUserTable =
-            "CREATE TABLE $TABLE_USERS ($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "$COLUMN_EMAIL TEXT, $COLUMN_USERNAME TEXT, $COLUMN_PASSWORD TEXT)"
-
-        db?.execSQL(createUserTable)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        // Upgrade policy if needed in the future
-    }
-
-    fun isUserRegistered(username: String): Boolean {
-        // Check if the username already exists in the database
-        val db = readableDatabase
-        val query = "SELECT * FROM $TABLE_USERS WHERE $COLUMN_USERNAME = ?"
-        val cursor = db.rawQuery(query, arrayOf(username))
-        val result = cursor.count > 0
-        cursor.close()
-        return result
-    }
-
-    fun saveUserData(email: String, username: String, password: String) {
-        // Save user data in the database
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_EMAIL, email)
-            put(COLUMN_USERNAME, username)
-            put(COLUMN_PASSWORD, password)
-        }
-
-        db.insert(TABLE_USERS, null, values)
-        db.close()
-    }
-
-    fun isValidLogin(username: String, password: String): Boolean {
+    fun isValidLogin(username: String, password: String, callback: LoginCallback) {
         // Check if the username and password match a user in the database
-        val db = readableDatabase
-        val query =
-            "SELECT * FROM $TABLE_USERS WHERE $COLUMN_USERNAME = ? AND $COLUMN_PASSWORD = ?"
-        val cursor: Cursor = db.rawQuery(query, arrayOf(username, password))
-        val result = cursor.count > 0
-        cursor.close()
-        return result
+        val usersRef = databaseReference.child("users")
+        usersRef.orderByChild("username").equalTo(username)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        // User with the provided username is found
+                        val userSnapshot = snapshot.children.first()
+                        val storedPassword =
+                            userSnapshot.child("password").getValue(String::class.java)
+
+                        if (storedPassword == password) {
+                            // Passwords match, login successful
+                            val user = userSnapshot.getValue(User::class.java)
+                            callback.onLoginResult(user)
+                        } else {
+                            // Passwords do not match
+                            callback.onLoginResult(null)
+                        }
+                    } else {
+                        // User with the provided username is not found
+                        callback.onLoginResult(null)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Handle error
+                    println(error)
+                    callback.onLoginResult(null)
+                }
+            })
     }
 
-    fun getEmailByUsername(username: String): String? {
-        val db = readableDatabase
-        val columns = arrayOf(COLUMN_EMAIL)
-        val selection = "$COLUMN_USERNAME = ?"
-        val selectionArgs = arrayOf(username)
+    fun isEmailExists(email: String, callback: (Boolean) -> Unit) {
+        val usersRef = databaseReference.child("users")
+        usersRef.orderByChild("email").equalTo(email)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    callback(snapshot.exists())
+                }
 
-        val cursor: Cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null)
-
-        var email: String? = null
-
-        if (cursor.moveToFirst()) {
-            val columnIndex = cursor.getColumnIndex(COLUMN_EMAIL)
-            email = cursor.getString(columnIndex)
-        }
-
-        cursor.close()
-        db.close()
-
-        return email
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseHelper", "Error checking email existence", error.toException())
+                    callback(false)
+                }
+            })
     }
 
-    fun updatePassword(username: String, newPassword: String): Boolean {
-        val db = this.writableDatabase
-        val values = ContentValues()
-        values.put(COLUMN_PASSWORD, newPassword)
+    fun addUser(
+        username: String,
+        email: String,
+        imageProfile: ByteArray?,
+        password: String,
+        callback: (Boolean) -> Unit
+    ) {
+        val userId = auth.currentUser?.uid ?: databaseReference.push().key
+        val userRef = databaseReference.child("users").child(userId ?: "")
+        // Convert the ByteArray to a base64-encoded string before storing
+        val base64ImageProfile = byteArrayToBase64(imageProfile)
 
-        // Update the password based on the username
-        val rowsAffected = db.update(
-            TABLE_USERS,
-            values,
-            "$COLUMN_USERNAME = ?",
-            arrayOf(username)
-        )
+        // Create a User object with the provided data
+        val user = User(username, email, password, base64ImageProfile)
 
-        db.close()
+        userRef.setValue(user)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("FirebaseHelper", "User added successfully. UserId: $userId")
+                    callback(true)
+                } else {
+                    Log.e("FirebaseHelper", "Error adding user", task.exception)
+                    callback(false)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirebaseHelper", "Failure adding user", exception)
+                callback(false)
+            }
+    }
 
-        // Return true if the password was successfully updated
-        return rowsAffected > 0
+    fun getUserByUsername(username: String, callback: (User?) -> Unit) {
+        val usersRef = databaseReference.child("users")
+        usersRef.orderByChild("username").equalTo(username)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val userData = snapshot.children.first().getValue(User::class.java)
+                        callback(userData)
+                    } else {
+                        callback(null)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseHelper", "Error getting user by username", error.toException())
+                    callback(null)
+                }
+            })
+    }
+
+    fun updatePassword(username: String, newPassword: String, callback: (Boolean) -> Unit) {
+        val usersRef = databaseReference.child("users")
+        usersRef.orderByChild("username").equalTo(username)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val userId = snapshot.children.first().key
+                        val userRef = usersRef.child(userId ?: "")
+                        userRef.child("password").setValue(newPassword)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    callback(true)
+                                } else {
+                                    Log.e(
+                                        "FirebaseHelper",
+                                        "Error updating password",
+                                        task.exception
+                                    )
+                                    callback(false)
+                                }
+                            }
+                    } else {
+                        callback(false)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseHelper", "Error updating password", error.toException())
+                    callback(false)
+                }
+            })
     }
 }

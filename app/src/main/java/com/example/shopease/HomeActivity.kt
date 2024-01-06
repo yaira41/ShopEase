@@ -1,6 +1,5 @@
 package com.example.shopease
 
-import ProfileFragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +16,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
 
     private lateinit var bottomNavigation: BottomNavigationView
+    private var username: String? = null
+    private var email: String? = null
+    private var imageProfile: ByteArray? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +27,10 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
         // Inflate the custom upper navigation bar layout
         val inflater = LayoutInflater.from(this)
         val customUpperNavBar = inflater.inflate(R.layout.upper_nav_bar, null)
+
+        username = intent.getStringExtra("USERNAME_KEY")!!
+        email = intent.getStringExtra("EMAIL_KEY")!!
+        imageProfile = intent.getByteArrayExtra("PROFILE_IMAGE_KEY")!!
 
         // Set custom upper navigation bar as the support action bar
         supportActionBar?.setDisplayShowCustomEnabled(true)
@@ -83,13 +89,11 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
 
     fun onProfileButtonClick(view: View) {
         val profileFragment = ProfileFragment()
-        val username = intent.getStringExtra("USERNAME_KEY")
-        val email = intent.getStringExtra("EMAIL_KEY")
         // Create a Bundle and add data to it
         val bundle = Bundle()
         bundle.putString("USERNAME_KEY", username)
         bundle.putString("EMAIL_KEY", email)
-
+        bundle.putByteArray("PROFILE_IMAGE_KEY", imageProfile)
         loadFragment(profileFragment, bundle)
     }
 
