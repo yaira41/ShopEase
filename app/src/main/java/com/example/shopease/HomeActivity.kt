@@ -1,13 +1,11 @@
 package com.example.shopease
 
 import ProfileFragment
-import ShopListAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -19,7 +17,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
 
     private lateinit var bottomNavigation: BottomNavigationView
-    private lateinit var shopListAdapter: ShopListAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,25 +55,6 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
 
         // Set the "Home" item as the default selected item
         bottomNavigation.selectedItemId = R.id.action_home
-
-        shopListAdapter = ShopListAdapter(mutableListOf())
-
-        val rvShopListItem = findViewById<RecyclerView>(R.id.rvShopListItems)
-        rvShopListItem.adapter = shopListAdapter
-        rvShopListItem.layoutManager = LinearLayoutManager(this)
-
-
-
-        val addButton = findViewById<Button>(R.id.bAddButton)
-        val editText = findViewById<EditText>(R.id.etShopListTitle)
-        addButton.setOnClickListener {
-            val itemTitle = editText.text.toString()
-            if(itemTitle.isNotEmpty()){
-                val newItem = ShopListItem(itemTitle)
-                shopListAdapter.addShopListItem(newItem)
-                editText.text.clear()
-            }
-        }
     }
 
     override fun updateTitle(title: String) {
@@ -112,10 +91,6 @@ class HomeActivity : AppCompatActivity(), InterfaceFragmentTitle {
         bundle.putString("EMAIL_KEY", email)
 
         loadFragment(profileFragment, bundle)
-    }
-
-    fun onMyShopListButtonClick() {
-        loadFragment(ShopListFragment())
     }
 
     fun onBackButtonClick() {
