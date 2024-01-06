@@ -1,3 +1,5 @@
+package com.example.shopease
+
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
@@ -5,8 +7,6 @@ import android.widget.TextView
 import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
-import com.example.shopease.R
-import com.example.shopease.ShopListItem
 
 class ShopListAdapter(
     private val items: MutableList<ShopListItem>
@@ -40,7 +40,7 @@ class ShopListAdapter(
         if (isChecked){
             tvShopListItem.paintFlags = tvShopListItem.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
         } else {
-            tvShopListItem.paintFlags = tvShopListItem.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            tvShopListItem.paintFlags = tvShopListItem.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
     }
 
