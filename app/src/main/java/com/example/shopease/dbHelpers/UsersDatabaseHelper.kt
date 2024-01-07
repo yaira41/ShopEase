@@ -2,7 +2,7 @@ package com.example.shopease.dbHelpers
 
 import android.util.Log
 import com.example.shopease.utils.LoginCallback
-import com.example.shopease.User
+import com.example.shopease.dataClasses.User
 import com.example.shopease.utils.Utils.byteArrayToBase64
 import com.google.firebase.database.*
 

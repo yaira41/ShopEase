@@ -15,7 +15,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.shopease.Utils.hashPassword
+import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.example.shopease.utils.Utils.hashPassword
 import java.io.ByteArrayOutputStream
 
 class RegisterActivity : AppCompatActivity() {
@@ -27,7 +28,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var btnSelectImage: Button
     private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
 
-    private lateinit var databaseHelper: DatabaseHelper
+    private lateinit var usersDatabaseHelper: UsersDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +40,7 @@ class RegisterActivity : AppCompatActivity() {
         imageProfile = findViewById(R.id.imageProfile)
         btnSelectImage = findViewById(R.id.btnSelectImage)
 
-        databaseHelper = DatabaseHelper()
+        usersDatabaseHelper = UsersDatabaseHelper()
 
         // Initialize image picker launcher
         imagePickerLauncher =
@@ -69,7 +70,7 @@ class RegisterActivity : AppCompatActivity() {
 
             // Call your addUser function to save the user to the database
 //            val user = User(username, email, hashPassword(password), imageByteArray)
-            databaseHelper.addUser(username, email, imageByteArray, hashPassword(password)) { success ->
+            usersDatabaseHelper.addUser(username, email, imageByteArray, hashPassword(password)) { success ->
                 if (success) {
                     Toast.makeText(this, "Registration Successful", Toast.LENGTH_SHORT).show()
 
@@ -95,12 +96,12 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         // Check if the username and email do not already exist in the database
-        databaseHelper.isUsernameExists(username) { exist ->
+        usersDatabaseHelper.isUsernameExists(username) { exist ->
             if (exist) {
                 result = false
             }
         }
-        databaseHelper.isEmailExists(email) { exist ->
+        usersDatabaseHelper.isEmailExists(email) { exist ->
             if (exist) {
                 result = false
             }

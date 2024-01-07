@@ -7,8 +7,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.shopease.Utils.base64ToByteArray
-import com.example.shopease.Utils.hashPassword
+import com.example.shopease.dataClasses.User
+import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.example.shopease.utils.LoginCallback
+import com.example.shopease.utils.Utils.base64ToByteArray
+import com.example.shopease.utils.Utils.hashPassword
 
 class LoginActivity : AppCompatActivity() {
 
@@ -17,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginButton: Button
     private lateinit var signupButton: Button
 
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: UsersDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.loginButton)
         signupButton = findViewById(R.id.signupButton)
 
-        dbHelper = DatabaseHelper()
+        dbHelper = UsersDatabaseHelper()
     }
 
     fun onLoginButtonClick(view: View) {

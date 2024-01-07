@@ -1,4 +1,4 @@
-package com.example.shopease
+package com.example.shopease.dataClasses
 
 data class User(
     val username: String = "",

@@ -12,7 +12,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.example.shopease.Utils.hashPassword
+import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.example.shopease.utils.Utils.hashPassword
 
 class ProfileFragment : Fragment() {
 
@@ -20,7 +21,7 @@ class ProfileFragment : Fragment() {
     private lateinit var emailTextView: TextView
     private lateinit var imageProfileView: ImageView
     private lateinit var changePasswordButton: Button
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: UsersDatabaseHelper
     private var username: String? = null
     private var email: String? = null
     private var imageProfile: ByteArray? = null
@@ -42,7 +43,7 @@ class ProfileFragment : Fragment() {
         email = arguments?.getString("EMAIL_KEY")
         imageProfile = arguments?.getByteArray("PROFILE_IMAGE_KEY")
 
-        dbHelper = DatabaseHelper()
+        dbHelper = UsersDatabaseHelper()
         // Set username and email in the UI
         usernameTextView.text = "Username: $username"
         emailTextView.text = "Email: $email"
