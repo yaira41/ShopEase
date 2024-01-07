@@ -7,7 +7,7 @@ import com.example.shopease.utils.Utils.byteArrayToBase64
 import com.google.firebase.database.*
 
 
-class DatabaseHelper : BaseDatabaseHelper() {
+class UsersDatabaseHelper : BaseDatabaseHelper() {
 
     fun isUsernameExists(username: String, callback: (Boolean) -> Unit) {
         val usersRef = databaseReference.child("users")
