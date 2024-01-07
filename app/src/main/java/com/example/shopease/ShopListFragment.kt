@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.shopease.dataClasses.ShopListItem
 
 class ShopListFragment : Fragment() {
     private lateinit var shopListAdapter: ShopListAdapter

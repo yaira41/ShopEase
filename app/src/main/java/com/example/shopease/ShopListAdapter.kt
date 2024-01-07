@@ -7,6 +7,7 @@ import android.widget.TextView
 import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
+import com.example.shopease.dataClasses.ShopListItem
 
 class ShopListAdapter(
     private val items: MutableList<ShopListItem>

@@ -1,15 +1,13 @@
-package com.example.shopease
+package com.example.shopease.dbHelpers
 
 import android.util.Log
-import com.example.shopease.Utils.byteArrayToBase64
-import com.google.firebase.auth.FirebaseAuth
+import com.example.shopease.utils.LoginCallback
+import com.example.shopease.dataClasses.User
+import com.example.shopease.utils.Utils.byteArrayToBase64
 import com.google.firebase.database.*
 
 
-class DatabaseHelper {
-
-    private val databaseReference: DatabaseReference = FirebaseDatabase.getInstance().reference
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+class UsersDatabaseHelper : BaseDatabaseHelper() {
 
     fun isUsernameExists(username: String, callback: (Boolean) -> Unit) {
         val usersRef = databaseReference.child("users")

@@ -1,4 +1,4 @@
-package com.example.shopease
+package com.example.shopease.dataClasses
 
 data class ShopListItem (
     val title: String,

@@ -1,7 +1,5 @@
-package com.example.shopease
+package com.example.shopease.utils
 
-import android.content.Context
-import android.widget.Toast
 import java.security.MessageDigest
 
 object Utils {
