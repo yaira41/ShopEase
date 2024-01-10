@@ -52,6 +52,9 @@
             android:theme="@style/AppTheme.NoActionBar"> <!-- or "false" based on your requirement -->
         </activity>
 
+        <activity android:name=".FriendsActivity"
+            android:label="@string/friends_activity_title"
+            android:theme="@style/AppTheme"/>
     </application>
 
 

@@ -1,0 +1,70 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomNavigation" >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:id="@+id/requestFriendImgButton"
+                style="@style/ButtonRoundedSquare"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="160dp"
+                android:layout_marginEnd="70dp"
+                android:background="@drawable/rounded_square_style"
+                android:src="@drawable/requests_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.95"
+                app:layout_constraintStart_toEndOf="@+id/addFriendImgButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/addFriendImgButton"
+                style="@style/ButtonRoundedSquare"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="70dp"
+                android:layout_marginTop="160dp"
+                android:background="@drawable/rounded_square_style"
+                android:src="@drawable/add_friend_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/friendsImgButton"
+                style="@style/ButtonRoundedSquare"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="176dp"
+                android:background="@drawable/rounded_square_style"
+                android:src="@drawable/friends_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/requestFriendImgButton"
+                app:layout_constraintVertical_bias="0.287" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
+
+    <include layout="@layout/upper_nav_bar" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_navigation_menu" />
+
+</RelativeLayout>
