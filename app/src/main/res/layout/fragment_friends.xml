@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -7,7 +8,7 @@
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottomNavigation">
+        tools:ignore="UselessParent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -47,12 +48,14 @@
                 android:layout_marginBottom="176dp"
                 android:background="@drawable/rounded_square_style"
                 android:src="@drawable/friends_icon"
+                android:onClick="navigateToFriendRequests"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/requestFriendImgButton"
-                app:layout_constraintVertical_bias="0.287" />
+                app:layout_constraintVertical_bias="0.287"
+                tools:ignore="UsingOnClickInXml" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </FrameLayout>

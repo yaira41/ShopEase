@@ -1,0 +1,29 @@
+package com.example.shopease.friends
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
+import androidx.fragment.app.Fragment
+import com.example.shopease.BaseActivity
+import com.example.shopease.R
+
+class FriendsFragment : Fragment() {
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        (activity as BaseActivity?)?.updateTitle("Friends")
+        val view = inflater.inflate(R.layout.fragment_friends, container, false)
+        val friendRequestsButton: ImageButton = view.findViewById(R.id.requestFriendImgButton)
+        friendRequestsButton.setOnClickListener {
+            navigateToFriendRequests(view)
+        }
+        return view
+    }
+
+
+    private fun navigateToFriendRequests(view: View) {
+        (activity as BaseActivity?)?.loadFragment(FriendRequestsFragment())
+    }
+}

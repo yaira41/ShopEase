@@ -33,7 +33,7 @@ class ProfileFragment : Fragment() {
         (activity as BaseActivity?)?.updateTitle("Profile")
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
-        usernameTextView = view.findViewById(R.id.usernameTextView)
+        usernameTextView = view.findViewById(R.id.usernameProfileTextView)
         emailTextView = view.findViewById(R.id.emailTextView)
         changePasswordButton = view.findViewById(R.id.changePasswordButton)
         imageProfileView = view.findViewById(R.id.imageProfileFragment)

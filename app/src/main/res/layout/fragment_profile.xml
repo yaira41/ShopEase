@@ -17,7 +17,7 @@
 
 
     <TextView
-        android:id="@+id/usernameTextView"
+        android:id="@+id/usernameProfileTextView"
         android:layout_width="269dp"
         android:layout_height="46dp"
         android:layout_marginTop="160dp"
