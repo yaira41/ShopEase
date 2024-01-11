@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.example.shopease.utils.Utils
 import com.example.shopease.utils.Utils.hashPassword
 
 class ProfileFragment : Fragment() {
@@ -90,7 +91,7 @@ class ProfileFragment : Fragment() {
 
     private fun setByteArrayImageOnImageView(imageByteArray: ByteArray?, imageView: ImageView) {
         // Convert the ByteArray to a Bitmap
-        val bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray!!.size)
+        val bitmap = Utils.byteArrayToBitmap(imageByteArray)
 
         // Set the Bitmap on the ImageView
         imageView.setImageBitmap(bitmap)

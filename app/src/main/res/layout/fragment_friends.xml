@@ -29,7 +29,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
-                android:id="@+id/addFriendImgButton"
+                android:id="@+id/searchFriendImgButton"
                 style="@style/ButtonRoundedSquare"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
