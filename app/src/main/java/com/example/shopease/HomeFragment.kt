@@ -15,7 +15,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
 
     ): View? {
-        (activity as HomeActivity?)?.updateTitle("Home")
+        (activity as BaseActivity?)?.updateTitle("Home")
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 }

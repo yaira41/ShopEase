@@ -1,6 +1,5 @@
 package com.example.shopease
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,24 +8,32 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-open class BaseActivity: AppCompatActivity(), InterfaceFragmentTitle {
+open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     private lateinit var bottomNavigation: BottomNavigationView
     private var username: String? = null
     private var email: String? = null
     private var imageProfile: ByteArray? = null
 
-    internal fun setNavBars() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        handleIntentExtras()
+    }
+
+    internal fun setUpUpperNavBar() {
         val inflater = LayoutInflater.from(this)
         val customUpperNavBar = inflater.inflate(R.layout.upper_nav_bar, null)
 
-        username = intent.getStringExtra("USERNAME_KEY")!!
-        email = intent.getStringExtra("EMAIL_KEY")!!
-        imageProfile = intent.getByteArrayExtra("PROFILE_IMAGE_KEY")!!
-
-        // Set custom upper navigation bar as the support action bar
         supportActionBar?.setDisplayShowCustomEnabled(true)
         supportActionBar?.customView = customUpperNavBar
+    }
 
+    internal fun handleIntentExtras() {
+        username = intent.getStringExtra("USERNAME_KEY")
+        email = intent.getStringExtra("EMAIL_KEY")
+        imageProfile = intent.getByteArrayExtra("PROFILE_IMAGE_KEY")
+    }
+
+    internal fun setBottomNavBar() {
         bottomNavigation = findViewById(R.id.bottomNavigation)
         bottomNavigation.setOnNavigationItemSelectedListener { menuItem ->
 
@@ -42,8 +49,7 @@ open class BaseActivity: AppCompatActivity(), InterfaceFragmentTitle {
                 }
 
                 R.id.action_friends -> {
-                    val intent = Intent(this, FriendsActivity::class.java)
-                    startActivity(intent)
+                    loadFragment(FriendsFragment())
                     true
                 }
 
@@ -73,6 +79,7 @@ open class BaseActivity: AppCompatActivity(), InterfaceFragmentTitle {
         // Add to back stack if needed
         if (addToBackStack) {
             transaction.addToBackStack(null)
+                .setReorderingAllowed(true)
         }
 
         // Commit the transaction
@@ -89,7 +96,11 @@ open class BaseActivity: AppCompatActivity(), InterfaceFragmentTitle {
         loadFragment(profileFragment, bundle)
     }
 
-    fun onBackButtonClick() {
-        finish()
+    fun onBackButtonClick(view: View) {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            finish()
+        }
     }
 }
