@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,7 +29,11 @@ class FriendRequestsFragment : Fragment() {
 
         // Initialize RecyclerView and Adapter
         recyclerView = view.findViewById(R.id.recyclerViewFriendRequests)
-        adapter = FriendRequestsAdapter(emptyList()) // Initial empty list
+        adapter = FriendRequestsAdapter(
+            emptyList(),
+            this::onAcceptFriendRequest,
+            this::onIgnoreFriendRequest
+        ) // Initial empty list
 
         // Set up RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -44,5 +49,20 @@ class FriendRequestsFragment : Fragment() {
 
         return view
     }
+
+    private fun onAcceptFriendRequest(friendRequest: FriendRequest) {
+        // Handle acceptance logic
+        requestsDatabaseHelper.confirmFriendRequest(friendRequest.username, username)
+        Toast.makeText(requireContext(), "Friend request Accepted.", Toast.LENGTH_SHORT).show()
+        adapter.removeFriendRequest(friendRequest)
+    }
+
+    private fun onIgnoreFriendRequest(friendRequest: FriendRequest) {
+        // Handle ignore logic
+        requestsDatabaseHelper.ignoreFriendRequest(username, friendRequest.username)
+        Toast.makeText(requireContext(), "$friendRequest.username Ignored.", Toast.LENGTH_SHORT).show()
+        adapter.removeFriendRequest(friendRequest)
+    }
 }
+
 

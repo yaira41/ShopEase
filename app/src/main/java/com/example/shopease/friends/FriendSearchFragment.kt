@@ -78,17 +78,25 @@ class FriendSearchFragment : Fragment() {
         // Get the user being searched for
         val searchedUsername = usernameEditText.text.toString()
         val senderUsername = (activity as BaseActivity).username
+
         // Check if the user is not sending a request to themselves
         if (senderUsername != searchedUsername) {
-            requestDatabaseHelper.checkDuplicateFriendRequest(senderUsername!!, searchedUsername) {isDuplicate ->
-                if (!isDuplicate) {
-                    // No duplicate request, send friend request
-                    requestDatabaseHelper.addFriendRequest(senderUsername, searchedUsername)
-                    Toast.makeText(requireContext(), "Friend request sent!", Toast.LENGTH_SHORT).show()
+            requestDatabaseHelper.areFriends(senderUsername!!, searchedUsername) { areFriends ->
+                if (areFriends) {
+                    // Users are already friends
+                    Toast.makeText(requireContext(), "You are already friends!", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(requireContext(), "Friend request already exists", Toast.LENGTH_SHORT).show()
+                    // Check for duplicate friend request
+                    requestDatabaseHelper.checkDuplicateFriendRequest(senderUsername!!, searchedUsername) { isDuplicate ->
+                        if (!isDuplicate) {
+                            // No duplicate request, send friend request
+                            requestDatabaseHelper.addFriendRequest(senderUsername, searchedUsername)
+                            Toast.makeText(requireContext(), "Friend request sent!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(requireContext(), "Friend request already exists", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
-
             }
         } else {
             Toast.makeText(
@@ -96,7 +104,6 @@ class FriendSearchFragment : Fragment() {
                 "Cannot send a friend request to yourself",
                 Toast.LENGTH_SHORT
             ).show()
-
         }
     }
 }

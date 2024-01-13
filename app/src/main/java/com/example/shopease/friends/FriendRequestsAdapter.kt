@@ -1,21 +1,22 @@
 package com.example.shopease.friends
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
 import com.example.shopease.dataClasses.FriendRequest
 
-class FriendRequestsAdapter(private var friendRequests: List<FriendRequest>) :
-    RecyclerView.Adapter<FriendRequestViewHolder>() {
+class FriendRequestsAdapter(
+    private var friendRequests: List<FriendRequest>,
+    private val acceptCallback: (FriendRequest) -> Unit,
+    private val ignoreCallback: (FriendRequest) -> Unit
+) : RecyclerView.Adapter<FriendRequestViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendRequestViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_friend_request, parent, false)
-        return FriendRequestViewHolder(itemView)
+        return FriendRequestViewHolder(itemView, acceptCallback, ignoreCallback)
     }
 
     override fun onBindViewHolder(holder: FriendRequestViewHolder, position: Int) {
@@ -33,4 +34,9 @@ class FriendRequestsAdapter(private var friendRequests: List<FriendRequest>) :
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun removeFriendRequest(friendRequest: FriendRequest) {
+        friendRequests = friendRequests.filter { it != friendRequest }
+        notifyDataSetChanged()
+    }
 }

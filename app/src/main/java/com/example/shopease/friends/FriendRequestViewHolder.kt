@@ -10,9 +10,14 @@ import com.example.shopease.R
 import com.example.shopease.dataClasses.FriendRequest
 import com.example.shopease.utils.Utils.byteArrayToBitmap
 
-class FriendRequestViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val usernameTextView: TextView = itemView.findViewById(R.id.usernameTextView)
-    val userImageView: ImageView = itemView.findViewById(R.id.friendImageView)
+class FriendRequestViewHolder(
+    itemView: View,
+    private val acceptCallback: (FriendRequest) -> Unit,
+    private val ignoreCallback: (FriendRequest) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
+
+    private val usernameTextView: TextView = itemView.findViewById(R.id.usernameTextView)
+    private val userImageView: ImageView = itemView.findViewById(R.id.friendImageView)
 
     fun bind(friendRequest: FriendRequest) {
         usernameTextView.text = friendRequest.username
@@ -20,27 +25,22 @@ class FriendRequestViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView
         userImageView.setImageBitmap(bitmap)
 
         itemView.setOnClickListener {
-            // Handle item click
             showFriendRequestDialog(itemView.context, friendRequest)
         }
     }
 
     private fun showFriendRequestDialog(context: Context, friendRequest: FriendRequest) {
-        val alertDialog = AlertDialog.Builder(context)
+        AlertDialog.Builder(context)
             .setTitle("Friend Request")
             .setMessage("Do you want to accept or ignore this friend request?")
             .setPositiveButton("Accept") { dialog, _ ->
-                // Handle acceptance logic
-                // You can perform further actions here
+                acceptCallback.invoke(friendRequest)
                 dialog.dismiss()
             }
             .setNegativeButton("Ignore") { dialog, _ ->
-                // Handle ignore logic
-                // You can perform further actions here
+                ignoreCallback.invoke(friendRequest)
                 dialog.dismiss()
             }
-            .create()
-
-        alertDialog.show()
+            .show()
     }
 }
