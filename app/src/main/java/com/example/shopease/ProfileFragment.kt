@@ -90,10 +90,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setByteArrayImageOnImageView(imageByteArray: ByteArray?, imageView: ImageView) {
-        // Convert the ByteArray to a Bitmap
         val bitmap = Utils.byteArrayToBitmap(imageByteArray)
-
-        // Set the Bitmap on the ImageView
         imageView.setImageBitmap(bitmap)
     }
 }

@@ -8,9 +8,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.shopease.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.User
+import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.utils.Utils.base64ToByteArray
 import com.example.shopease.utils.Utils.byteArrayToBitmap
@@ -21,8 +24,8 @@ class FriendSearchFragment : Fragment() {
     private lateinit var searchUserButton: Button
     private lateinit var resultTextView: TextView
     private lateinit var profileImageView: ImageView
-
-    private lateinit var usersDatabaseHelper: UsersDatabaseHelper
+    private lateinit var sendFriendRequestButton: Button
+    private lateinit var requestDatabaseHelper: RequestsDatabaseHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,23 +36,29 @@ class FriendSearchFragment : Fragment() {
         searchUserButton = view.findViewById(R.id.searchUserButton)
         resultTextView = view.findViewById(R.id.resultSearchTextView)
         profileImageView = view.findViewById(R.id.profileImageView)
+        sendFriendRequestButton = view.findViewById(R.id.sendFriendRequestButton)
 
-        usersDatabaseHelper = UsersDatabaseHelper()
+        requestDatabaseHelper = RequestsDatabaseHelper()
 
         searchUserButton.setOnClickListener {
             searchFriendByUsername(usernameEditText.text.toString())
+        }
+
+        sendFriendRequestButton.setOnClickListener {
+            sendFriendRequest()
         }
 
         return view
     }
 
     private fun searchFriendByUsername(username: String) {
-        usersDatabaseHelper.getUserByUsername(username) { foundUser ->
+        requestDatabaseHelper.getUserByUsername(username) { foundUser ->
             if (foundUser != null) {
                 displayUser(foundUser)
             } else {
                 resultTextView.text = "User not found"
                 profileImageView.visibility = View.GONE
+                sendFriendRequestButton.visibility = View.GONE
             }
         }
     }
@@ -57,10 +66,38 @@ class FriendSearchFragment : Fragment() {
     private fun displayUser(user: User?) {
         if (user != null) {
             resultTextView.text = "Username: ${user.username}"
-             val bitmap = byteArrayToBitmap(base64ToByteArray(user.profileImage))
+            val bitmap = byteArrayToBitmap(base64ToByteArray(user.profileImage))
             profileImageView.setImageBitmap(bitmap)
             profileImageView.visibility = View.VISIBLE
+            sendFriendRequestButton.visibility = View.VISIBLE
+
+        }
+    }
+
+    private fun sendFriendRequest() {
+        // Get the user being searched for
+        val searchedUsername = usernameEditText.text.toString()
+        val senderUsername = (activity as BaseActivity).username
+        // Check if the user is not sending a request to themselves
+        if (senderUsername != searchedUsername) {
+            requestDatabaseHelper.checkDuplicateFriendRequest(senderUsername!!, searchedUsername) {isDuplicate ->
+                if (!isDuplicate) {
+                    // No duplicate request, send friend request
+                    requestDatabaseHelper.addFriendRequest(senderUsername, searchedUsername)
+                    Toast.makeText(requireContext(), "Friend request sent!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Friend request already exists", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Cannot send a friend request to yourself",
+                Toast.LENGTH_SHORT
+            ).show()
 
         }
     }
 }
+

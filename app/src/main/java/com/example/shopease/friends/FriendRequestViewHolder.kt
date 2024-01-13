@@ -8,5 +8,5 @@ import com.example.shopease.R
 
 class FriendRequestViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val usernameTextView: TextView = itemView.findViewById(R.id.usernameTextView)
-    val userImageView: ImageView = itemView.findViewById(R.id.userImageView)
+    val userImageView: ImageView = itemView.findViewById(R.id.friendImageView)
 }

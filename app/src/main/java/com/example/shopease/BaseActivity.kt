@@ -11,7 +11,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     private lateinit var bottomNavigation: BottomNavigationView
-    private var username: String? = null
+    public var username: String? = null
     private var email: String? = null
     private var imageProfile: ByteArray? = null
 
