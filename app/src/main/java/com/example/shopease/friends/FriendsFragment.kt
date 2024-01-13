@@ -17,6 +17,7 @@ class FriendsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_friends, container, false)
         val friendRequestsButton: ImageButton = view.findViewById(R.id.requestFriendImgButton)
         val searchFriendButton: ImageButton = view.findViewById(R.id.searchFriendImgButton)
+        val myFriendsButton: ImageButton = view.findViewById(R.id.myFriendsImgButton)
 
         searchFriendButton.setOnClickListener {
             navigateToSearchFriends(view)
@@ -24,6 +25,10 @@ class FriendsFragment : Fragment() {
 
         friendRequestsButton.setOnClickListener {
             navigateToFriendRequests(view)
+        }
+
+        myFriendsButton.setOnClickListener {
+            navigateToFriends(view)
         }
 
         return view
@@ -35,5 +40,9 @@ class FriendsFragment : Fragment() {
 
     private fun navigateToSearchFriends(view: View) {
         (activity as BaseActivity?)?.loadFragment(FriendSearchFragment())
+    }
+
+    private fun navigateToFriends(view: View) {
+        (activity as BaseActivity?)?.loadFragment(ShowFriendsFragment())
     }
 }

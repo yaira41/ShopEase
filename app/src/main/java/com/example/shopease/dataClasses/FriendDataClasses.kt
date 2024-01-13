@@ -5,7 +5,4 @@ data class FriendRequest(
     val imageByteArray: ByteArray
 )
 
-data class Request(
-    val senderUsername: String = "",
-    val receiverUsername: String = ""
-)
+data class FriendInfo(val username: String, val imageProfileByteArray: ByteArray?)

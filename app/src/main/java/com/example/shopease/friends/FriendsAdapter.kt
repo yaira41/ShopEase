@@ -1,14 +1,16 @@
 package com.example.shopease.friends
 
+// FriendsAdapter.kt
+
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
+import com.example.shopease.dataClasses.FriendInfo
 
-class FriendsAdapter(private var friends: List<String>) :
+class FriendsAdapter(private var friends: List<FriendInfo>, private val context: Context) :
     RecyclerView.Adapter<FriendViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendViewHolder {
@@ -19,7 +21,7 @@ class FriendsAdapter(private var friends: List<String>) :
 
     override fun onBindViewHolder(holder: FriendViewHolder, position: Int) {
         val friend = friends[position]
-        holder.bind(friend)
+        holder.bind(context, friend)
     }
 
     override fun getItemCount(): Int {
@@ -27,16 +29,8 @@ class FriendsAdapter(private var friends: List<String>) :
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateFriends(newFriends: List<String>) {
+    fun updateFriends(newFriends: List<FriendInfo>) {
         friends = newFriends
         notifyDataSetChanged()
-    }
-}
-
-class FriendViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val friendTextView: TextView = itemView.findViewById(R.id.friendTextView)
-
-    fun bind(friend: String) {
-        friendTextView.text = friend
     }
 }

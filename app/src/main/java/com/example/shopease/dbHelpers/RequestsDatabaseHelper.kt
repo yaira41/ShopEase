@@ -1,9 +1,11 @@
 package com.example.shopease.dbHelpers
 
 import android.util.Log
+import com.example.shopease.dataClasses.FriendInfo
 import com.example.shopease.dataClasses.FriendRequest
 import com.example.shopease.dataClasses.User
 import com.example.shopease.utils.Utils.base64ToByteArray
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -22,9 +24,9 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
                 for (friendSnapshot in dataSnapshot.children) {
                     val senderUsername = friendSnapshot.value as String
                     // Assume there is a function to get the profile image URL for a given username
-                    getProfileImage(senderUsername) { profileImage ->
+                    getUserImageByteArray(senderUsername) { profileImage ->
                         val friendRequest =
-                            FriendRequest(senderUsername, base64ToByteArray(profileImage!!))
+                            FriendRequest(senderUsername, profileImage!!)
                         friendRequests.add(friendRequest)
                         callback(friendRequests)
                     }
@@ -37,7 +39,7 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
         })
     }
 
-    private fun getProfileImage(username: String, callback: (String?) -> Unit) {
+    private fun getUserImageByteArray(username: String, callback: (ByteArray?) -> Unit) {
         databaseReference.child("users").orderByChild("username").equalTo(username)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -45,7 +47,7 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
                         val profileImage =
                             dataSnapshot.children.firstOrNull()?.child("profileImage")
                                 ?.getValue(String::class.java)
-                        callback(profileImage)
+                        callback(base64ToByteArray(profileImage!!))
                     } else {
                         // User not found or profileImage not available
                         callback(null)
@@ -55,6 +57,35 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
                 override fun onCancelled(databaseError: DatabaseError) {
                     // Handle errors
                     callback(null)
+                }
+            })
+    }
+    fun getFriendsWithImages(username: String, callback: (List<FriendInfo>) -> Unit) {
+        val friendsRef = databaseReference.child("confirmFriends").child(username).child("friends")
+        friendsRef.orderByValue()
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val friendUsernames = dataSnapshot.children.mapNotNull { it.key }
+                    val friendsWithImages = mutableListOf<FriendInfo>()
+                    var completedTasks = 0
+
+                    // Fetch images for each friend
+                    for (friendUsername in friendUsernames) {
+                        getUserImageByteArray(friendUsername) { imageByteArray ->
+                            friendsWithImages.add(FriendInfo(friendUsername, imageByteArray))
+                            completedTasks++
+
+                            // Check if all tasks are completed
+                            if (completedTasks == friendUsernames.size) {
+                                callback(friendsWithImages)
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle errors
+                    callback(emptyList())
                 }
             })
     }
@@ -192,21 +223,5 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
 
     fun ignoreFriendRequest(senderUsername: String, receiverUsername: String) {
         removeFriendRequest(senderUsername, receiverUsername)
-    }
-
-    fun getFriends(username: String, callback: (List<String>) -> Unit) {
-        val friendsRef = databaseReference.child("confirmFriends").child(username).child("friends")
-        friendsRef.orderByValue()
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val friends = dataSnapshot.children.mapNotNull { it.key }
-                    callback(friends)
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    // Handle errors
-                    callback(emptyList())
-                }
-            })
     }
 }
