@@ -1,0 +1,16 @@
+<!-- res/layout/item_show_friend.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/imageViewShowFriend"
+        style="@style/FriendImageStyle"/>
+
+    <TextView
+        android:id="@+id/textViewShowUsername"
+        style="@style/FriendUsernameStyle"/>
+</LinearLayout>

@@ -4,30 +4,4 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:columnCount="3"
-    android:rowCount="0"
-    android:padding="8dp">
-
-    <!-- Sample item, repeat as needed -->
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:layout_margin="8dp">
-
-        <ImageView
-            android:id="@+id/imageViewFriend1"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:scaleType="centerCrop"/>
-
-        <TextView
-            android:id="@+id/textViewUsername1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/imageViewFriend1"
-            android:textAlignment="center"
-            android:padding="8dp" />
-
-    </RelativeLayout>
-
-</GridLayout>
+    android:padding="8dp"/>
