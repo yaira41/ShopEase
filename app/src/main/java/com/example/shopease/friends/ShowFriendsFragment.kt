@@ -1,15 +1,20 @@
 package com.example.shopease.friends
 
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.GridLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.shopease.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.FriendInfo
+import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.utils.Utils.byteArrayToBitmap
 
@@ -54,15 +59,15 @@ class ShowFriendsFragment : Fragment() {
             val friendView = layoutInflater.inflate(R.layout.item_show_friend, null)
             val binding = ItemFriendBinding.bind(friendView)
 
-            // Log the friend information
-            Log.d("FriendInfo", "Username: ${friend.username}")
-            Log.d("FriendInfo", "Image ByteArray: ${friend.imageProfileByteArray}")
-
             // Set username and image profile to friendView
             binding.textViewUsername.text = friend.username
             friend.imageProfileByteArray?.let { byteArray ->
                 val bitmap = byteArrayToBitmap(byteArray)
                 binding.imageViewFriend.setImageBitmap(bitmap)
+            }
+            
+            binding.imageViewFriend.setOnClickListener {
+                showFriendDetailsDialog(friend)
             }
 
             // Add friendView to the GridLayout
@@ -74,7 +79,33 @@ class ShowFriendsFragment : Fragment() {
             friendView.layoutParams = params
 
             gridLayout.addView(friendView)
-            Log.d("GridLayout", "Added friendView to GridLayout")
         }
     }
+
+    private fun showFriendDetailsDialog(friend: FriendInfo) {
+        requestsDatabaseHelper.getUserByUsername(friend.username) {
+            user ->
+            val dialog = Dialog(requireContext())
+            dialog.setContentView(R.layout.dialog_show_user_detail)
+
+            val imageViewFriendDetails = dialog.findViewById<ImageView>(R.id.imageShowDialogViewProfile)
+            val textViewUsernameDetails = dialog.findViewById<TextView>(R.id.textShowDialogViewUsername)
+            val textViewOtherDetails = dialog.findViewById<TextView>(R.id.textShowDialogViewEmail)
+
+            friend.imageProfileByteArray?.let { byteArray ->
+                val bitmap = byteArrayToBitmap(byteArray)
+                imageViewFriendDetails.setImageBitmap(bitmap)
+            }
+            textViewUsernameDetails.text = friend.username
+            textViewOtherDetails.text = user?.email
+
+            val buttonClose = dialog.findViewById<Button>(R.id.btnShowDialogClose)
+            buttonClose.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+        }
+        }
+
 }
