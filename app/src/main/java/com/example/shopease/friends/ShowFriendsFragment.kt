@@ -2,19 +2,17 @@ package com.example.shopease.friends
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.GridLayout
+import androidx.gridlayout.widget.GridLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.shopease.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.FriendInfo
-import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.utils.Utils.byteArrayToBitmap
 
@@ -30,7 +28,7 @@ class ShowFriendsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_show_friends, container, false)
-        gridLayout = view.findViewById(R.id.gridLayoutFriends)
+        gridLayout = view.findViewById(R.id.gridLayoutShowFriends)
 
         // Add a top margin of 50dp to the GridLayout
         val params = gridLayout.layoutParams as ViewGroup.MarginLayoutParams
@@ -65,7 +63,7 @@ class ShowFriendsFragment : Fragment() {
                 val bitmap = byteArrayToBitmap(byteArray)
                 binding.imageViewFriend.setImageBitmap(bitmap)
             }
-            
+
             binding.imageViewFriend.setOnClickListener {
                 showFriendDetailsDialog(friend)
             }
