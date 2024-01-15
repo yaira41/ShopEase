@@ -14,7 +14,7 @@ class WishlistsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as HomeActivity?)?.updateTitle("Wishlists")
+        (activity as BaseActivity?)?.updateTitle("Wishlists")
         val view = inflater.inflate(R.layout.fragment_wishlists, container, false)
 
         val button = view.findViewById<Button>(R.id.bMoveToMyShopList);

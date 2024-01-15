@@ -1,5 +1,7 @@
 package com.example.shopease.utils
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import java.security.MessageDigest
 
 object Utils {
@@ -27,5 +29,9 @@ object Utils {
 
     fun base64ToByteArray(base64String: String): ByteArray {
         return android.util.Base64.decode(base64String, android.util.Base64.DEFAULT)
+    }
+
+    fun byteArrayToBitmap(byteArray: ByteArray?): Bitmap {
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
     }
 }
