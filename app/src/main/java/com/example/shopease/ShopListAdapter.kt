@@ -10,12 +10,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.dataClasses.ShopListItem
 
 class ShopListAdapter(
-    private val items: MutableList<ShopListItem>
+    val items: MutableList<ShopListItem>,
+    var itemLongClickListener: ShopListAdapter.OnItemLongClickListener? = null,
+    private var parentView: View
 ) : RecyclerView.Adapter<ShopListAdapter.ShopListHolder>() {
+
+
+    interface OnItemLongClickListener {
+        fun onItemLongClick(position: Int, view: View)
+    }
 
     class ShopListHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopListHolder {
+//        shopListName = findViewById(R.id.etListName)
         return ShopListHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.shop_list_item,
@@ -25,9 +33,13 @@ class ShopListAdapter(
         )
     }
 
+    fun initialList(itemsToAdd: List<ShopListItem>){
+        items.addAll(itemsToAdd)
+    }
+
     fun addShopListItem(item: ShopListItem) {
         items.add(item)
-        notifyItemInserted(items.size - 1)
+        notifyItemInserted(items.size + 1)
     }
 
 //    fun deleteCheckedItems(){
@@ -58,7 +70,11 @@ class ShopListAdapter(
                 toggleStrikeThrough(tvShopListItem, isChecked)
                 curItem.isChecked = !curItem.isChecked
             }
+        }
 
+        holder.itemView.setOnLongClickListener {
+            itemLongClickListener?.onItemLongClick(position, parentView)
+            true // Consume the long click event
         }
     }
 

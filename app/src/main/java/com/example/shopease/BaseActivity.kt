@@ -40,7 +40,9 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
 
             when (menuItem.itemId) {
                 R.id.action_wishlist -> {
-                    loadFragment(WishlistsFragment())
+                    val bundle = Bundle()
+                    bundle.putString("USERNAME_KEY", username)
+                    loadFragment(WishlistsFragment(), bundle)
                     true
                 }
 
