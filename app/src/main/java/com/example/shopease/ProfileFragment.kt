@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.example.shopease.utils.Utils
 import com.example.shopease.utils.Utils.hashPassword
 
 class ProfileFragment : Fragment() {
@@ -30,10 +31,10 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as HomeActivity?)?.updateTitle("Profile")
+        (activity as BaseActivity?)?.updateTitle("Profile")
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
-        usernameTextView = view.findViewById(R.id.usernameTextView)
+        usernameTextView = view.findViewById(R.id.usernameProfileTextView)
         emailTextView = view.findViewById(R.id.emailTextView)
         changePasswordButton = view.findViewById(R.id.changePasswordButton)
         imageProfileView = view.findViewById(R.id.imageProfileFragment)
@@ -89,10 +90,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setByteArrayImageOnImageView(imageByteArray: ByteArray?, imageView: ImageView) {
-        // Convert the ByteArray to a Bitmap
-        val bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray!!.size)
-
-        // Set the Bitmap on the ImageView
+        val bitmap = Utils.byteArrayToBitmap(imageByteArray)
         imageView.setImageBitmap(bitmap)
     }
 }

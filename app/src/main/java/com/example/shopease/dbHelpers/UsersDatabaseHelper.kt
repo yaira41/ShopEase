@@ -108,26 +108,6 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
             }
     }
 
-    fun getUserByUsername(username: String, callback: (User?) -> Unit) {
-        val usersRef = databaseReference.child("users")
-        usersRef.orderByChild("username").equalTo(username)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        val userData = snapshot.children.first().getValue(User::class.java)
-                        callback(userData)
-                    } else {
-                        callback(null)
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("FirebaseHelper", "Error getting user by username", error.toException())
-                    callback(null)
-                }
-            })
-    }
-
     fun updatePassword(username: String, newPassword: String, callback: (Boolean) -> Unit) {
         val usersRef = databaseReference.child("users")
         usersRef.orderByChild("username").equalTo(username)

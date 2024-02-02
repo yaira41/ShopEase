@@ -16,8 +16,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -49,9 +49,8 @@
         <activity
             android:name=".HomeActivity"
             android:label="@string/home_activity_title"
-            android:theme="@style/AppTheme.NoActionBar"> <!-- or "false" based on your requirement -->
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
-
     </application>
 
 
