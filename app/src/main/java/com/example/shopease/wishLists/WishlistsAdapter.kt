@@ -1,15 +1,12 @@
-package com.example.shopease
+package com.example.shopease.wishLists
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.shopease.dataClasses.ShopListItem
+import com.example.shopease.R
 import com.example.shopease.dbHelpers.ShopList
 
 class WishlistsAdapter(
@@ -35,8 +32,8 @@ class WishlistsAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): WishlistsAdapter.WishListHolder {
-        return WishlistsAdapter.WishListHolder(
+    ): WishListHolder {
+        return WishListHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.list_picker,
                 parent,

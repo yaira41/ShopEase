@@ -1,4 +1,4 @@
-package com.example.shopease
+package com.example.shopease.wishLists
 
 import android.graphics.Paint
 import android.view.LayoutInflater
@@ -7,11 +7,12 @@ import android.widget.TextView
 import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
+import com.example.shopease.R
 import com.example.shopease.dataClasses.ShopListItem
 
 class ShopListAdapter(
     val items: MutableList<ShopListItem>,
-    var itemLongClickListener: ShopListAdapter.OnItemLongClickListener? = null,
+    var itemLongClickListener: OnItemLongClickListener? = null,
     private var parentView: View
 ) : RecyclerView.Adapter<ShopListAdapter.ShopListHolder>() {
 

@@ -1,4 +1,4 @@
-package com.example.shopease
+package com.example.shopease.wishLists
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.shopease.R
 import com.example.shopease.dataClasses.ShopListItem
 import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper

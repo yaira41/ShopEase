@@ -1,6 +1,5 @@
 package com.example.shopease.dbHelpers
 import android.util.Log
-import com.example.shopease.ShopListAdapter
 import com.example.shopease.dataClasses.ShopListItem
 import com.google.firebase.database.*
 
