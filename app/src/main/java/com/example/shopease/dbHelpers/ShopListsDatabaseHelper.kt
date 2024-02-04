@@ -169,7 +169,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
 
     fun insertNewList(
         listName: String,
-        items: List<ShopListItem>,
+        items: List<ShopListItem>?,
         members: List<String>,
         listener: InsertShopListCallback
     ) {
@@ -204,7 +204,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
     data class ShopList(
         val id: String? = null,
         val name: String,
-        val items: List<ShopListItem>,
+        val items: List<ShopListItem>?,
         val members: List<String>,
     ) {
         override fun toString(): String {

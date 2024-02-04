@@ -43,10 +43,11 @@ class ShopListFragment : Fragment() {
         username = arguments?.getString("USERNAME_KEY") ?: ""
         shopListAdapter = ShopListAdapter(mutableListOf(),
             itemLongClickListener = object : ShopListAdapter.OnItemLongClickListener {
-            override fun onItemLongClick(position: Int, view: View) {
-                showDeleteButton(view, position)
-            }
-        }, parentLayout)
+                override fun onItemLongClick(position: Int, view: View) {
+                    showDeleteButton(view, position)
+                }
+            }, parentLayout
+        )
         fetchData()
 
         val rvShopListItem = view.findViewById<RecyclerView>(R.id.rvShopListItems)
@@ -57,7 +58,7 @@ class ShopListFragment : Fragment() {
         val editText = view.findViewById<EditText>(R.id.etShopListTitle)
         addButton.setOnClickListener {
             val itemTitle = editText.text.toString()
-            if(itemTitle.isNotEmpty()){
+            if (itemTitle.isNotEmpty()) {
                 val newItem = ShopListItem(itemTitle)
                 shopListAdapter.addShopListItem(newItem)
                 editText.text.clear()
@@ -104,7 +105,8 @@ class ShopListFragment : Fragment() {
                 editListName.visibility = View.GONE
 
                 // Hide keyboard
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm =
+                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(editListName.windowToken, 0)
 
                 true
@@ -115,34 +117,24 @@ class ShopListFragment : Fragment() {
 
         val saveListButton = view.findViewById<Button>(R.id.bCreateListButton)
         saveListButton.setOnClickListener {
-            if(shopListName.text.isNullOrEmpty()){
+            if (shopListName.text.isNullOrEmpty()) {
                 showToast("הכנס שם לרשימה")
             } else {
-                if(id.isEmpty()){
-                    shopListsDatabaseHelper.insertNewList(shopListName.text.toString(),shopListAdapter.items,
-                        listOf(username), object : ShopListsDatabaseHelper.InsertShopListCallback {
-                            override fun onShopListInserted(shopList: ShopList?) {
-                                if (shopList != null) {
-                                    showToast("Shop list inserted successfully.")
-                                } else {
-                                    showToast("Failed to insert shop list")
-                                }
+                shopListsDatabaseHelper.updateShopList(id,
+                    shopListName.text.toString(),
+                    shopListAdapter.items,
+                    listOf(username),
+                    object : ShopListsDatabaseHelper.InsertShopListCallback {
+                        override fun onShopListInserted(shopList: ShopList?) {
+                            if (shopList != null) {
+                                showToast("Shop list updated successfully.")
+                            } else {
+                                showToast("Failed to update shop list")
                             }
                         }
-                    )
-                } else {
-                    shopListsDatabaseHelper.updateShopList(id,shopListName.text.toString(),shopListAdapter.items,
-                        listOf(username), object : ShopListsDatabaseHelper.InsertShopListCallback {
-                            override fun onShopListInserted(shopList: ShopList?) {
-                                if (shopList != null) {
-                                    showToast("Shop list updated successfully.")
-                                } else {
-                                    showToast("Failed to update shop list")
-                                }
-                            }
-                        }
-                    )
-               }
+                    }
+                )
+
                 parentFragmentManager.popBackStack();
             }
         }

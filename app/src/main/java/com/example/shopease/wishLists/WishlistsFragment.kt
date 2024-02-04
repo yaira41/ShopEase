@@ -1,10 +1,12 @@
 package com.example.shopease.wishLists
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +15,9 @@ import com.example.shopease.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
+import com.example.shopease.wishLists.ShopListFragment
+import com.example.shopease.wishLists.WishlistsAdapter
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class WishlistsFragment : Fragment() {
 
@@ -50,14 +55,13 @@ class WishlistsFragment : Fragment() {
         )
 
         fetchUserLists(username)
-        val button = view.findViewById<Button>(R.id.bMoveToMyShopList);
-        button.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putString("USERNAME_KEY", username)
-            replaceWithNewFragment(ShopListFragment(), bundle)
+
+        val fab = view.findViewById<FloatingActionButton>(R.id.bMoveToMyShopList)
+        fab.setOnClickListener {
+            showCreateListDialog()
         }
 
-        return view;
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,7 +70,6 @@ class WishlistsFragment : Fragment() {
         val rvShopLists = view.findViewById<RecyclerView>(R.id.rvAllLists)
         rvShopLists.adapter = wishlistsAdapter
         rvShopLists.layoutManager = LinearLayoutManager(requireContext())
-
     }
 
     private fun fetchUserLists(userName : String) {
@@ -109,11 +112,52 @@ class WishlistsFragment : Fragment() {
         wishlistsAdapter.notifyItemRemoved(position)
     }
 
-
     private fun replaceWithNewFragment(newFragment : Fragment, args: Bundle? = null) {
         newFragment.arguments = args
 
         parentFragmentManager.beginTransaction().replace(R.id.fragmentContainer, newFragment)
-                .addToBackStack(null).commit()
+            .addToBackStack(null).commit()
     }
+
+    private fun showCreateListDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("שם רשימה")
+
+        val input = EditText(requireContext())
+        builder.setView(input)
+
+        builder.setPositiveButton("צור") { _, _ ->
+            val listName = input.text.toString()
+            if (listName.isEmpty()) {
+                showToast("הכנס שם לרשימה")
+            } else {
+                dbHelper.insertNewList(
+                    listName,
+                    null,
+                    listOf(username),
+                    object : ShopListsDatabaseHelper.InsertShopListCallback {
+                        override fun onShopListInserted(shopList: ShopList?) {
+                            if (shopList != null) {
+                                showToast("הרשימה נוצרה בהצלחה.")
+                                fetchUserLists(username)
+                            } else {
+                                showToast("משהו השתבש.")
+                            }
+                        }
+                    }
+                )
+            }
+        }
+
+        builder.setNegativeButton("בטל") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        // Move builder.show() here
+        builder.show()
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
 }
