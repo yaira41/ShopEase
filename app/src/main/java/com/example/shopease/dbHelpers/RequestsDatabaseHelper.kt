@@ -60,6 +60,21 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
                 }
             })
     }
+    fun getFriendsFromUsername(username: String, callback: (List<String>) -> Unit) {
+        val friendsRef = databaseReference.child("confirmFriends").child(username).child("friends")
+
+        friendsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val friendUsernames = dataSnapshot.children.mapNotNull { it.key }
+                callback(friendUsernames)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle errors
+                callback(emptyList())
+            }
+        })
+    }
     fun getFriendsWithImages(username: String, callback: (List<FriendInfo>) -> Unit) {
         val friendsRef = databaseReference.child("confirmFriends").child(username).child("friends")
         friendsRef.orderByValue()

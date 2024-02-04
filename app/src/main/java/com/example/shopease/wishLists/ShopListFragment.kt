@@ -13,10 +13,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
 import com.example.shopease.dataClasses.ShopListItem
+import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 
@@ -26,7 +28,9 @@ class ShopListFragment : Fragment() {
     private lateinit var id: String
     private lateinit var name: String
     private lateinit var username: String
+    private lateinit var shopListName: TextView
     private lateinit var dbHelper: ShopListsDatabaseHelper
+    private lateinit var friendDbHelper : RequestsDatabaseHelper
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -38,6 +42,7 @@ class ShopListFragment : Fragment() {
         val parentLayout = view.findViewById<View>(R.id.fShopListFragment)
 
         dbHelper = ShopListsDatabaseHelper()
+        friendDbHelper = RequestsDatabaseHelper()
         id = arguments?.getString("SHOP_LIST_ID_KEY") ?: ""
         name = arguments?.getString("SHOP_LIST_NAME_KEY") ?: "New List"
         username = arguments?.getString("USERNAME_KEY") ?: ""
@@ -65,8 +70,13 @@ class ShopListFragment : Fragment() {
             }
         }
 
-        val shopListName = view.findViewById<TextView>(R.id.tvListName)
         val editListName = view.findViewById<EditText>(R.id.etListName)
+        val shareListButton = view.findViewById<Button>(R.id.sharedListButton)
+        shopListName = view.findViewById(R.id.tvListName)
+
+        shareListButton.setOnClickListener {
+            showShareListDialog()
+        }
 
         // Initially, show the TextView and hide the EditText
         shopListName.text = name
@@ -179,7 +189,56 @@ class ShopListFragment : Fragment() {
             }
         }
     }
+    private fun showShareListDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("בחר עם מי לשתף.")
 
+        // Use the asynchronous getFriendsFromUsername function
+        friendDbHelper.getFriendsFromUsername(username) { friendUsernames ->
+            val checkedFriends = BooleanArray(friendUsernames.size) { false }
+
+            builder.setMultiChoiceItems(
+                friendUsernames.toTypedArray(),
+                checkedFriends
+            ) { _, which, isChecked ->
+                checkedFriends[which] = isChecked
+            }
+
+            builder.setPositiveButton("שתף") { _, _ ->
+                val selectedFriends = mutableListOf<String>()
+                selectedFriends.add(username) // Add itself first
+                for (i in checkedFriends.indices) {
+                    if (checkedFriends[i]) {
+                        selectedFriends.add(friendUsernames[i])
+                    }
+                }
+
+                shareListWithFriends(selectedFriends)
+            }
+
+            builder.setNegativeButton("ביטול") { dialog, _ ->
+                dialog.cancel()
+            }
+
+            builder.show()
+        }
+    }
+
+    private fun shareListWithFriends(selectedFriends: List<String>) {
+        shopListsDatabaseHelper.updateShopList(id,
+            shopListName.text.toString(),
+            shopListAdapter.items,
+            selectedFriends,
+            object : ShopListsDatabaseHelper.InsertShopListCallback {
+                override fun onShopListInserted(shopList: ShopList?) {
+                    if (shopList != null) {
+                        showToast("הרשימה שותפה בהצלחה.")
+                    } else {
+                        showToast("משהו השתבש.")
+                    }
+                }
+            })
+    }
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
