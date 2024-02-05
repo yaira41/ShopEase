@@ -3,6 +3,7 @@ package com.example.shopease.wishLists
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -10,7 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -40,7 +43,6 @@ class ShopListFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
         val parentLayout = view.findViewById<View>(R.id.fShopListFragment)
-
         dbHelper = ShopListsDatabaseHelper()
         friendDbHelper = RequestsDatabaseHelper()
         id = arguments?.getString("SHOP_LIST_ID_KEY") ?: ""
@@ -51,7 +53,7 @@ class ShopListFragment : Fragment() {
                 override fun onItemLongClick(position: Int, view: View) {
                     showDeleteButton(view, position)
                 }
-            }, parentLayout
+            }
         )
         fetchData()
 
@@ -61,6 +63,7 @@ class ShopListFragment : Fragment() {
 
         val addButton = view.findViewById<Button>(R.id.bAddButton)
         val editText = view.findViewById<EditText>(R.id.etShopListTitle)
+
         addButton.setOnClickListener {
             val itemTitle = editText.text.toString()
             if (itemTitle.isNotEmpty()) {
@@ -153,11 +156,15 @@ class ShopListFragment : Fragment() {
     }
 
     private fun showDeleteButton(view: View, position: Int) {
-        val deleteButton = view.findViewById<Button>(R.id.btnDeleteItem)
+        val deleteButton = view.findViewById<ImageButton>(R.id.btnDeleteItem)
+        val checkBox = view.findViewById<CheckBox>(R.id.cbBought)
         deleteButton.visibility = View.VISIBLE
+        checkBox.visibility = View.GONE
+
+
 
         view.setOnClickListener {
-            hideDeleteButton(view)
+            hideDeleteButton(view, position)
         }
 
         deleteButton.setOnClickListener {
@@ -165,17 +172,25 @@ class ShopListFragment : Fragment() {
         }
     }
 
-    private fun hideDeleteButton(view: View) {
-        val deleteButton = view.findViewById<Button>(R.id.btnDeleteItem)
+    private fun hideDeleteButton(view: View, position: Int) {
+        val deleteButton = view.findViewById<ImageButton>(R.id.btnDeleteItem)
+        val checkBox = view.findViewById<CheckBox>(R.id.cbBought)
         deleteButton.visibility = View.GONE
+        checkBox.visibility = View.VISIBLE
+        shopListAdapter.notifyItemChanged(position)
     }
 
     private fun onDeleteButtonClick(position: Int) {
-        val selectedItem = shopListAdapter.items[position]
-        Toast.makeText(requireContext(), "Delete ${selectedItem.title}", Toast.LENGTH_SHORT).show()
+        if (position >= 0 && position < shopListAdapter.items.size) {
+            val selectedItem = shopListAdapter.items[position]
+            Toast.makeText(requireContext(), "Delete ${selectedItem.title}", Toast.LENGTH_SHORT).show()
 
-        shopListAdapter.items.removeAt(position)
-        shopListAdapter.notifyItemRemoved(position)
+            shopListAdapter.items.removeAt(position)
+            shopListAdapter.notifyItemRemoved(position)
+
+            // Update positions of remaining items
+            shopListAdapter.notifyItemRangeChanged(position, shopListAdapter.items.size)
+        }
     }
 
     private fun fetchData() {
