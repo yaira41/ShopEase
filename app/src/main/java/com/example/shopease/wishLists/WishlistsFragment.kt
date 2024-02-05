@@ -104,12 +104,19 @@ class WishlistsFragment : Fragment() {
     private fun onDeleteButtonClick(position: Int) {
         val selectedList = shopLists[position]
         Toast.makeText(requireContext(), "Delete ${selectedList.name}", Toast.LENGTH_SHORT).show()
-        if(!selectedList.id.isNullOrEmpty()){
+        if (!selectedList.id.isNullOrEmpty()) {
             dbHelper.deleteShopListForSpecificUser(selectedList.id, username)
         }
 
+        // Remove the item from the data source
         shopLists.removeAt(position)
+        // Notify the adapter about the item removal
         wishlistsAdapter.notifyItemRemoved(position)
+
+        // Update the positions in the adapter for items after the deleted one
+        for (i in position until shopLists.size) {
+            wishlistsAdapter.notifyItemChanged(i)
+        }
     }
 
     private fun replaceWithNewFragment(newFragment : Fragment, args: Bundle? = null) {
@@ -157,7 +164,10 @@ class WishlistsFragment : Fragment() {
         builder.show()
     }
     private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        val context = context
+        if (context != null) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
 }

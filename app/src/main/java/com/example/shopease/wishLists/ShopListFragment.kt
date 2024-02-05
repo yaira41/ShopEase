@@ -255,6 +255,9 @@ class ShopListFragment : Fragment() {
             })
     }
     private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        val context = context
+        if (context != null) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
     }
 }
