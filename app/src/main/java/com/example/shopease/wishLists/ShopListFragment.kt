@@ -3,10 +3,7 @@ package com.example.shopease.wishLists
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -17,6 +14,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
@@ -73,7 +71,6 @@ class ShopListFragment : Fragment() {
             }
         }
 
-        val editListName = view.findViewById<EditText>(R.id.etListName)
         val shareListButton = view.findViewById<Button>(R.id.sharedListButton)
         shopListName = view.findViewById(R.id.tvListName)
 
@@ -83,50 +80,6 @@ class ShopListFragment : Fragment() {
 
         // Initially, show the TextView and hide the EditText
         shopListName.text = name
-        shopListName.visibility = View.VISIBLE
-        editListName.visibility = View.GONE
-
-        // Set an OnClickListener to switch to EditText when clicked
-        shopListName.setOnClickListener {
-            shopListName.visibility = View.GONE
-            editListName.visibility = View.VISIBLE
-            editListName.setText(shopListName.text)
-            editListName.requestFocus()
-
-            // Show the keyboard when switching to EditText
-            val imm =
-                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(editListName, InputMethodManager.SHOW_IMPLICIT)
-        }
-
-        editListName.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                // If EditText loses focus, switch back to TextView
-                shopListName.text = editListName.text.toString()
-
-                // Make TextView visible and EditText invisible
-                shopListName.visibility = View.VISIBLE
-                editListName.visibility = View.GONE
-            }
-        }
-
-        parentLayout.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                shopListName.text = editListName.text.toString()
-
-                shopListName.visibility = View.VISIBLE
-                editListName.visibility = View.GONE
-
-                // Hide keyboard
-                val imm =
-                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(editListName.windowToken, 0)
-
-                true
-            } else {
-                false
-            }
-        }
 
         val saveListButton = view.findViewById<Button>(R.id.bCreateListButton)
         saveListButton.setOnClickListener {
@@ -168,7 +121,7 @@ class ShopListFragment : Fragment() {
         }
 
         deleteButton.setOnClickListener {
-            onDeleteButtonClick(position)
+            showConfirmationDialog(position)
         }
     }
 
@@ -259,5 +212,25 @@ class ShopListFragment : Fragment() {
         if (context != null) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
+    }
+    private fun showConfirmationDialog(position: Int) {
+        val dialogView = layoutInflater.inflate(R.layout.confirmation_dialog, null)
+        val builder = android.app.AlertDialog.Builder(requireContext())
+        builder.setView(dialogView)
+        val dialog = builder.create()
+
+        val confirmButton: Button = dialogView.findViewById(R.id.btnConfirmDelete)
+        val cancelButton: Button = dialogView.findViewById(R.id.btnCancelDelete)
+
+        confirmButton.setOnClickListener {
+            onDeleteButtonClick(position)
+            dialog.dismiss()
+        }
+
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }

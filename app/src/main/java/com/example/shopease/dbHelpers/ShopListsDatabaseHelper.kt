@@ -131,6 +131,10 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
             }
     }
 
+    fun updateWishlistName(shopListId: String, newName: String) {
+        databaseReference.child("shopLists").child(shopListId).child("name").setValue(newName)
+    }
+
     fun deleteShopListForSpecificUser(shopListId: String, member: String) {
         val shopListRef = databaseReference.child("shopLists").child(shopListId)
 
@@ -203,7 +207,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
     // Example data model for a shop list
     data class ShopList(
         val id: String? = null,
-        val name: String,
+        var name: String,
         val items: List<ShopListItem>?,
         val members: List<String>,
     ) {

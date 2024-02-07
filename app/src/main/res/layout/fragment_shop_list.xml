@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fShopListFragment"
@@ -7,81 +8,70 @@
     android:layout_height="match_parent"
     tools:context=".wishLists.ShopListFragment">
 
+    <EditText
+        android:id="@+id/etShopListTitle"
+        android:layout_width="250dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="120dp"
+        android:hint="הכנס מוצר..."
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvShopListItems"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="248dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/bCreateListButton" />
 
     <Button
         android:id="@+id/bAddButton"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:text="הוסף"
-        app:layout_constraintBottom_toTopOf="@+id/rvShopListItems"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etShopListTitle" />
 
-    <EditText
-        android:id="@+id/etShopListTitle"
-        android:layout_width="270dp"
-        android:layout_height="42dp"
-        android:layout_marginTop="132dp"
-        android:autofillHints="חפש מוצר..."
-        android:hint="הכנס מוצר..."
-        android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/rvShopListItems"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.161" />
-
-    <EditText
-        android:id="@+id/etListName"
-        android:layout_width="159dp"
-        android:layout_height="43dp"
-        android:layout_marginStart="124dp"
-        android:layout_marginTop="88dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/tvListName"
-        android:layout_width="159dp"
-        android:layout_height="43dp"
-        android:layout_marginStart="124dp"
-        android:layout_marginTop="88dp"
+        android:layout_width="300dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="52dp"
+        android:textAlignment="center"
+        android:textSize="28sp"
+        android:textColor="@color/colorPrimaryDark"
         android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/bAddButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.513"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/bCreateListButton"
-        android:layout_width="106dp"
-        android:layout_height="46dp"
-        android:layout_marginStart="60dp"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
         android:text="שמור"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/sharedListButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvShopListItems"
-        app:layout_constraintVertical_bias="0.736" />
+        app:layout_constraintTop_toBottomOf="@+id/bAddButton" />
 
     <Button
         android:id="@+id/sharedListButton"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:text="שתף רשימה"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.646"
-        app:layout_constraintStart_toEndOf="@+id/bCreateListButton"
-        app:layout_constraintTop_toBottomOf="@+id/rvShopListItems"
-        app:layout_constraintVertical_bias="0.734" />
+        app:layout_constraintStart_toEndOf="@id/bCreateListButton"
+        app:layout_constraintTop_toBottomOf="@+id/bAddButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

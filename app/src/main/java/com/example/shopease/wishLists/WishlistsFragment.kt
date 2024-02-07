@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,7 +36,9 @@ class WishlistsFragment : Fragment() {
         username = arguments?.getString("USERNAME_KEY") ?: ""
         dbHelper = ShopListsDatabaseHelper()
 
-        wishlistsAdapter = WishlistsAdapter(shopLists,
+// Add a long-press listener in your adapter
+        wishlistsAdapter = WishlistsAdapter(
+            shopLists,
             itemClickListener = object : WishlistsAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int) {
                     val selectedList = shopLists[position]
@@ -48,11 +51,13 @@ class WishlistsFragment : Fragment() {
             },
             itemLongClickListener = object : WishlistsAdapter.OnItemLongClickListener {
                 override fun onItemLongClick(position: Int, view: View) {
-                    showDeleteButton(view, position)
+                    // Show the update dialog on long press
+                    showUpdateItemDialog(shopLists[position], position)
                 }
             },
             view
         )
+
 
         fetchUserLists(username)
 
@@ -72,7 +77,39 @@ class WishlistsFragment : Fragment() {
         rvShopLists.layoutManager = LinearLayoutManager(requireContext())
     }
 
-    private fun fetchUserLists(userName : String) {
+    private fun showUpdateItemDialog(selectedList: ShopList, position: Int) {
+        val builder = AlertDialog.Builder(requireContext())
+        val inflater = LayoutInflater.from(requireContext())
+        val dialogView = inflater.inflate(R.layout.update_item_dialog, null)
+        val editText = dialogView.findViewById<EditText>(R.id.changeWishlistName)
+        val confirmButton = dialogView.findViewById<Button>(R.id.updateWishlistName)
+        val deleteButton = dialogView.findViewById<Button>(R.id.deleteWishlistButton)
+
+        editText.setText(selectedList.name)
+
+        builder.setView(dialogView)
+        val alertDialog = builder.create()
+
+        confirmButton.setOnClickListener {
+            val updatedName = editText.text.toString()
+            if (updatedName.isNotEmpty()) {
+                shopLists[position].name = updatedName
+                val id = shopLists[position].id
+                dbHelper.updateWishlistName(id!!, updatedName)
+                wishlistsAdapter.notifyItemChanged(position)
+            }
+            alertDialog.dismiss()
+        }
+
+        deleteButton.setOnClickListener {
+            showConfirmationDialog(position)
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
+
+    private fun fetchUserLists(userName: String) {
         dbHelper.getAllUserLists(userName) { allLists ->
             wishlistsAdapter.clear()
             if (allLists.isEmpty()) {
@@ -81,24 +118,6 @@ class WishlistsFragment : Fragment() {
                 wishlistsAdapter.initialList(allLists)
             }
         }
-    }
-
-    private fun showDeleteButton(view: View, position: Int) {
-        val deleteButton = view.findViewById<Button>(R.id.btnDelete)
-        deleteButton.visibility = View.VISIBLE
-
-        view.setOnClickListener {
-            hideDeleteButton(view)
-        }
-
-        deleteButton.setOnClickListener {
-            onDeleteButtonClick(position)
-        }
-    }
-
-    private fun hideDeleteButton(view: View) {
-        val deleteButton = view.findViewById<Button>(R.id.btnDelete)
-        deleteButton.visibility = View.GONE
     }
 
     private fun onDeleteButtonClick(position: Int) {
@@ -119,7 +138,7 @@ class WishlistsFragment : Fragment() {
         }
     }
 
-    private fun replaceWithNewFragment(newFragment : Fragment, args: Bundle? = null) {
+    private fun replaceWithNewFragment(newFragment: Fragment, args: Bundle? = null) {
         newFragment.arguments = args
 
         parentFragmentManager.beginTransaction().replace(R.id.fragmentContainer, newFragment)
@@ -163,11 +182,31 @@ class WishlistsFragment : Fragment() {
         // Move builder.show() here
         builder.show()
     }
+
     private fun showToast(message: String) {
         val context = context
         if (context != null) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
+    private fun showConfirmationDialog(position: Int) {
+        val dialogView = layoutInflater.inflate(R.layout.confirmation_dialog, null)
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setView(dialogView)
+        val dialog = builder.create()
 
+        val confirmButton: Button = dialogView.findViewById(R.id.btnConfirmDelete)
+        val cancelButton: Button = dialogView.findViewById(R.id.btnCancelDelete)
+
+        confirmButton.setOnClickListener {
+            onDeleteButtonClick(position)
+            dialog.dismiss()
+        }
+
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
 }
