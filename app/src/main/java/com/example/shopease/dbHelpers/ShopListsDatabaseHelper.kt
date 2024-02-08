@@ -2,7 +2,9 @@ package com.example.shopease.dbHelpers
 import android.util.Log
 import com.example.shopease.dataClasses.ShopListItem
 import com.google.firebase.database.*
-
+interface CheckProductExistenceCallback {
+    fun onProductExistenceChecked(exists: Boolean)
+}
 class ShopListsDatabaseHelper : BaseDatabaseHelper() {
 
     interface InsertShopListCallback {
@@ -43,10 +45,13 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                                 val itemState =
                                     itemSnapshot.child("checked").getValue(Boolean::class.java)
                                         ?: false
-                                val countItem =
-                                    itemSnapshot.child("countByUnit").getValue(String::class.java)
-                                        ?: "1"
-                                itemsList.add(ShopListItem(itemTitle, countItem, itemState))
+                                val itemCount =
+                                    itemSnapshot.child("count").getValue(Int::class.java)
+                                        ?: 1
+                                val itemUnit =
+                                    itemSnapshot.child("unit").getValue(String::class.java)
+                                        ?: "יחידות"
+                                itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
                             }
 
                             // Create ShopList object
@@ -73,7 +78,25 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                 }
             })
     }
+    fun isExistProductInList(listId: String, productName: String, callback: CheckProductExistenceCallback) {
+        val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
 
+        shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val exists = dataSnapshot.children.any { it.child("title").getValue(String::class.java) == productName }
+                callback.onProductExistenceChecked(exists)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(
+                    "ShopListsDatabaseHelper",
+                    "Error checking product existence in the list",
+                    error.toException()
+                )
+                callback.onProductExistenceChecked(false)
+            }
+        })
+    }
     fun getListById(id: String, listener: (List<ShopListItem>) -> Unit) {
         // Replace "users" with the collection name where user lists are stored in your Firestore
         databaseReference.child("shopLists").child(id)
@@ -88,10 +111,13 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                         val itemState =
                             itemSnapshot.child("checked").getValue(Boolean::class.java)
                                 ?: false
-                        val countItem =
-                            itemSnapshot.child("countByUnit").getValue(String::class.java)
-                                ?: "1"
-                        itemsList.add(ShopListItem(itemTitle, countItem, itemState))                    }
+                        val itemCount =
+                            itemSnapshot.child("count").getValue(Int::class.java)
+                                ?: 1
+                        val itemUnit =
+                            itemSnapshot.child("unit").getValue(String::class.java)
+                                ?: "יחידות"
+                        itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))                    }
 
                     if (itemsList.isEmpty()) {
                         listener(emptyList())
@@ -184,12 +210,6 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
     ) {
         val shopListsRef = databaseReference.child("shopLists")
         val newShopListRef = shopListsRef.push()
-//        val newList23 = hashMapOf(
-//            "id" to newShopListRef,
-//            "name" to listName,
-//            "items" to items,
-//            "members" to members
-//        )
 
         val newList = ShopList(newShopListRef.key, listName, items, members)
 
@@ -205,10 +225,39 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                 )
             }
     }
+    fun updateShopListItem(listId: String, position: Int, updatedItem: ShopListItem) {
+        val shopListRef = databaseReference.child("shopLists").child(listId)
+
+        shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val itemsList: MutableList<ShopListItem> = mutableListOf()
+
+                // Retrieve the current items list
+                val itemsSnapshot = dataSnapshot.child("items")
+                for (itemSnapshot in itemsSnapshot.children) {
+                    val currentItem = itemSnapshot.getValue(ShopListItem::class.java)
+                    currentItem?.let { itemsList.add(it) }
+                }
+
+                // Update the specific item in the list
+                if (position >= 0 && position < itemsList.size) {
+                    itemsList[position] = updatedItem
+                }
+
+                // Update the shop list with the modified items list
+                shopListRef.child("items").setValue(itemsList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(
+                    "ShopListFirebaseHelper",
+                    "Error updating shop list item",
+                    error.toException()
+                )
+            }
+        })
+    }
 }
-
-    // Add other methods for shop list operations as needed
-
     // Example data model for a shop list
     data class ShopList(
         val id: String? = null,

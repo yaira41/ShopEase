@@ -1,7 +1,8 @@
 package com.example.shopease.dataClasses
 
-data class ShopListItem (
-    val title: String,
-    var countByUnit: String,
+data class ShopListItem(
+    val title: String = "",
+    val count: Int = 1,
+    val unit: String = "יחידות",
     var isChecked: Boolean = false
 )

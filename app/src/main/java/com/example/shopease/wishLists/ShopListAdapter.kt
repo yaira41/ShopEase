@@ -1,5 +1,6 @@
 package com.example.shopease.wishLists
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
@@ -50,6 +51,7 @@ class ShopListAdapter(
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ShopListHolder, position: Int) {
         val curItem = items[position]
         holder.itemView.apply {
@@ -59,7 +61,7 @@ class ShopListAdapter(
 
             tvShopListItem.text = curItem.title
             cbCheckBox.isChecked = curItem.isChecked
-            countItem.text = curItem.countByUnit
+            countItem.text = "${curItem.count} ${curItem.unit}"
             toggleStrikeThrough(tvShopListItem, cbCheckBox.isChecked, countItem)
             cbCheckBox.setOnCheckedChangeListener{_, isChecked ->
                 toggleStrikeThrough(tvShopListItem, isChecked, countItem)
