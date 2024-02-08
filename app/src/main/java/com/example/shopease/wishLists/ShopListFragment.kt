@@ -1,16 +1,17 @@
 package com.example.shopease.wishLists
 
+import ShopItemOptionsBottomSheetDialogFragment
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -23,7 +24,7 @@ import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 
-class ShopListFragment : Fragment() {
+class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.BottomSheetListener {
     private lateinit var shopListAdapter: ShopListAdapter
     private val shopListsDatabaseHelper = ShopListsDatabaseHelper()
     private lateinit var id: String
@@ -31,7 +32,7 @@ class ShopListFragment : Fragment() {
     private lateinit var username: String
     private lateinit var shopListName: TextView
     private lateinit var dbHelper: ShopListsDatabaseHelper
-    private lateinit var friendDbHelper : RequestsDatabaseHelper
+    private lateinit var friendDbHelper: RequestsDatabaseHelper
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -40,7 +41,6 @@ class ShopListFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
-        val parentLayout = view.findViewById<View>(R.id.fShopListFragment)
         dbHelper = ShopListsDatabaseHelper()
         friendDbHelper = RequestsDatabaseHelper()
         id = arguments?.getString("SHOP_LIST_ID_KEY") ?: ""
@@ -49,7 +49,7 @@ class ShopListFragment : Fragment() {
         shopListAdapter = ShopListAdapter(mutableListOf(),
             itemLongClickListener = object : ShopListAdapter.OnItemLongClickListener {
                 override fun onItemLongClick(position: Int, view: View) {
-                    showDeleteButton(view, position)
+                    showOptionsBottomSheet(position)
                 }
             }
         )
@@ -58,16 +58,26 @@ class ShopListFragment : Fragment() {
         val rvShopListItem = view.findViewById<RecyclerView>(R.id.rvShopListItems)
         rvShopListItem.adapter = shopListAdapter
         rvShopListItem.layoutManager = LinearLayoutManager(requireContext())
-
         val addButton = view.findViewById<Button>(R.id.bAddButton)
-        val editText = view.findViewById<EditText>(R.id.etShopListTitle)
+        val itemTitle = view.findViewById<EditText>(R.id.etItemTitle)
+        val count = view.findViewById<TextView>(R.id.etQuantity)
+        val unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)
+
+        val unitList = listOf("יחידות", "קג", "ג", "מל", "ליטר") // Replace with your list of units
+        val unitAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, unitList)
+        unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        unitSpinner.adapter = unitAdapter
+        unitSpinner.setSelection(0)
 
         addButton.setOnClickListener {
-            val itemTitle = editText.text.toString()
-            if (itemTitle.isNotEmpty()) {
-                val newItem = ShopListItem(itemTitle)
+            val titleItem = itemTitle.text.toString()
+            val countItem = count.text.toString().toInt()
+            val unit = unitSpinner.selectedItem.toString()
+            if (titleItem.isNotEmpty()) {
+                val newItem = ShopListItem(titleItem, countItem, unit)
                 shopListAdapter.addShopListItem(newItem)
-                editText.text.clear()
+                itemTitle.text.clear()
             }
         }
 
@@ -108,35 +118,11 @@ class ShopListFragment : Fragment() {
         return view;
     }
 
-    private fun showDeleteButton(view: View, position: Int) {
-        val deleteButton = view.findViewById<ImageButton>(R.id.btnDeleteItem)
-        val checkBox = view.findViewById<CheckBox>(R.id.cbBought)
-        deleteButton.visibility = View.VISIBLE
-        checkBox.visibility = View.GONE
-
-
-
-        view.setOnClickListener {
-            hideDeleteButton(view, position)
-        }
-
-        deleteButton.setOnClickListener {
-            showConfirmationDialog(position)
-        }
-    }
-
-    private fun hideDeleteButton(view: View, position: Int) {
-        val deleteButton = view.findViewById<ImageButton>(R.id.btnDeleteItem)
-        val checkBox = view.findViewById<CheckBox>(R.id.cbBought)
-        deleteButton.visibility = View.GONE
-        checkBox.visibility = View.VISIBLE
-        shopListAdapter.notifyItemChanged(position)
-    }
-
     private fun onDeleteButtonClick(position: Int) {
         if (position >= 0 && position < shopListAdapter.items.size) {
             val selectedItem = shopListAdapter.items[position]
-            Toast.makeText(requireContext(), "Delete ${selectedItem.title}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Delete ${selectedItem.title}", Toast.LENGTH_SHORT)
+                .show()
 
             shopListAdapter.items.removeAt(position)
             shopListAdapter.notifyItemRemoved(position)
@@ -157,6 +143,7 @@ class ShopListFragment : Fragment() {
             }
         }
     }
+
     private fun showShareListDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("בחר עם מי לשתף.")
@@ -207,12 +194,14 @@ class ShopListFragment : Fragment() {
                 }
             })
     }
+
     private fun showToast(message: String) {
         val context = context
         if (context != null) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun showConfirmationDialog(position: Int) {
         val dialogView = layoutInflater.inflate(R.layout.confirmation_dialog, null)
         val builder = android.app.AlertDialog.Builder(requireContext())
@@ -232,5 +221,31 @@ class ShopListFragment : Fragment() {
         }
 
         dialog.show()
+    }
+
+    private fun showOptionsBottomSheet(position: Int) {
+        val curItem =
+            shopListAdapter.items[position] // Assuming `items` is the list of ShopListItem
+
+        val bottomSheetFragment = ShopItemOptionsBottomSheetDialogFragment.newInstance(
+            curItem.title,
+            curItem.count,
+            curItem.unit
+        )
+
+        bottomSheetFragment.listener = this
+        bottomSheetFragment.position = position
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
+    }
+
+    override fun onDeleteClicked(position: Int) {
+        showConfirmationDialog(position)
+    }
+
+    override fun onConfirmClicked(position: Int, title: String, count: Int, unit: String) {
+        val shopListItem = ShopListItem(title, count, unit, false)
+        dbHelper.updateShopListItem(id, position, shopListItem)
+        shopListAdapter.items[position] = shopListItem
+        shopListAdapter.notifyItemChanged(position)
     }
 }

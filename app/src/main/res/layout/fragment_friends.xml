@@ -24,7 +24,6 @@
                 android:background="@drawable/rounded_square_style"
                 android:src="@drawable/requests_icon"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.95"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
@@ -54,6 +53,40 @@
                 app:layout_constraintTop_toBottomOf="@+id/requestFriendImgButton"
                 app:layout_constraintVertical_bias="0.287"
                 tools:ignore="UsingOnClickInXml" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="בקשות חברות"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.774"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/requestFriendImgButton" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="חיפוש חבר"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.225"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/searchFriendImgButton"
+                tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="100dp"
+                android:textAlignment="center"
+                android:text="החברים שלי"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/myFriendsImgButton" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </FrameLayout>

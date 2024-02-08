@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/etItemTitleUpdate"
+            android:layout_width="220dp"
+            android:layout_height="45dp" />
+
+        <EditText
+            android:id="@+id/etQuantityUpdate"
+            android:layout_width="50dp"
+            android:layout_height="45dp"
+            android:inputType="numberSigned" />
+
+        <Spinner
+            android:id="@+id/unitSpinnerUpdate"
+            android:layout_width="110dp"
+            android:layout_height="45dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnConfirmUpdate"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="עדכן" />
+
+        <Button
+            android:id="@+id/btnDeleteItem"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="מחק" />
+    </LinearLayout>
+
+</LinearLayout>
