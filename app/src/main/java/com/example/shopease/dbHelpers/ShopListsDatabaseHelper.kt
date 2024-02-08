@@ -43,7 +43,10 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                                 val itemState =
                                     itemSnapshot.child("checked").getValue(Boolean::class.java)
                                         ?: false
-                                itemsList.add(ShopListItem(itemTitle, itemState))
+                                val countItem =
+                                    itemSnapshot.child("countByUnit").getValue(String::class.java)
+                                        ?: "1"
+                                itemsList.add(ShopListItem(itemTitle, countItem, itemState))
                             }
 
                             // Create ShopList object
@@ -85,8 +88,10 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                         val itemState =
                             itemSnapshot.child("checked").getValue(Boolean::class.java)
                                 ?: false
-                        itemsList.add(ShopListItem(itemTitle, itemState))
-                    }
+                        val countItem =
+                            itemSnapshot.child("countByUnit").getValue(String::class.java)
+                                ?: "1"
+                        itemsList.add(ShopListItem(itemTitle, countItem, itemState))                    }
 
                     if (itemsList.isEmpty()) {
                         listener(emptyList())

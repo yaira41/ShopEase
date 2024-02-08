@@ -1,16 +1,16 @@
 package com.example.shopease.wishLists
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -40,7 +40,6 @@ class ShopListFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
-        val parentLayout = view.findViewById<View>(R.id.fShopListFragment)
         dbHelper = ShopListsDatabaseHelper()
         friendDbHelper = RequestsDatabaseHelper()
         id = arguments?.getString("SHOP_LIST_ID_KEY") ?: ""
@@ -58,16 +57,26 @@ class ShopListFragment : Fragment() {
         val rvShopListItem = view.findViewById<RecyclerView>(R.id.rvShopListItems)
         rvShopListItem.adapter = shopListAdapter
         rvShopListItem.layoutManager = LinearLayoutManager(requireContext())
-
         val addButton = view.findViewById<Button>(R.id.bAddButton)
-        val editText = view.findViewById<EditText>(R.id.etShopListTitle)
+        val itemTitle = view.findViewById<EditText>(R.id.etItemTitle)
+        val count = view.findViewById<TextView>(R.id.etQuantity)
+        val unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)
+
+        val unitList = listOf("יחידות", "קג", "ג", "מל", "ליטר") // Replace with your list of units
+        val unitAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, unitList)
+        unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        unitSpinner.adapter = unitAdapter
+        unitSpinner.setSelection(0)
 
         addButton.setOnClickListener {
-            val itemTitle = editText.text.toString()
-            if (itemTitle.isNotEmpty()) {
-                val newItem = ShopListItem(itemTitle)
+            val titleItem = itemTitle.text.toString()
+            val countItem = count.text.toString().toInt()
+            val unit = unitSpinner.selectedItem.toString()
+            val countByUnit = "$countItem $unit"
+            if (titleItem.isNotEmpty()) {
+                val newItem = ShopListItem(titleItem, countByUnit)
                 shopListAdapter.addShopListItem(newItem)
-                editText.text.clear()
+                itemTitle.text.clear()
             }
         }
 

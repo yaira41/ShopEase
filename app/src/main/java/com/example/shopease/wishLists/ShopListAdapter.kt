@@ -3,10 +3,9 @@ package com.example.shopease.wishLists
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.ImageButton
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
 import com.example.shopease.dataClasses.ShopListItem
@@ -41,11 +40,13 @@ class ShopListAdapter(
         notifyItemInserted(items.size + 1)
     }
 
-    private fun toggleStrikeThrough(tvShopListItem: TextView, isChecked: Boolean) {
+    private fun toggleStrikeThrough(tvShopListItem: TextView, isChecked: Boolean, countItem: TextView) {
         if (isChecked){
             tvShopListItem.paintFlags = tvShopListItem.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            countItem.paintFlags = countItem.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
         } else {
             tvShopListItem.paintFlags = tvShopListItem.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            countItem.paintFlags = countItem.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
     }
 
@@ -54,12 +55,14 @@ class ShopListAdapter(
         holder.itemView.apply {
             val tvShopListItem: TextView = findViewById(R.id.tvShopItemTitle)
             val cbCheckBox: CheckBox = findViewById(R.id.cbBought)
+            val countItem: TextView = findViewById(R.id.tvItemCount)
 
             tvShopListItem.text = curItem.title
             cbCheckBox.isChecked = curItem.isChecked
-            toggleStrikeThrough(tvShopListItem, cbCheckBox.isChecked)
+            countItem.text = curItem.countByUnit
+            toggleStrikeThrough(tvShopListItem, cbCheckBox.isChecked, countItem)
             cbCheckBox.setOnCheckedChangeListener{_, isChecked ->
-                toggleStrikeThrough(tvShopListItem, isChecked)
+                toggleStrikeThrough(tvShopListItem, isChecked, countItem)
                 curItem.isChecked = !curItem.isChecked
             }
         }
