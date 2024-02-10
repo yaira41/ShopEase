@@ -1,15 +1,19 @@
 package com.example.shopease.wishLists
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
 import com.example.shopease.dataClasses.ShopListItem
+import com.example.shopease.utils.StrikeThroughTextView
 
 class ShopListAdapter(
     val items: MutableList<ShopListItem>,
@@ -32,7 +36,7 @@ class ShopListAdapter(
         )
     }
 
-    fun initialList(itemsToAdd: List<ShopListItem>){
+    fun initialList(itemsToAdd: List<ShopListItem>) {
         items.addAll(itemsToAdd)
     }
 
@@ -41,13 +45,16 @@ class ShopListAdapter(
         notifyItemInserted(items.size + 1)
     }
 
-    private fun toggleStrikeThrough(tvShopListItem: TextView, isChecked: Boolean, countItem: TextView) {
-        if (isChecked){
-            tvShopListItem.paintFlags = tvShopListItem.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            countItem.paintFlags = countItem.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+    private fun toggleStrikeThrough(
+        tvShopListItem: StrikeThroughTextView,
+        isChecked: Boolean,
+        pencilImageView: ImageView
+    ) {
+        if (isChecked) {
+            animateCrayonMark(pencilImageView, tvShopListItem)
+            tvShopListItem.setStrikeThrough(true)
         } else {
-            tvShopListItem.paintFlags = tvShopListItem.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-            countItem.paintFlags = countItem.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            tvShopListItem.setStrikeThrough(false)
         }
     }
 
@@ -55,16 +62,17 @@ class ShopListAdapter(
     override fun onBindViewHolder(holder: ShopListHolder, position: Int) {
         val curItem = items[position]
         holder.itemView.apply {
-            val tvShopListItem: TextView = findViewById(R.id.tvShopItemTitle)
+            val tvShopListItem: StrikeThroughTextView = findViewById(R.id.tvShopItemTitle)
             val cbCheckBox: CheckBox = findViewById(R.id.cbBought)
             val countItem: TextView = findViewById(R.id.tvItemCount)
+            val pencilImageView: ImageView = findViewById(R.id.pencilImageView)
 
             tvShopListItem.text = curItem.title
             cbCheckBox.isChecked = curItem.isChecked
             countItem.text = "${curItem.count} ${curItem.unit}"
-            toggleStrikeThrough(tvShopListItem, cbCheckBox.isChecked, countItem)
-            cbCheckBox.setOnCheckedChangeListener{_, isChecked ->
-                toggleStrikeThrough(tvShopListItem, isChecked, countItem)
+            toggleStrikeThrough(tvShopListItem, cbCheckBox.isChecked, pencilImageView)
+            cbCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                toggleStrikeThrough(tvShopListItem, isChecked, pencilImageView)
                 curItem.isChecked = !curItem.isChecked
             }
         }
@@ -73,6 +81,36 @@ class ShopListAdapter(
             itemLongClickListener?.onItemLongClick(position, holder.itemView)
             true // Consume the long click event
         }
+    }
+
+    private fun animateCrayonMark(pencilImageView: ImageView, textView: StrikeThroughTextView) {
+        pencilImageView.visibility = View.VISIBLE
+
+        // Get the starting position of tvShopItemTitle relative to its parent
+        val tvStartX = textView.x // Adjust the offset as needed
+
+        // Get the ending position of tvShopItemTitle relative to its parent
+        val tvEndX = tvStartX + textView.width
+
+        // Reset the translationX to the starting position before starting a new animation
+        pencilImageView.translationX = tvStartX - 5
+
+        // Set the pencil image dynamically
+        pencilImageView.setImageResource(R.drawable.pencil)
+
+        val movePencil = ObjectAnimator.ofFloat(pencilImageView, "translationX", tvStartX, tvEndX)
+        movePencil.duration = 2000 // Adjust the duration as needed
+
+        movePencil.addUpdateListener { animation ->
+            val value = animation.animatedValue as Float
+            textView.setStrikeThrough(true, value)
+        }
+        movePencil.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                pencilImageView.visibility = View.GONE
+            }
+        })
+        movePencil.start()
     }
 
     override fun getItemCount(): Int {

@@ -33,15 +33,15 @@
 
         <Button
             android:id="@+id/btnConfirmUpdate"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="עדכן" />
+            style="@style/ConfirmButtonStyle"
+            android:layout_weight="1"
+            android:text="עדכן פריט" />
 
         <Button
             android:id="@+id/btnDeleteItem"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="מחק" />
+            style="@style/DeleteButtonStyle"
+            android:layout_weight="1"
+            android:text="מחק פריט" />
     </LinearLayout>
 
 </LinearLayout>

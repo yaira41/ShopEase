@@ -2,13 +2,13 @@
     <item
         android:id="@+id/action_wishlist"
         android:icon="@drawable/wishlist_icon"
-        android:title="Wishlists" />
+        android:title="רשימות" />
     <item
         android:id="@+id/action_home"
         android:icon="@drawable/home_icon"
-        android:title="Home" />
+        android:title="בית" />
     <item
         android:id="@+id/action_friends"
         android:icon="@drawable/friends_icon"
-        android:title="Friends" />
+        android:title="חברים" />
 </menu>
