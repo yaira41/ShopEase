@@ -41,7 +41,7 @@ class StrikeThroughTextView : AppCompatTextView {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (strikeThroughEnabled) {
-            val lineY = (height / 2).toFloat()
+            val lineY = (height / 2).toFloat() + 2
             canvas.drawLine(0f, lineY, strikeThroughEndPosition, lineY, strikeThroughPaint)
         }
     }

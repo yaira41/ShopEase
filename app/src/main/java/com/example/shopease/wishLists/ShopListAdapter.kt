@@ -70,7 +70,6 @@ class ShopListAdapter(
             tvShopListItem.text = curItem.title
             cbCheckBox.isChecked = curItem.isChecked
             countItem.text = "${curItem.count} ${curItem.unit}"
-            toggleStrikeThrough(tvShopListItem, cbCheckBox.isChecked, pencilImageView)
             cbCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 toggleStrikeThrough(tvShopListItem, isChecked, pencilImageView)
                 curItem.isChecked = !curItem.isChecked
@@ -99,7 +98,7 @@ class ShopListAdapter(
         pencilImageView.setImageResource(R.drawable.pencil)
 
         val movePencil = ObjectAnimator.ofFloat(pencilImageView, "translationX", tvStartX, tvEndX)
-        movePencil.duration = 850 // Adjust the duration as needed
+        movePencil.duration = 500 // Adjust the duration as needed
 
         movePencil.addUpdateListener { animation ->
             val value = animation.animatedValue as Float
