@@ -87,24 +87,25 @@ class ShopListAdapter(
         pencilImageView.visibility = View.VISIBLE
 
         // Get the starting position of tvShopItemTitle relative to its parent
-        val tvStartX = textView.x // Adjust the offset as needed
+        val tvStartX = textView.x
 
         // Get the ending position of tvShopItemTitle relative to its parent
         val tvEndX = tvStartX + textView.width
 
         // Reset the translationX to the starting position before starting a new animation
-        pencilImageView.translationX = tvStartX - 5
+        pencilImageView.translationX = tvStartX
 
         // Set the pencil image dynamically
         pencilImageView.setImageResource(R.drawable.pencil)
 
         val movePencil = ObjectAnimator.ofFloat(pencilImageView, "translationX", tvStartX, tvEndX)
-        movePencil.duration = 2000 // Adjust the duration as needed
+        movePencil.duration = 850 // Adjust the duration as needed
 
         movePencil.addUpdateListener { animation ->
             val value = animation.animatedValue as Float
-            textView.setStrikeThrough(true, value)
+            textView.setStrikeThrough(true, value - tvStartX)
         }
+
         movePencil.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
                 pencilImageView.visibility = View.GONE
