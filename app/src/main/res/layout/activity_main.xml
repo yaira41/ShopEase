@@ -8,8 +8,8 @@
         android:id="@+id/logoImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
         android:src="@drawable/start_page"
-        android:background="#dbd1c0"
         android:clickable="true"
         android:onClick="navigateToLoginPage" />
 </RelativeLayout>
