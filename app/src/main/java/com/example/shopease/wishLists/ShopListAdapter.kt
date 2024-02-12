@@ -55,6 +55,7 @@ class ShopListAdapter(
             tvShopListItem.setStrikeThrough(true)
         } else {
             tvShopListItem.setStrikeThrough(false)
+            tvShopListItem.setStrikeThroughTextFlag(false)
         }
     }
 
@@ -70,6 +71,7 @@ class ShopListAdapter(
             tvShopListItem.text = curItem.title
             cbCheckBox.isChecked = curItem.isChecked
             countItem.text = "${curItem.count} ${curItem.unit}"
+            tvShopListItem.setStrikeThroughTextFlag(cbCheckBox.isChecked)
             cbCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 toggleStrikeThrough(tvShopListItem, isChecked, pencilImageView)
                 curItem.isChecked = !curItem.isChecked

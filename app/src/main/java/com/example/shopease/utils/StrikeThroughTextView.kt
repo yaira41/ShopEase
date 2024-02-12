@@ -30,6 +30,13 @@ class StrikeThroughTextView : AppCompatTextView {
         strikeThroughPaint.flags = Paint.STRIKE_THRU_TEXT_FLAG
     }
 
+    fun setStrikeThroughTextFlag(enabled: Boolean) {
+        if (enabled) {
+            paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        }else{
+            paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        }
+    }
     fun setStrikeThrough(enabled: Boolean, endPosition: Float = 0f) {
         strikeThroughEnabled = enabled
         if (enabled) {
