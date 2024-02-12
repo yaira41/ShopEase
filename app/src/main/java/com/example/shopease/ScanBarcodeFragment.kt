@@ -1,13 +1,17 @@
 package com.example.shopease
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -20,13 +24,9 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import okio.IOException
 import org.json.JSONObject
-import android.content.Context
-import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
-import com.bumptech.glide.Glide
-import org.json.JSONException
+import java.io.IOException
+import java.net.URL
 
 class BarcodeScannerFragment : Fragment() {
 
@@ -86,20 +86,30 @@ class BarcodeScannerFragment : Fragment() {
             )
         }
     }
-    fun loadImage(context: Context, imageUrl: String, imageView: ImageView) {
-        Glide.with(context)
-            .load(imageUrl)
-            .into(imageView)
-    }
 
-    private fun showProductDialog(context: Context, productName: String, imageUrl: String) {
+    private fun showProductDialog(context: Context, productName: String, imageUrl: String?) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Product Details")
             .setMessage("Name: $productName")
 
-        // Load and set the image using Glide
+        // Load and set the image using Glide asynchronously
         val imageView = ImageView(context)
-        loadImage(context, imageUrl, imageView)
+        if (!imageUrl.isNullOrBlank()) {
+            Thread {
+                try {
+                    val url = URL(imageUrl)
+                    val bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+
+                    // Load the bitmap on the main thread using runOnUiThread
+                    requireActivity().runOnUiThread {
+                        imageView.setImageBitmap(bmp)
+                    }
+                } catch (e: IOException) {
+                    Log.e("Image Loading", "Error loading image", e)
+                }
+            }.start()
+        }
+
         builder.setView(imageView)
 
         builder.setPositiveButton("OK") { dialog, _ ->
@@ -109,6 +119,7 @@ class BarcodeScannerFragment : Fragment() {
         val dialog = builder.create()
         dialog.show()
     }
+
     private fun startScanning() {
         // Start barcode scanning
         barcodeView.resume()
@@ -157,19 +168,16 @@ class BarcodeScannerFragment : Fragment() {
 
                         // Load image on the main thread
                         requireActivity().runOnUiThread {
-                            showProductDialog(requireContext(), productNameEn!!, ingredientsImage!!)
+                            showProductDialog(requireContext(), productNameEn!!, ingredientsImage)
                         }
 
-                    } catch (e: JSONException) {
+                    } catch (e: Exception) {
                         Log.e("JSON Parsing", "Error parsing JSON response", e)
                     }
                 }
             }
         })
     }
-
-
-
 
     override fun onResume() {
         super.onResume()
