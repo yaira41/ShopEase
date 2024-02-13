@@ -65,25 +65,25 @@ class ProfileFragment : Fragment() {
             dialogView.findViewById(R.id.confirmNewPasswordEditText)
 
         val dialog = AlertDialog.Builder(requireContext())
-            .setTitle("Change Password")
+            .setTitle("שנה סיסמה")
             .setView(dialogView)
-            .setPositiveButton("Change") { _, _ ->
+            .setPositiveButton("שנה סיסמה") { _, _ ->
                 val newPassword = newPasswordEditText.text.toString()
                 val confirmNewPassword = confirmNewPasswordEditText.text.toString()
 
                 if (newPassword == confirmNewPassword) {
                     dbHelper.updatePassword(username.toString(),  hashPassword(newPassword)) {success ->
                         if(success) {
-                            Toast.makeText(requireContext(), "Password changed successfully",
+                            Toast.makeText(requireContext(), "הסיסמה עודכנה בהצלחה",
                                 Toast.LENGTH_SHORT).show()
                         }
                     }
                 } else {
                     Toast.makeText(requireContext(),
-                        "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        "הסיסמאות אינן זהות", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("בטל", null)
             .create()
 
         dialog.show()

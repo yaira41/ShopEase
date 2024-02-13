@@ -26,7 +26,6 @@ class WishlistsAdapter(
 
     class WishListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val shopListName: TextView = itemView.findViewById(R.id.tvShopListTitle)
-        val deleteButton: Button = itemView.findViewById(R.id.btnDelete)
     }
 
     override fun onCreateViewHolder(
@@ -72,29 +71,6 @@ class WishlistsAdapter(
             itemLongClickListener?.onItemLongClick(position, parentView)
             true // Consume the long click event
         }
-
-        // Set click listener for delete button
-        holder.deleteButton.setOnClickListener {
-            // Handle delete button click
-            onItemDeleteButtonClick(position)
-        }
-    }
-
-    private fun onItemDeleteButtonClick(position: Int) {
-        // Handle delete button click
-//        val selectedList = items[position]
-////        Toast.makeText(
-////            holder.itemView.context,
-////            "Delete ${selectedList.name}",
-////            Toast.LENGTH_SHORT
-////        ).show()
-//
-//        // Remove the shop list from the list and update the adapter
-//        items.removeAt(position)
-//        notifyItemRemoved(position)
-
-        // Perform deletion in the database (you need to implement this)
-        // dbHelper.deleteShopList(selectedList.id)
     }
 
     override fun getItemCount(): Int {

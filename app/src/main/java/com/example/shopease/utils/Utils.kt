@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import java.security.MessageDigest
 
 object Utils {
-
     fun hashPassword(password: String): String {
         val bytes = password.toByteArray()
         val md = MessageDigest.getInstance("SHA-256")

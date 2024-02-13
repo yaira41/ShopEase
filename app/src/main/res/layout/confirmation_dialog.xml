@@ -20,17 +20,13 @@
 
         <Button
             android:id="@+id/btnConfirmDelete"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:text="חיובי!" />
+            style="@style/DeleteButtonStyle"
+            android:text="כן" />
 
         <Button
             android:id="@+id/btnCancelDelete"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:text="שלילי!" />
+            style="@style/ConfirmButtonStyle"
+            android:text="לא" />
     </LinearLayout>
 
 </LinearLayout>

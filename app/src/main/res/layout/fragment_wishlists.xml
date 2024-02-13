@@ -13,7 +13,6 @@
         android:hint="הרשימות שלי"
         android:padding="10dp" />
 
-    <!-- Floating Action Button (FAB) on the left bottom -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/bMoveToMyShopList"
         android:layout_width="90dp"
@@ -24,7 +23,6 @@
         android:layout_marginBottom="16dp"
         android:src="@drawable/plus" />
 
-    <!-- RecyclerView with left margin -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAllLists"
         android:layout_width="match_parent"
