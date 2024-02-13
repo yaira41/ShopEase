@@ -114,7 +114,7 @@ class BarcodeScannerFragment : Fragment() {
         }
         // Add button to add product to lists
         builder.setPositiveButton("הוסף מוצר לרשימה") { _, _ ->
-            showChooseListDialog(productName, dialogView)
+            showChooseListDialog(productName)
         }
 
         builder.setNegativeButton("בטל") { dialog, _ ->
@@ -124,7 +124,7 @@ class BarcodeScannerFragment : Fragment() {
         val dialog = builder.create()
         dialog.show()
     }
-    private fun showChooseListDialog(productName: String, dialogView: View) {
+    private fun showChooseListDialog(productName: String) {
         val username = (activity as BaseActivity?)?.username
         shopListsHelper.getAllUserLists(username!!) { shopLists ->
             val listNames = shopLists.map { it.name }.toTypedArray()
@@ -133,7 +133,7 @@ class BarcodeScannerFragment : Fragment() {
             builder.setTitle("בחר רשימה:")
                 .setItems(listNames) { dialog, which ->
                     val selectedList = shopLists[which]
-                    showAddToShopListDialog(selectedList.id!!, productName, dialogView)
+                    showAddToShopListDialog(selectedList.id!!, productName)
                     dialog.dismiss()
                 }
 
@@ -142,8 +142,10 @@ class BarcodeScannerFragment : Fragment() {
         }
     }
 
-    private fun showAddToShopListDialog(listId: String, productName: String, dialogView: View) {
+    private fun showAddToShopListDialog(listId: String, productName: String) {
         val builder = AlertDialog.Builder(requireContext())
+        val inflater = LayoutInflater.from(requireContext())
+        val dialogView = inflater.inflate(R.layout.dialog_add_to_shop_list, null)
         builder.setView(dialogView)
 
         val countItemEditText = dialogView.findViewById<EditText>(R.id.countItemEditText)
