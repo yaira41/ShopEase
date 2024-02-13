@@ -214,8 +214,8 @@ class BarcodeScannerFragment : Fragment() {
                             val productNameEn =
                                 product?.optString("product_name", "שם המוצר אינו קיים.")
                             val images = product?.optJSONObject("selected_images")
-                            val ingredientsImage =
-                                images?.optJSONObject("ingredients")?.optString("small", "")
+                            val ingredientsImage = images?.optJSONObject("ingredients")?.optJSONObject("small")
+                                ?.optString("en", "")
 
                             Log.d("Product Info", "Product Name (English): $productNameEn")
 
