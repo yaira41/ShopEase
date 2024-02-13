@@ -1,6 +1,7 @@
 package com.example.shopease
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -10,11 +11,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
@@ -24,6 +29,7 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 import java.net.URL
@@ -31,8 +37,7 @@ import java.net.URL
 class BarcodeScannerFragment : Fragment() {
 
     private lateinit var barcodeView: CompoundBarcodeView
-    private lateinit var scanButton: Button
-
+    private val shopListsHelper by lazy { ShopListsDatabaseHelper() }
     private val CAMERA_PERMISSION_REQUEST_CODE = 123
 
     override fun onCreateView(
@@ -46,12 +51,6 @@ class BarcodeScannerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         barcodeView = view.findViewById(R.id.barcode_scanner)
-        scanButton = view.findViewById(R.id.scanButton)
-
-        scanButton.setOnClickListener {
-            checkCameraPermission()
-        }
-
         barcodeView.decodeSingle(object : BarcodeCallback {
             override fun barcodeResult(result: BarcodeResult?) {
                 result?.let {
@@ -87,13 +86,17 @@ class BarcodeScannerFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showProductDialog(context: Context, productName: String, imageUrl: String?) {
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("Product Details")
-            .setMessage("Name: $productName")
+        val inflater = LayoutInflater.from(context)
+        val dialogView = inflater.inflate(R.layout.dialog_product_info, null)
+        builder.setView(dialogView)
 
         // Load and set the image using Glide asynchronously
-        val imageView = ImageView(context)
+        val productImageView = dialogView.findViewById<ImageView>(R.id.productImageView)
+        val productNameTextView = dialogView.findViewById<TextView>(R.id.productNameTextView)
+        productNameTextView.text = " שם מוצר:  $productName"
         if (!imageUrl.isNullOrBlank()) {
             Thread {
                 try {
@@ -102,43 +105,76 @@ class BarcodeScannerFragment : Fragment() {
 
                     // Load the bitmap on the main thread using runOnUiThread
                     requireActivity().runOnUiThread {
-                        imageView.setImageBitmap(bmp)
+                        productImageView.setImageBitmap(bmp)
                     }
                 } catch (e: IOException) {
                     Log.e("Image Loading", "Error loading image", e)
                 }
             }.start()
         }
+        // Add button to add product to lists
+        builder.setPositiveButton("הוסף מוצר לרשימה") { _, _ ->
+            showChooseListDialog(productName, dialogView)
+        }
 
-        builder.setView(imageView)
-
-        builder.setPositiveButton("OK") { dialog, _ ->
+        builder.setNegativeButton("בטל") { dialog, _ ->
             dialog.dismiss()
         }
 
         val dialog = builder.create()
         dialog.show()
     }
+    private fun showChooseListDialog(productName: String, dialogView: View) {
+        val username = (activity as BaseActivity?)?.username
+        shopListsHelper.getAllUserLists(username!!) { shopLists ->
+            val listNames = shopLists.map { it.name }.toTypedArray()
+
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("בחר רשימה:")
+                .setItems(listNames) { dialog, which ->
+                    val selectedList = shopLists[which]
+                    showAddToShopListDialog(selectedList.id!!, productName, dialogView)
+                    dialog.dismiss()
+                }
+
+            val dialog = builder.create()
+            dialog.show()
+        }
+    }
+
+    private fun showAddToShopListDialog(listId: String, productName: String, dialogView: View) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setView(dialogView)
+
+        val countItemEditText = dialogView.findViewById<EditText>(R.id.countItemEditText)
+        val addToShopListButton = dialogView.findViewById<Button>(R.id.addToShopListButton)
+
+        addToShopListButton.setOnClickListener {
+            val countItem = countItemEditText.text.toString().toIntOrNull() ?: 1
+
+            // Call the method to add the product to the selected shop list
+            addToShopList(listId, productName, countItem, "יחידות")
+
+            // Dismiss the dialog
+            builder.create().dismiss()
+            showToast("נוסף בהצלחה. $productName המוצר")
+        }
+
+        builder.setPositiveButton("בטל") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+    private fun addToShopList(listId: String, title: String, countItem: Int, unit: String) {
+        val shopListsHelper = ShopListsDatabaseHelper()
+        shopListsHelper.addProductToList(listId, title, countItem, unit)
+    }
 
     private fun startScanning() {
         // Start barcode scanning
         barcodeView.resume()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, start scanning
-                startScanning()
-            } else {
-                // Permission denied, show a message or handle accordingly
-                Log.d("Permission", "Camera permission denied")
-            }
-        }
     }
 
     private fun fetchProductInfo(barcodeNumber: String) {
@@ -159,19 +195,40 @@ class BarcodeScannerFragment : Fragment() {
                 if (responseData != null) {
                     try {
                         val jsonResponse = JSONObject(responseData)
-                        val product = jsonResponse.optJSONObject("product")
-                        val productNameEn = product?.optString("product_name_en", "Product Name not available")
-                        val images = product?.optJSONObject("selected_images")
-                        val ingredientsImage = images?.optJSONObject("ingredients")?.optJSONObject("small")?.optString("en")
+                        val status = jsonResponse.optInt("status")
+                        if (status == 0) {
+                            // Product not found, handle accordingly (e.g., show a message)
+                            Log.d("Product Info", "Product not found")
+                            requireActivity().runOnUiThread {
+                                // Show a message or perform any action for a not found product
+                                // You can also modify the showProductDialog method to handle this case
+                                showProductDialog(
+                                    requireContext(),
+                                    "מצטערים, המוצר אינו נמצא.",
+                                    null
+                                )
+                            }
+                        } else {
+                            // Product found, continue parsing and displaying details
+                            val product = jsonResponse.optJSONObject("product")
+                            val productNameEn =
+                                product?.optString("product_name", "שם המוצר אינו קיים.")
+                            val images = product?.optJSONObject("selected_images")
+                            val ingredientsImage =
+                                images?.optJSONObject("ingredients")?.optString("small", "")
 
-                        Log.d("Product Info", "Product Name (English): $productNameEn")
+                            Log.d("Product Info", "Product Name (English): $productNameEn")
 
-                        // Load image on the main thread
-                        requireActivity().runOnUiThread {
-                            showProductDialog(requireContext(), productNameEn!!, ingredientsImage)
+                            // Load image on the main thread
+                            requireActivity().runOnUiThread {
+                                showProductDialog(
+                                    requireContext(),
+                                    productNameEn!!,
+                                    ingredientsImage
+                                )
+                            }
                         }
-
-                    } catch (e: Exception) {
+                    } catch (e: JSONException) {
                         Log.e("JSON Parsing", "Error parsing JSON response", e)
                     }
                 }
@@ -183,7 +240,9 @@ class BarcodeScannerFragment : Fragment() {
         super.onResume()
         checkCameraPermission()
     }
-
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
     override fun onPause() {
         super.onPause()
         barcodeView.pause()

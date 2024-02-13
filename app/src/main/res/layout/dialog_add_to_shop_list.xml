@@ -1,0 +1,21 @@
+<!-- Inside dialog_add_to_shop_list.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/countItemEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="כמות"
+        android:inputType="numberSigned"/>
+
+    <Button
+        android:id="@+id/addToShopListButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="הוסף לרשימה"/>
+
+</LinearLayout>

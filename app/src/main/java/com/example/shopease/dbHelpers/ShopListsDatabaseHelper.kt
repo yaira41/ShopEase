@@ -78,6 +78,23 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                 }
             })
     }
+    fun addProductToList(listId: String, product: String, countItem: Int, unit: String) {
+        val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
+
+        // Create a unique key for the new product entry in the shop list
+        val newItemRef = shopListRef.push()
+
+        // Construct the product entry
+        val productEntry = mapOf(
+            "title" to product,
+            "count" to countItem,
+            "unit" to unit,
+            "checked" to false
+        )
+
+        // Set the product entry in the shop list
+        newItemRef.setValue(productEntry)
+    }
     fun isExistProductInList(listId: String, productName: String, callback: CheckProductExistenceCallback) {
         val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
 
