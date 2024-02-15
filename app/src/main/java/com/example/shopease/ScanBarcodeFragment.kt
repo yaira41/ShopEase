@@ -215,9 +215,8 @@ class BarcodeScannerFragment : Fragment() {
                             val product = jsonResponse.optJSONObject("product")
                             val productNameEn =
                                 product?.optString("product_name", "שם המוצר אינו קיים.")
-                            val images = product?.optJSONObject("selected_images")
-                            val ingredientsImage = images?.optJSONObject("ingredients")?.optJSONObject("small")
-                                ?.optString("en", "")
+                            val frontImage = product?.optString("image_front_url") ?:
+                            product?.optString("image_front_small_url")
 
                             Log.d("Product Info", "Product Name (English): $productNameEn")
 
@@ -226,7 +225,7 @@ class BarcodeScannerFragment : Fragment() {
                                 showProductDialog(
                                     requireContext(),
                                     productNameEn!!,
-                                    ingredientsImage
+                                    frontImage
                                 )
                             }
                         }
