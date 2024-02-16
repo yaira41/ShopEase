@@ -4,7 +4,10 @@
 
     <!-- Add the camera permission -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
 
 
     <application
@@ -17,6 +20,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShopEase"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyB6DN98YbbcNAYK2aTGZc6No0sNjs5DpbE" />
+<!--        android:value="AIzaSyC_8PFoC9lX33FaMVtmZVdGVm6iGgE16JI" />-->
+
+
+
 
         <activity
             android:name=".MainActivity"
