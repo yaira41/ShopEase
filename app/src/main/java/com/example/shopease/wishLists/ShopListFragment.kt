@@ -20,6 +20,15 @@ import com.example.shopease.dataClasses.ShopListItem
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import androidx.core.app.ActivityCompat
+
 
 class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.BottomSheetListener {
     private lateinit var shopListAdapter: ShopListAdapter
@@ -30,6 +39,9 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
     private lateinit var shopListName: TextView
     private lateinit var dbHelper: ShopListsDatabaseHelper
     private lateinit var friendDbHelper: RequestsDatabaseHelper
+    private val PERMISSION_REQUEST_CODE = 101
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -43,6 +55,19 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         id = arguments?.getString("SHOP_LIST_ID_KEY") ?: ""
         name = arguments?.getString("SHOP_LIST_NAME_KEY") ?: "New List"
         username = arguments?.getString("USERNAME_KEY") ?: ""
+        // Ensure correct context for permission request
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        // Create ActivityResultLauncher for permission request
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                getCurrentLocation()
+            } else {
+                Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
         shopListAdapter = ShopListAdapter(mutableListOf(),
             itemLongClickListener = object : ShopListAdapter.OnItemLongClickListener {
                 override fun onItemLongClick(position: Int, view: View) {
@@ -79,11 +104,33 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         }
 
         val shareListButton = view.findViewById<Button>(R.id.sharedListButton)
+
+        // Location button setup
+//        val button4 = view.findViewById<Button>(R.id.button4) // Replace with your actual button ID
+//        button4.setOnClickListener {
+//            if (ContextCompat.checkSelfPermission(
+//                    requireContext(),
+//                    Manifest.permission.ACCESS_FINE_LOCATION
+//                ) == PackageManager.PERMISSION_GRANTED
+//            ) {
+//                getCurrentLocation()
+//            } else {
+//                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+//            }
+//        }
+//        val button4 = view.findViewById<Button>(R.id.button4)
+//        button4.setOnClickListener {
+//            findNavController().navigate(R.id.action_shopListFragment_to_locationPickerFragment)
+//        }
+
+
         shopListName = view.findViewById(R.id.tvListName)
 
         shareListButton.setOnClickListener {
             showShareListDialog()
         }
+
+
 
         // Initially, show the TextView and hide the EditText
         shopListName.text = name
@@ -113,6 +160,34 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         }
 
         return view;
+    }
+
+    private fun getCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Request permission if not granted
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSION_REQUEST_CODE
+            )
+        } else {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    // Got the location
+                    val latitude = location.latitude
+                    val longitude = location.longitude
+                    // Do something with the latitude and longitude, e.g., display them
+                    Toast.makeText(context, "Latitude: $latitude, Longitude: $longitude", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Couldn't get location", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun onDeleteButtonClick(position: Int) {
@@ -244,5 +319,18 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         dbHelper.updateShopListItem(id, position, shopListItem)
         shopListAdapter.items[position] = shopListItem
         shopListAdapter.notifyItemChanged(position)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            getCurrentLocation()
+        } else {
+            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+        }
     }
 }
