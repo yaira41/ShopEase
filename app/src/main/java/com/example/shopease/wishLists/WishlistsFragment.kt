@@ -146,10 +146,11 @@ class WishlistsFragment : Fragment() {
     }
 
     private fun showCreateListDialog() {
-        val builder = AlertDialog.Builder(requireContext())
+        val context = context ?: return  // Check if the fragment is attached to a context
+        val builder = AlertDialog.Builder(context)
         builder.setTitle("שם רשימה")
 
-        val input = EditText(requireContext())
+        val input = EditText(context)
         builder.setView(input)
 
         builder.setPositiveButton("צור") { _, _ ->
@@ -179,7 +180,6 @@ class WishlistsFragment : Fragment() {
             dialog.cancel()
         }
 
-        // Move builder.show() here
         builder.show()
     }
 

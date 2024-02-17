@@ -20,7 +20,6 @@ class HomeFragment : Fragment() {
         btnGoToScan.setOnClickListener {
             (activity as BaseActivity?)?.loadFragment(BarcodeScannerFragment())
         }
-
         return view // Return the view you've inflated
     }
 }
