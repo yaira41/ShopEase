@@ -1,7 +1,11 @@
 package com.example.shopease.utils
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.security.MessageDigest
 
 object Utils {
@@ -32,5 +36,19 @@ object Utils {
 
     fun byteArrayToBitmap(byteArray: ByteArray?): Bitmap {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
+    }
+    fun uriToByteArray(context: Context, uri: Uri): ByteArray? {
+        try {
+            val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
+            inputStream?.let {
+                val bitmap = BitmapFactory.decodeStream(it)
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+                return byteArrayOutputStream.toByteArray()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
     }
 }

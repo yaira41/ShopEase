@@ -14,7 +14,7 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     private lateinit var bottomNavigation: BottomNavigationView
     public var username: String? = null
     private var email: String? = null
-    private var imageProfile: ByteArray? = null
+    public var imageProfile: ByteArray? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

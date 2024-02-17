@@ -1,10 +1,12 @@
 package com.example.shopease.dbHelpers
 
 import android.util.Log
-import com.example.shopease.utils.LoginCallback
 import com.example.shopease.dataClasses.User
+import com.example.shopease.utils.LoginCallback
 import com.example.shopease.utils.Utils.byteArrayToBase64
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 
 
 class UsersDatabaseHelper : BaseDatabaseHelper() {
@@ -76,6 +78,41 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
                 }
             })
     }
+
+    fun updateImage(username: String, newImageUrl: ByteArray?, callback: (Boolean) -> Unit) {
+        val base64ImageProfile = byteArrayToBase64(newImageUrl)
+        val usersRef = databaseReference.child("users")
+        usersRef.orderByChild("username").equalTo(username)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val userId = snapshot.children.first().key
+                        val userRef = usersRef.child(userId ?: "")
+                        userRef.child("profileImage").setValue(base64ImageProfile)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    callback(true)
+                                } else {
+                                    Log.e(
+                                        "FirebaseHelper",
+                                        "Error updating profile image URL",
+                                        task.exception
+                                    )
+                                    callback(false)
+                                }
+                            }
+                    } else {
+                        callback(false)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseHelper", "Error updating profile image URL", error.toException())
+                    callback(false)
+                }
+            })
+    }
+
 
     fun addUser(
         username: String,
