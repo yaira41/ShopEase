@@ -30,6 +30,7 @@ class ProfileFragment : Fragment() {
     private lateinit var emailTextView: TextView
     private lateinit var imageProfileView: ImageButton
     private lateinit var changePasswordButton: Button
+    private lateinit var logoutButton: Button
     private lateinit var dbHelper: UsersDatabaseHelper
     private var username: String? = null
     private var email: String? = null
@@ -47,7 +48,7 @@ class ProfileFragment : Fragment() {
         emailTextView = view.findViewById(R.id.tvEmailProfile)
         changePasswordButton = view.findViewById(R.id.changePasswordButton)
         imageProfileView = view.findViewById(R.id.imageProfileFragment)
-
+        logoutButton = view.findViewById(R.id.btnLogout)
         // Replace these values with the actual username and email
         username = arguments?.getString("USERNAME_KEY")
         email = arguments?.getString("EMAIL_KEY")
@@ -66,7 +67,10 @@ class ProfileFragment : Fragment() {
         imageProfileView.setOnClickListener {
             showProfileImageDialog()
         }
-
+        logoutButton.setOnClickListener{
+            dbHelper.logoutUser()
+            (activity as BaseActivity).finish()
+        }
 
         return view
     }
@@ -175,9 +179,4 @@ class ProfileFragment : Fragment() {
             }
         }
     }
-    fun logoutUser() {
-        auth.signOut()
-        Log.d("UserDatabaseHelper", "User logged out")
-    }
-
 }

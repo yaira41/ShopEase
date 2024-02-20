@@ -98,7 +98,7 @@ class RegisterActivity : AppCompatActivity() {
             return false
         }
 
-        if (username.length < 6) {
+        if (passwordEditText.text.length < 6) {
             showToast("סיסמה קצרה מידי.")
             return false
         }

@@ -209,4 +209,8 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
         user?.updatePassword(newPassword)
             ?.addOnCompleteListener(onCompleteListener)
     }
+    fun logoutUser() {
+        FirebaseManager.auth.signOut()
+        Log.d("UserDatabaseHelper", "User logged out")
+    }
 }

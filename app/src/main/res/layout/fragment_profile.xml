@@ -70,6 +70,15 @@
         android:layout_below="@id/profileTable"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="10dp"
         android:text="שנה סיסמה" />
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="168dp"
+        android:layout_height="48dp"
+        android:layout_below="@+id/changePasswordButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="300dp"
+        android:text="התנתק" />
 </RelativeLayout>
