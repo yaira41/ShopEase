@@ -14,9 +14,9 @@ interface CheckProductExistenceCallback {
 }
 
 class ShopListsDatabaseHelper : BaseDatabaseHelper() {
-    init {
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
-    }
+//    init {
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+//    }
 
     interface InsertShopListCallback {
         fun onShopListInserted(shopList: ShopList?)
@@ -24,7 +24,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
 
     fun getAllUserLists(userName: String, listener: (List<ShopList>) -> Unit) {
         val query =
-            databaseReference.child("shopLists").orderByChild("members/$userName").equalTo(true)
+            databaseReference.child("shopLists")
 
         // Enable offline persistence for the query
         query.keepSynced(true)
@@ -54,7 +54,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                             val itemTitle =
                                 itemSnapshot.child("title").getValue(String::class.java) ?: "asd"
                             val itemState =
-                                itemSnapshot.child("checked").getValue(Boolean::class.java) ?: false
+                                itemSnapshot.child("isChecked").getValue(Boolean::class.java) ?: false
                             val itemCount =
                                 itemSnapshot.child("count").getValue(Int::class.java) ?: 1
                             val itemUnit =
@@ -93,7 +93,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
             "title" to product,
             "count" to countItem,
             "unit" to unit,
-            "checked" to false
+            "isChecked" to false
         )
 
         // Set the product entry in the shop list
@@ -138,7 +138,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                             itemSnapshot.child("title").getValue(String::class.java)
                                 ?: "asd"
                         val itemState =
-                            itemSnapshot.child("checked").getValue(Boolean::class.java)
+                            itemSnapshot.child("isChecked").getValue(Boolean::class.java)
                                 ?: false
                         val itemCount =
                             itemSnapshot.child("count").getValue(Int::class.java)

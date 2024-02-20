@@ -77,7 +77,7 @@ class FriendSearchFragment : Fragment() {
     private fun sendFriendRequest() {
         // Get the user being searched for
         val searchedUsername = usernameEditText.text.toString()
-        val senderUsername = (activity as BaseActivity).username
+        val senderUsername = (activity as BaseActivity).user?.username
 
         // Check if the user is not sending a request to themselves
         if (senderUsername != searchedUsername) {

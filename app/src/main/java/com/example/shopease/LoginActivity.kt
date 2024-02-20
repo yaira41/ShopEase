@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
@@ -16,7 +17,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
     private lateinit var signupButton: Button
-
+    private lateinit var auth: FirebaseAuth
     private lateinit var dbHelper: UsersDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,8 +28,24 @@ class LoginActivity : AppCompatActivity() {
         passwordEditText = findViewById(R.id.passwordLoginEditText)
         loginButton = findViewById(R.id.loginButton)
         signupButton = findViewById(R.id.signupButton)
-
+        auth = FirebaseAuth.getInstance()
         dbHelper = UsersDatabaseHelper()
+        checkConnection()
+    }
+
+    private fun checkConnection() {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            dbHelper.getUserByUid(currentUser.uid, object : UsersDatabaseHelper.GetUserCallback {
+                override fun onUserResult(user: User?) {
+                    if (user != null) {
+                        showToast("היי, ראינו שהתחברת כבר.")
+                        navigateToHomeActivity(user) // You can pass the currentUser object to your HomeActivity
+                        finish()
+                    }
+                }
+            })
+        }
     }
 
     fun onLoginButtonClick(view: View) {
@@ -42,12 +59,12 @@ class LoginActivity : AppCompatActivity() {
                 if (user != null) {
                     // Login successful, user object is not null
                     // You can access user properties here
-                    showToast("Login successful. Welcome, ${user.username}!")
+                    showToast("התחברת בהצלחה.${user.username}!")
                     navigateToHomeActivity(user)
                     finish()
                 } else {
                     // Login failed, user object is null
-                    showToast("Invalid login credentials.")
+                    showToast("בעיה בהתחברות")
                 }
             }
         })

@@ -147,9 +147,9 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                     object : ShopListsDatabaseHelper.InsertShopListCallback {
                         override fun onShopListInserted(shopList: ShopList?) {
                             if (shopList != null) {
-                                showToast("Shop list updated successfully.")
+                                showToast("הרשימה עודכנה בהצלחה.")
                             } else {
-                                showToast("Failed to update shop list")
+                                showToast("משהו השתבש.")
                             }
                         }
                     }

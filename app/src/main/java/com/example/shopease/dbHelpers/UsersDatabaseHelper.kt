@@ -3,6 +3,8 @@ package com.example.shopease.dbHelpers
 import android.util.Log
 import com.example.shopease.dataClasses.User
 import com.example.shopease.utils.Utils.byteArrayToBase64
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -15,6 +17,9 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
 
     interface LoginCallback {
         fun onLoginResult(user: User?)
+    }
+    interface GetUserCallback {
+        fun onUserResult(user: User?)
     }
 
     fun registerUser(
@@ -122,11 +127,28 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
                 }
             })
     }
-
-    fun updateImage(username: String, newImageUrl: ByteArray?, callback: (Boolean) -> Unit) {
-        val base64ImageProfile = byteArrayToBase64(newImageUrl)
+    fun isUsernameExists(username: String, callback: (Boolean) -> Unit) {
         val usersRef = databaseReference.child("users")
         usersRef.orderByChild("username").equalTo(username)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    callback(snapshot.exists())
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(
+                        "FirebaseHelper",
+                        "Error checking username existence",
+                        error.toException()
+                    )
+                    callback(false)
+                }
+            })
+    }
+    fun updateImage(uid: String, newImageUrl: ByteArray?, callback: (Boolean) -> Unit) {
+        val base64ImageProfile = byteArrayToBase64(newImageUrl)
+        val usersRef = databaseReference.child("users")
+        usersRef.orderByChild("uid").equalTo(uid)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
@@ -161,67 +183,30 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
             })
     }
 
-//    fun addUser(
-//        username: String,
-//        email: String,
-//        imageProfile: ByteArray?,
-//        password: String,
-//        callback: (Boolean) -> Unit
-//    ) {
-//        val userId = auth.currentUser?.uid ?: databaseReference.push().key
-//        val userRef = databaseReference.child("users").child(userId ?: "")
-//        // Convert the ByteArray to a base64-encoded string before storing
-//        val base64ImageProfile = byteArrayToBase64(imageProfile)
-//
-//        // Create a User object with the provided data
-//        val user = User(userId ?: "", username, email, base64ImageProfile)
-//
-//        userRef.setValue(user)
-//            .addOnCompleteListener { task ->
-//                if (task.isSuccessful) {
-//                    Log.d("FirebaseHelper", "User added successfully. UserId: $userId")
-//                    callback(true)
-//                } else {
-//                    Log.e("FirebaseHelper", "Error adding user", task.exception)
-//                    callback(false)
-//                }
-//            }
-//            .addOnFailureListener { exception ->
-//                Log.e("FirebaseHelper", "Failure adding user", exception)
-//                callback(false)
-//            }
-//    }
-
-    fun updatePassword(username: String, newPassword: String, callback: (Boolean) -> Unit) {
-        val usersRef = databaseReference.child("users")
-        usersRef.orderByChild("username").equalTo(username)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        val userId = snapshot.children.first().key
-                        val userRef = usersRef.child(userId ?: "")
-                        userRef.child("password").setValue(newPassword)
-                            .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    callback(true)
-                                } else {
-                                    Log.e(
-                                        "FirebaseHelper",
-                                        "Error updating password",
-                                        task.exception
-                                    )
-                                    callback(false)
-                                }
-                            }
-                    } else {
-                        callback(false)
-                    }
+    fun getUserByUid(uid: String, callback: GetUserCallback) {
+        val userRef = databaseReference.child("users").child(uid)
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val userData = snapshot.getValue(User::class.java)
+                if (userData != null) {
+                    // User data retrieved successfully
+                    callback.onUserResult(userData)
+                } else {
+                    // User data not found
+                    callback.onUserResult(null)
                 }
+            }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("FirebaseHelper", "Error updating password", error.toException())
-                    callback(false)
-                }
-            })
+            override fun onCancelled(error: DatabaseError) {
+                // Handle the error
+                callback.onUserResult(null)
+            }
+        })
+    }
+    fun updatePassword(newPassword: String, onCompleteListener: OnCompleteListener<Void>) {
+        val user: FirebaseUser? = auth.currentUser
+
+        user?.updatePassword(newPassword)
+            ?.addOnCompleteListener(onCompleteListener)
     }
 }

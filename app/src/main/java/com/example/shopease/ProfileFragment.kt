@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +17,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.shopease.dbHelpers.FirebaseManager.auth
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.utils.Utils
+import com.example.shopease.utils.Utils.base64ToByteArray
+import com.example.shopease.utils.Utils.byteArrayToBase64
+import com.google.android.gms.tasks.OnCompleteListener
 
 class ProfileFragment : Fragment() {
 
@@ -28,7 +33,7 @@ class ProfileFragment : Fragment() {
     private lateinit var dbHelper: UsersDatabaseHelper
     private var username: String? = null
     private var email: String? = null
-    private var imageProfile: ByteArray? = null
+    private var imageProfile: String? = null
     private val GALLERY_REQUEST_CODE = 1001
 
     override fun onCreateView(
@@ -46,13 +51,13 @@ class ProfileFragment : Fragment() {
         // Replace these values with the actual username and email
         username = arguments?.getString("USERNAME_KEY")
         email = arguments?.getString("EMAIL_KEY")
-        imageProfile = arguments?.getByteArray("PROFILE_IMAGE_KEY")
+        imageProfile = arguments?.getString("PROFILE_IMAGE_KEY")
 
         dbHelper = UsersDatabaseHelper()
         // Set username and email in the UI
         usernameTextView.text = username
         emailTextView.text = email
-        setByteArrayImageOnImageView(imageProfile, imageProfileView)
+        setByteArrayImageOnImageView(base64ToByteArray(imageProfile!!), imageProfileView)
 
         // Handle the change password button click
         changePasswordButton.setOnClickListener {
@@ -80,17 +85,15 @@ class ProfileFragment : Fragment() {
                 val confirmNewPassword = confirmNewPasswordEditText.text.toString()
 
                 if (newPassword == confirmNewPassword) {
-                    dbHelper.updatePassword(
-                        username.toString(),
-                        newPassword
-                    ) { success ->
-                        if (success) {
-                            Toast.makeText(
-                                requireContext(), "הסיסמה עודכנה בהצלחה",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                    dbHelper.updatePassword(newPassword, OnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            // Password changed successfully
+                            Log.d("UserDatabaseHelper", "Password changed successfully")
+                        } else {
+                            // Handle the error
+                            Log.e("UserDatabaseHelper", "Error changing password: ${task.exception}")
                         }
-                    }
+                    })
                 } else {
                     Toast.makeText(
                         requireContext(),
@@ -115,7 +118,7 @@ class ProfileFragment : Fragment() {
         val changeImageButton: Button = dialogView.findViewById(R.id.changeProfileImageButton)
 
         // Set the profile image in the dialog
-        setByteArrayImageOnImageView(imageProfile, profileImageView)
+        setByteArrayImageOnImageView(base64ToByteArray(imageProfile!!), profileImageView)
 
         // Handle the change image button click
         changeImageButton.setOnClickListener {
@@ -162,7 +165,7 @@ class ProfileFragment : Fragment() {
 
                 // Update the image in the ImageView
                 setByteArrayImageOnImageView(selectedImageByteArray, imageProfileView)
-                (activity as BaseActivity).imageProfile = selectedImageByteArray
+                (activity as BaseActivity).user?.profileImage = byteArrayToBase64(selectedImageByteArray)
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -172,6 +175,9 @@ class ProfileFragment : Fragment() {
             }
         }
     }
-
+    fun logoutUser() {
+        auth.signOut()
+        Log.d("UserDatabaseHelper", "User logged out")
+    }
 
 }

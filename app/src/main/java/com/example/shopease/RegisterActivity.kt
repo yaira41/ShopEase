@@ -88,18 +88,29 @@ class RegisterActivity : AppCompatActivity() {
     private fun isRegistrationValid(username: String, email: String): Boolean {
         // Check if the email is valid
         if (!isValidEmail(email)) {
-            showToast("Invalid email address.")
+            showToast("מייל בנוי בצורה שגויה.")
             return false
         }
 
         // Check if the username and email are not empty
         if (username.isEmpty() || email.isEmpty()) {
-            showToast("Username and email cannot be empty.")
+            showToast("ערכים לא יכולים להיות ריקים.")
+            return false
+        }
+
+        if (username.length < 6) {
+            showToast("סיסמה קצרה מידי.")
             return false
         }
 
         // Check if the email do not already exist in the database
         var result = true
+        usersDatabaseHelper.isUsernameExists(username) { exist ->
+            if (exist) {
+                result = false
+                showToast("היוזר כבר בשימוש")
+            }
+        }
         usersDatabaseHelper.isEmailExists(email) { exist ->
             if (exist) {
                 result = false

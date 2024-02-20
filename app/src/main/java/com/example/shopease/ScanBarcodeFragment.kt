@@ -125,7 +125,7 @@ class BarcodeScannerFragment : Fragment() {
         dialog.show()
     }
     private fun showChooseListDialog(productName: String) {
-        val username = (activity as BaseActivity?)?.username
+        val username = (activity as BaseActivity?)?.user?.username
         shopListsHelper.getAllUserLists(username!!) { shopLists ->
             val listNames = shopLists.map { it.name }.toTypedArray()
 

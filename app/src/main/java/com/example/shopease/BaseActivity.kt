@@ -6,15 +6,14 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.shopease.dataClasses.User
 import com.example.shopease.friends.FriendsFragment
 import com.example.shopease.wishLists.WishlistsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     private lateinit var bottomNavigation: BottomNavigationView
-    public var username: String? = null
-    private var email: String? = null
-    public var imageProfile: ByteArray? = null
+    public var user: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +29,7 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     }
 
     internal fun handleIntentExtras() {
-        username = intent.getStringExtra("USERNAME_KEY")
-        email = intent.getStringExtra("EMAIL_KEY")
-        imageProfile = intent.getByteArrayExtra("PROFILE_IMAGE_KEY")
+        user = intent.getSerializableExtra("USER_KEY") as User?
     }
 
     internal fun setBottomNavBar() {
@@ -42,7 +39,7 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
             when (menuItem.itemId) {
                 R.id.action_wishlist -> {
                     val bundle = Bundle()
-                    bundle.putString("USERNAME_KEY", username)
+                    bundle.putString("USERNAME_KEY", user?.username)
                     loadFragment(WishlistsFragment(), bundle)
                     true
                 }
@@ -94,9 +91,9 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
         val profileFragment = ProfileFragment()
         // Create a Bundle and add data to it
         val bundle = Bundle()
-        bundle.putString("USERNAME_KEY", username)
-        bundle.putString("EMAIL_KEY", email)
-        bundle.putByteArray("PROFILE_IMAGE_KEY", imageProfile)
+        bundle.putString("USERNAME_KEY", user?.username)
+        bundle.putString("EMAIL_KEY", user?.email)
+        bundle.putString("PROFILE_IMAGE_KEY", user?.profileImage)
         loadFragment(profileFragment, bundle)
     }
 
