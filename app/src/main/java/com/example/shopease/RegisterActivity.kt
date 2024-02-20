@@ -15,8 +15,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
-import com.example.shopease.utils.Utils.hashPassword
 import java.io.ByteArrayOutputStream
 
 class RegisterActivity : AppCompatActivity() {
@@ -69,41 +69,41 @@ class RegisterActivity : AppCompatActivity() {
             val imageByteArray = convertImageToByteArray()
 
             // Call your addUser function to save the user to the database
-//            val user = User(username, email, hashPassword(password), imageByteArray)
-            usersDatabaseHelper.addUser(username, email, imageByteArray, hashPassword(password)) { success ->
-                if (success) {
-                    Toast.makeText(this, "Registration Successful", Toast.LENGTH_SHORT).show()
-
-                } else {
-                    // Registration failed
-                    Toast.makeText(this, "Registration Failed", Toast.LENGTH_SHORT).show()
+            usersDatabaseHelper.registerUser(username, email, password, imageByteArray, object : UsersDatabaseHelper.RegistrationCallback {
+                override fun onRegistrationResult(success: Boolean, user: User?) {
+                    if (success) {
+                        Toast.makeText(this@RegisterActivity, "Registration Successful", Toast.LENGTH_SHORT).show()
+                        navigateToLoginActivity()
+                    } else {
+                        // Registration failed
+                        Toast.makeText(this@RegisterActivity, "Registration Failed", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
-            finish()
+            })
+
+
         }
     }
 
     private fun isRegistrationValid(username: String, email: String): Boolean {
-        var result = true
         // Check if the email is valid
         if (!isValidEmail(email)) {
+            showToast("Invalid email address.")
             return false
         }
 
         // Check if the username and email are not empty
         if (username.isEmpty() || email.isEmpty()) {
+            showToast("Username and email cannot be empty.")
             return false
         }
 
-        // Check if the username and email do not already exist in the database
-        usersDatabaseHelper.isUsernameExists(username) { exist ->
-            if (exist) {
-                result = false
-            }
-        }
+        // Check if the email do not already exist in the database
+        var result = true
         usersDatabaseHelper.isEmailExists(email) { exist ->
             if (exist) {
                 result = false
+                showToast("המייל כבר בשימוש")
             }
         }
 
@@ -152,5 +152,15 @@ class RegisterActivity : AppCompatActivity() {
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         return byteArrayOutputStream.toByteArray()
+    }
+
+    private fun navigateToLoginActivity() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

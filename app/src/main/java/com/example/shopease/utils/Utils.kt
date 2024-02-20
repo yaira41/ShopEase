@@ -9,12 +9,6 @@ import java.io.InputStream
 import java.security.MessageDigest
 
 object Utils {
-    fun hashPassword(password: String): String {
-        val bytes = password.toByteArray()
-        val md = MessageDigest.getInstance("SHA-256")
-        val digest = md.digest(bytes)
-        return bytesToHex(digest)
-    }
 
     private fun bytesToHex(bytes: ByteArray): String {
         val hexChars = CharArray(bytes.size * 2)

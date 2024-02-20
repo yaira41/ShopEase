@@ -1,83 +1,87 @@
 package com.example.shopease.dbHelpers
+
 import android.util.Log
 import com.example.shopease.dataClasses.ShopListItem
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
+import com.google.firebase.database.ValueEventListener
+
 interface CheckProductExistenceCallback {
     fun onProductExistenceChecked(exists: Boolean)
 }
+
 class ShopListsDatabaseHelper : BaseDatabaseHelper() {
+    init {
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+    }
 
     interface InsertShopListCallback {
         fun onShopListInserted(shopList: ShopList?)
     }
 
     fun getAllUserLists(userName: String, listener: (List<ShopList>) -> Unit) {
-        // Replace "users" with the collection name where user lists are stored in your Firestore
-        databaseReference.child("shopLists")
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val lists: MutableList<ShopList> = mutableListOf()
+        val query =
+            databaseReference.child("shopLists").orderByChild("members/$userName").equalTo(true)
 
-                    for (listSnapshot in dataSnapshot.children) {
+        // Enable offline persistence for the query
+        query.keepSynced(true)
 
-                        // Extracting members
-                        val membersList: MutableList<String> = mutableListOf()
-                        val membersSnapshot = listSnapshot.child("members")
-                        for (memberSnapshot in membersSnapshot.children) {
-                            val member = memberSnapshot.getValue(String::class.java)
-                            member?.let { membersList.add(it) }
-                        }
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val lists: MutableList<ShopList> = mutableListOf()
 
-                        if (userName in membersList) {
-
-                            // Convert each list snapshot to ListObject
-                            val id = listSnapshot.child("id").getValue(String::class.java)
-                            val name =
-                                listSnapshot.child("name").getValue(String::class.java) ?: "list"
-
-                            // Extracting items
-                            val itemsList: MutableList<ShopListItem> = mutableListOf()
-                            val itemsSnapshot = listSnapshot.child("items")
-                            for (itemSnapshot in itemsSnapshot.children) {
-                                val itemTitle =
-                                    itemSnapshot.child("title").getValue(String::class.java)
-                                        ?: "asd"
-                                val itemState =
-                                    itemSnapshot.child("checked").getValue(Boolean::class.java)
-                                        ?: false
-                                val itemCount =
-                                    itemSnapshot.child("count").getValue(Int::class.java)
-                                        ?: 1
-                                val itemUnit =
-                                    itemSnapshot.child("unit").getValue(String::class.java)
-                                        ?: "יחידות"
-                                itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
-                            }
-
-                            // Create ShopList object
-                            val shopList = ShopList(id, name, itemsList, membersList)
-                            lists.add(shopList)
-                        }
+                for (listSnapshot in dataSnapshot.children) {
+                    // Extracting members
+                    val membersList: MutableList<String> = mutableListOf()
+                    val membersSnapshot = listSnapshot.child("members")
+                    for (memberSnapshot in membersSnapshot.children) {
+                        val member = memberSnapshot.getValue(String::class.java)
+                        member?.let { membersList.add(it) }
                     }
 
-                    if (lists.isEmpty()) {
-                        listener(emptyList())
-                    } else {
-                        listener(lists)
-                    }
+                    if (userName in membersList) {
+                        // Convert each list snapshot to ListObject
+                        val id = listSnapshot.child("id").getValue(String::class.java)
+                        val name = listSnapshot.child("name").getValue(String::class.java) ?: "list"
 
+                        // Extracting items
+                        val itemsList: MutableList<ShopListItem> = mutableListOf()
+                        val itemsSnapshot = listSnapshot.child("items")
+                        for (itemSnapshot in itemsSnapshot.children) {
+                            val itemTitle =
+                                itemSnapshot.child("title").getValue(String::class.java) ?: "asd"
+                            val itemState =
+                                itemSnapshot.child("checked").getValue(Boolean::class.java) ?: false
+                            val itemCount =
+                                itemSnapshot.child("count").getValue(Int::class.java) ?: 1
+                            val itemUnit =
+                                itemSnapshot.child("unit").getValue(String::class.java) ?: "יחידות"
+                            itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
+                        }
+
+                        // Create ShopList object
+                        val shopList = ShopList(id, name, itemsList, membersList)
+                        lists.add(shopList)
+                    }
                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e(
-                        "ShopListFirebaseHelper",
-                        "Error getting all lists by username",
-                        error.toException()
-                    )
+                if (lists.isEmpty()) {
                     listener(emptyList())
+                } else {
+                    listener(lists)
                 }
-            })
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("ShopListsDatabaseHelper", "Error getting user lists", error.toException())
+                listener(emptyList())
+            }
+        })
     }
+
     fun addProductToList(listId: String, product: String, countItem: Int, unit: String) {
         val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
 
@@ -95,12 +99,19 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         // Set the product entry in the shop list
         newItemRef.setValue(productEntry)
     }
-    fun isExistProductInList(listId: String, productName: String, callback: CheckProductExistenceCallback) {
+
+    fun isExistProductInList(
+        listId: String,
+        productName: String,
+        callback: CheckProductExistenceCallback
+    ) {
         val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
 
         shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val exists = dataSnapshot.children.any { it.child("title").getValue(String::class.java) == productName }
+                val exists = dataSnapshot.children.any {
+                    it.child("title").getValue(String::class.java) == productName
+                }
                 callback.onProductExistenceChecked(exists)
             }
 
@@ -114,6 +125,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
             }
         })
     }
+
     fun getListById(id: String, listener: (List<ShopListItem>) -> Unit) {
         // Replace "users" with the collection name where user lists are stored in your Firestore
         databaseReference.child("shopLists").child(id)
@@ -134,7 +146,8 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                         val itemUnit =
                             itemSnapshot.child("unit").getValue(String::class.java)
                                 ?: "יחידות"
-                        itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))                    }
+                        itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
+                    }
 
                     if (itemsList.isEmpty()) {
                         listener(emptyList())
@@ -166,17 +179,24 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
 
         val updatedList = ShopList(listId, listName, items, members)
 
-        shopListRef.setValue(updatedList)
-            .addOnSuccessListener {
-                listener.onShopListInserted(updatedList)
+        shopListRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                currentData.value = updatedList.toMap()
+                return Transaction.success(currentData)
             }
-            .addOnFailureListener { exception ->
-                Log.e(
-                    "ShopListFirebaseHelper",
-                    "Error updating the shop list",
-                    exception.cause
-                )
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                dataSnapshot: DataSnapshot?
+            ) {
+                if (error == null && committed) {
+                    listener.onShopListInserted(updatedList)
+                } else {
+                    Log.e("ShopListsDatabaseHelper", "Transaction failed", error?.toException())
+                }
             }
+        })
     }
 
     fun updateWishlistName(shopListId: String, newName: String) {
@@ -232,7 +252,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
 
         newShopListRef.setValue(newList)
             .addOnSuccessListener {
-                 listener.onShopListInserted(newList)
+                listener.onShopListInserted(newList)
             }
             .addOnFailureListener { exception ->
                 Log.e(
@@ -242,6 +262,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                 )
             }
     }
+
     fun updateShopListItem(listId: String, position: Int, updatedItem: ShopListItem) {
         val shopListRef = databaseReference.child("shopLists").child(listId)
 
@@ -275,14 +296,24 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         })
     }
 }
-    // Example data model for a shop list
-    data class ShopList(
-        val id: String? = null,
-        var name: String,
-        val items: List<ShopListItem>?,
-        val members: List<String>,
-    ) {
-        override fun toString(): String {
-            return name
-        }
+
+// Example data model for a shop list
+data class ShopList(
+    val id: String? = null,
+    var name: String,
+    val items: List<ShopListItem>?,
+    val members: List<String>,
+) {
+    fun toMap(): Map<String, Any?> {
+        val map = mutableMapOf<String, Any?>()
+        map["id"] = id
+        map["name"] = name
+        map["items"] = items?.map { it.toMap() }
+        map["members"] = members
+        return map
     }
+
+    override fun toString(): String {
+        return name
+    }
+}

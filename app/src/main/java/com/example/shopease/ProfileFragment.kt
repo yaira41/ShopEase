@@ -18,7 +18,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.utils.Utils
-import com.example.shopease.utils.Utils.hashPassword
 
 class ProfileFragment : Fragment() {
 
@@ -83,7 +82,7 @@ class ProfileFragment : Fragment() {
                 if (newPassword == confirmNewPassword) {
                     dbHelper.updatePassword(
                         username.toString(),
-                        hashPassword(newPassword)
+                        newPassword
                     ) { success ->
                         if (success) {
                             Toast.makeText(

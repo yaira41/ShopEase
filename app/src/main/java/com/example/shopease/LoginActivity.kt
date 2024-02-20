@@ -9,9 +9,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
-import com.example.shopease.utils.LoginCallback
-import com.example.shopease.utils.Utils.base64ToByteArray
-import com.example.shopease.utils.Utils.hashPassword
 
 class LoginActivity : AppCompatActivity() {
 
@@ -35,11 +32,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun onLoginButtonClick(view: View) {
-        val username = usernameEditText.text.toString()
+        val email = usernameEditText.text.toString()
         val password = passwordEditText.text.toString()
 
         // Check if the login is valid
-        dbHelper.isValidLogin(username, hashPassword(password), object : LoginCallback {
+        dbHelper.login(email, password, object : UsersDatabaseHelper.LoginCallback {
             // Fetch user information from the database
             override fun onLoginResult(user: User?) {
                 if (user != null) {
@@ -65,13 +62,12 @@ class LoginActivity : AppCompatActivity() {
     fun navigateToHomeActivity(user: User) {
         // Pass user information to HomeActivity
         val intent = Intent(this, HomeActivity::class.java).apply {
-            putExtra("USERNAME_KEY", user.username)
-            putExtra("EMAIL_KEY", user.email)
-            putExtra("PROFILE_IMAGE_KEY", base64ToByteArray(user.profileImage))
+            putExtra("USER_KEY", user)
         }
         startActivity(intent)
-        finish()
+        finish() // Ensure no operations are performed after this line
     }
+
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
