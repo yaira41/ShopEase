@@ -40,7 +40,7 @@ class RegisterActivity : AppCompatActivity() {
         imageProfile = findViewById(R.id.imageProfile)
         btnSelectImage = findViewById(R.id.btnSelectImage)
 
-        usersDatabaseHelper = UsersDatabaseHelper()
+        usersDatabaseHelper = UsersDatabaseHelper(applicationContext)
 
         // Initialize image picker launcher
         imagePickerLauncher =

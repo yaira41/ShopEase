@@ -29,22 +29,19 @@ class LoginActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.loginButton)
         signupButton = findViewById(R.id.signupButton)
         auth = FirebaseAuth.getInstance()
-        dbHelper = UsersDatabaseHelper()
-        checkConnection()
+        dbHelper = UsersDatabaseHelper(applicationContext)
+
+        // Check for locally stored user credentials
+        checkForLocallyStoredUser()
     }
 
-    private fun checkConnection() {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            dbHelper.getUserByUid(currentUser.uid, object : UsersDatabaseHelper.GetUserCallback {
-                override fun onUserResult(user: User?) {
-                    if (user != null) {
-                        showToast("היי, ראינו שהתחברת כבר.")
-                        navigateToHomeActivity(user) // You can pass the currentUser object to your HomeActivity
-                        finish()
-                    }
-                }
-            })
+    private fun checkForLocallyStoredUser() {
+        val locallyStoredUser = dbHelper.getLocallyStoredUser()
+
+        if (locallyStoredUser != null) {
+            showToast("היי, ראינו שיש לנו מידע שלך מההתחברות האחרונה.")
+            navigateToHomeActivity(locallyStoredUser)
+            finish()
         }
     }
 
@@ -57,8 +54,6 @@ class LoginActivity : AppCompatActivity() {
             // Fetch user information from the database
             override fun onLoginResult(user: User?) {
                 if (user != null) {
-                    // Login successful, user object is not null
-                    // You can access user properties here
                     showToast("התחברת בהצלחה.${user.username}!")
                     navigateToHomeActivity(user)
                     finish()
@@ -69,7 +64,6 @@ class LoginActivity : AppCompatActivity() {
             }
         })
     }
-
     fun onSignUpButtonClick(view: View) {
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)

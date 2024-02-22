@@ -1,5 +1,7 @@
 package com.example.shopease.dbHelpers
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.example.shopease.dataClasses.User
 import com.example.shopease.utils.Utils.byteArrayToBase64
@@ -9,7 +11,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 
-class UsersDatabaseHelper : BaseDatabaseHelper() {
+class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
 
     interface RegistrationCallback {
         fun onRegistrationResult(success: Boolean, user: User?)
@@ -18,8 +20,13 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
     interface LoginCallback {
         fun onLoginResult(user: User?)
     }
+
     interface GetUserCallback {
         fun onUserResult(user: User?)
+    }
+
+    private val sharedPreferences: SharedPreferences by lazy {
+        context.getSharedPreferences("UserPreferences", Context.MODE_PRIVATE)
     }
 
     fun registerUser(
@@ -45,6 +52,8 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
                         userRef.setValue(newUser)
                             .addOnCompleteListener { innerTask ->
                                 if (innerTask.isSuccessful) {
+                                    // Save user data locally after successful registration
+                                    saveUserLocally(newUser)
                                     callback.onRegistrationResult(true, newUser)
                                 } else {
                                     Log.e(
@@ -83,6 +92,8 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
                         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 val userData = snapshot.getValue(User::class.java)
+                                // Save user data locally after successful login
+                                saveUserLocally(userData)
                                 callback.onLoginResult(userData)
                             }
 
@@ -209,8 +220,45 @@ class UsersDatabaseHelper : BaseDatabaseHelper() {
         user?.updatePassword(newPassword)
             ?.addOnCompleteListener(onCompleteListener)
     }
+
     fun logoutUser() {
+        // Clear user data locally on logout
+        clearUserLocally()
+
+        // Sign out from Firebase
         FirebaseManager.auth.signOut()
         Log.d("UserDatabaseHelper", "User logged out")
+    }
+
+    private fun saveUserLocally(user: User?) {
+        val editor = sharedPreferences.edit()
+        if (user != null) {
+            editor.putString("userId", user.uid)
+            editor.putString("username", user.username)
+            editor.putString("email", user.email)
+            editor.putString("profileImage", user.profileImage)
+        } else {
+            // Clear local user data if user is null
+            clearUserLocally()
+        }
+        editor.apply()
+    }
+
+    private fun clearUserLocally() {
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+    }
+    fun getLocallyStoredUser(): User? {
+        val userId = sharedPreferences.getString("userId", null)
+        val username = sharedPreferences.getString("username", null)
+        val email = sharedPreferences.getString("email", null)
+        val profileImage = sharedPreferences.getString("profileImage", null)
+
+        return if (userId != null && username != null && email != null && profileImage != null) {
+            User(userId, username, email, profileImage)
+        } else {
+            null
+        }
     }
 }

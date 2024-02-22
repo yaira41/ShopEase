@@ -54,7 +54,7 @@ class ProfileFragment : Fragment() {
         email = arguments?.getString("EMAIL_KEY")
         imageProfile = arguments?.getString("PROFILE_IMAGE_KEY")
 
-        dbHelper = UsersDatabaseHelper()
+        dbHelper = UsersDatabaseHelper(requireContext())
         // Set username and email in the UI
         usernameTextView.text = username
         emailTextView.text = email
