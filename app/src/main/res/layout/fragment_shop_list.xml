@@ -81,17 +81,8 @@
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:text="שמור"
-        app:layout_constraintEnd_toStartOf="@id/sharedListButton"
+        app:layout_constraintEnd_toStartOf="@id/button4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bAddButton" />
-
-    <Button
-        android:id="@+id/sharedListButton"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:text="שתף רשימה"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bCreateListButton"
         app:layout_constraintTop_toBottomOf="@+id/bAddButton" />
 
     <Button
@@ -99,12 +90,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="95dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="94dp"
         android:text="בחר מיקום"
-        app:layout_constraintEnd_toEndOf="@+id/sharedListButton"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/bCreateListButton"
-        app:layout_constraintTop_toTopOf="@+id/bCreateListButton" />
+        app:layout_constraintTop_toBottomOf="@+id/bAddButton" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

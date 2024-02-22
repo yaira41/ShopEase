@@ -122,15 +122,7 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 //        button4.setOnClickListener {
 //            findNavController().navigate(R.id.action_shopListFragment_to_locationPickerFragment)
 //        }
-
-
         shopListName = view.findViewById(R.id.tvListName)
-
-        shareListButton.setOnClickListener {
-            showShareListDialog()
-        }
-
-
 
         // Initially, show the TextView and hide the EditText
         shopListName.text = name
@@ -214,57 +206,6 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 
             }
         }
-    }
-
-    private fun showShareListDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("בחר עם מי לשתף.")
-
-        // Use the asynchronous getFriendsFromUsername function
-        friendDbHelper.getFriendsFromUsername(username) { friendUsernames ->
-            val checkedFriends = BooleanArray(friendUsernames.size) { false }
-
-            builder.setMultiChoiceItems(
-                friendUsernames.toTypedArray(),
-                checkedFriends
-            ) { _, which, isChecked ->
-                checkedFriends[which] = isChecked
-            }
-
-            builder.setPositiveButton("שתף") { _, _ ->
-                val selectedFriends = mutableListOf<String>()
-                selectedFriends.add(username) // Add itself first
-                for (i in checkedFriends.indices) {
-                    if (checkedFriends[i]) {
-                        selectedFriends.add(friendUsernames[i])
-                    }
-                }
-
-                shareListWithFriends(selectedFriends)
-            }
-
-            builder.setNegativeButton("ביטול") { dialog, _ ->
-                dialog.cancel()
-            }
-
-            builder.show()
-        }
-    }
-
-    private fun shareListWithFriends(selectedFriends: List<String>) {
-        shopListsDatabaseHelper.updateShopList(id,
-            shopListName.text.toString(),
-            shopListAdapter.items,
-            selectedFriends,
-            object : ShopListsDatabaseHelper.InsertShopListCallback {
-                override fun onShopListInserted(shopList: ShopList?) {
-                    if (shopList != null) {
-                        showToast("הרשימה שותפה בהצלחה.")
-                    } else {
-                        showToast("משהו השתבש.")
-                    }
-                }
-            })
     }
 
     private fun showToast(message: String) {
