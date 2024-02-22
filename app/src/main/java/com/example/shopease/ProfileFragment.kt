@@ -41,7 +41,7 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as BaseActivity?)?.updateTitle("Profile")
+        (activity as BaseActivity?)?.updateTitle("פרופיל")
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         usernameTextView = view.findViewById(R.id.tvUsernameProfile)

@@ -75,10 +75,9 @@
 
     <Button
         android:id="@+id/btnLogout"
-        android:layout_width="168dp"
-        android:layout_height="48dp"
+        android:layout_width="139dp"
+        android:layout_height="45dp"
         android:layout_below="@+id/changePasswordButton"
         android:layout_centerHorizontal="true"
-        android:layout_marginEnd="300dp"
         android:text="התנתק" />
 </RelativeLayout>

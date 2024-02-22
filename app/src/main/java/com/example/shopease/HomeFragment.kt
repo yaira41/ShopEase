@@ -13,7 +13,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as BaseActivity?)?.updateTitle("Home")
+        (activity as BaseActivity?)?.updateTitle("בית")
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         var btnGoToScan = view.findViewById<Button>(R.id.btnGoToScan)

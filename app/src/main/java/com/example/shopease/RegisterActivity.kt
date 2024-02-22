@@ -72,11 +72,11 @@ class RegisterActivity : AppCompatActivity() {
             usersDatabaseHelper.registerUser(username, email, password, imageByteArray, object : UsersDatabaseHelper.RegistrationCallback {
                 override fun onRegistrationResult(success: Boolean, user: User?) {
                     if (success) {
-                        Toast.makeText(this@RegisterActivity, "Registration Successful", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@RegisterActivity, "נרשמת בהצלחה.", Toast.LENGTH_SHORT).show()
                         navigateToLoginActivity()
                     } else {
                         // Registration failed
-                        Toast.makeText(this@RegisterActivity, "Registration Failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@RegisterActivity, "משהו השתבש", Toast.LENGTH_SHORT).show()
                     }
                 }
             })
