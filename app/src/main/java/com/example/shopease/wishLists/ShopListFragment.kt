@@ -1,6 +1,8 @@
 package com.example.shopease.wishLists
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +13,9 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,14 +24,8 @@ import com.example.shopease.dataClasses.ShopListItem
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import androidx.core.app.ActivityCompat
 
 
 class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.BottomSheetListener {
@@ -94,7 +92,7 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 
         addButton.setOnClickListener {
             val titleItem = itemTitle.text.toString()
-            val countItem = count.text.toString().toInt()
+            val countItem = count.text.toString().toInt() ?: 1
             val unit = unitSpinner.selectedItem.toString()
             if (titleItem.isNotEmpty()) {
                 val newItem = ShopListItem(titleItem, countItem, unit)
@@ -102,8 +100,6 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                 itemTitle.text.clear()
             }
         }
-
-        val shareListButton = view.findViewById<Button>(R.id.sharedListButton)
 
         // Location button setup
 //        val button4 = view.findViewById<Button>(R.id.button4) // Replace with your actual button ID
@@ -127,31 +123,18 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         // Initially, show the TextView and hide the EditText
         shopListName.text = name
 
-        val saveListButton = view.findViewById<Button>(R.id.bCreateListButton)
-        saveListButton.setOnClickListener {
-            if (shopListName.text.isNullOrEmpty()) {
-                showToast("הכנס שם לרשימה")
-            } else {
-                shopListsDatabaseHelper.updateShopList(id,
-                    shopListName.text.toString(),
-                    shopListAdapter.items,
-                    listOf(username),
-                    object : ShopListsDatabaseHelper.InsertShopListCallback {
-                        override fun onShopListInserted(shopList: ShopList?) {
-                            if (shopList != null) {
-                                showToast("הרשימה עודכנה בהצלחה.")
-                            } else {
-                                showToast("משהו השתבש.")
-                            }
-                        }
-                    }
-                )
-
-                parentFragmentManager.popBackStack();
-            }
-        }
-
         return view;
+    }
+
+    fun updateList(items: List<ShopListItem>) {
+            shopListsDatabaseHelper.updateShopList(id,
+                shopListName.text.toString(),
+                items,
+                listOf(username),
+                object : ShopListsDatabaseHelper.InsertShopListCallback {
+                    override fun onShopListInserted(shopList: ShopList?) {}
+                }
+            )
     }
 
     private fun getCurrentLocation() {
@@ -190,7 +173,6 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 
             shopListAdapter.items.removeAt(position)
             shopListAdapter.notifyItemRemoved(position)
-
             // Update positions of remaining items
             shopListAdapter.notifyItemRangeChanged(position, shopListAdapter.items.size)
         }
@@ -273,5 +255,18 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         } else {
             Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
         }
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        // Save the current state and update the list in the database
+        updateList(shopListAdapter.items)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        // Save the current state and update the list in the database
+        updateList(shopListAdapter.items)
     }
 }

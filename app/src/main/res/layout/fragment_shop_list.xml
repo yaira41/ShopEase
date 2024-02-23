@@ -55,14 +55,13 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvShopListItems"
-        android:layout_width="367dp"
-        android:layout_height="156dp"
+        android:layout_width="345dp"
+        android:layout_height="301dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bCreateListButton"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/button4" />
 
     <Button
         android:id="@+id/bAddButton"
@@ -77,22 +76,12 @@
 
 
     <Button
-        android:id="@+id/bCreateListButton"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:text="שמור"
-        app:layout_constraintEnd_toStartOf="@id/button4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bAddButton" />
-
-    <Button
         android:id="@+id/button4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="95dp"
+        android:layout_marginEnd="264dp"
         android:text="בחר מיקום"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/bCreateListButton"
         app:layout_constraintTop_toBottomOf="@+id/bAddButton" />
 
 

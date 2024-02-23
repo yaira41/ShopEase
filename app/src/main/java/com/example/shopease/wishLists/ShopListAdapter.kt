@@ -114,7 +114,6 @@ class ShopListAdapter(
         })
         movePencil.start()
     }
-
     override fun getItemCount(): Int {
         return items.size
     }
