@@ -90,8 +90,8 @@ class WishlistsFragment : Fragment() {
             builder.setMultiChoiceItems(
                 friendUsernames.toTypedArray(),
                 checkedFriends
-            ) { _, which, isChecked ->
-                checkedFriends[which] = isChecked
+            ) { _, which, checked ->
+                checkedFriends[which] = checked
             }
 
             builder.setPositiveButton("שתף") { _, _ ->
