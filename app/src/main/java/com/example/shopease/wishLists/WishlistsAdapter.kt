@@ -53,6 +53,7 @@ class WishlistsAdapter(
     fun addShopList(item: ShopList) {
         items.add(item)
         notifyItemInserted(items.size + 1)
+        notifyItemChanged(items.size + 1)
     }
 
     override fun onBindViewHolder(holder: WishListHolder, position: Int) {

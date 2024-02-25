@@ -92,12 +92,14 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 
         addButton.setOnClickListener {
             val titleItem = itemTitle.text.toString()
-            val countItem = count.text.toString().toInt() ?: 1
+            val countItem = count.text.toString()
             val unit = unitSpinner.selectedItem.toString()
-            if (titleItem.isNotEmpty()) {
-                val newItem = ShopListItem(titleItem, countItem, unit)
+            if (titleItem.isNotEmpty() and countItem.isNotEmpty()) {
+                val newItem = ShopListItem(titleItem, countItem.toInt(), unit)
                 shopListAdapter.addShopListItem(newItem)
                 itemTitle.text.clear()
+            }else {
+                showToast("נראה שחסר לך שם מוצר ואו כמות.")
             }
         }
 

@@ -221,7 +221,7 @@ class WishlistsFragment : Fragment() {
                         override fun onShopListInserted(shopList: ShopList?) {
                             if (shopList != null) {
                                 showToast("הרשימה נוצרה בהצלחה.")
-                                fetchUserLists(username)
+                                wishlistsAdapter.addShopList(shopList)
                             } else {
                                 showToast("משהו השתבש.")
                             }
