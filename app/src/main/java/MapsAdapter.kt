@@ -48,7 +48,7 @@
 //
 //            setOnClickListener {
 //                val intent = Intent(context, MapsActivity::class.java)
-//                intent.putExtra(EXTRA_USER_MAP, userMap)
+//                intent.put(_USER_MAP, userMap)
 //                context.startActivity(intent)
 //            }
 //        }

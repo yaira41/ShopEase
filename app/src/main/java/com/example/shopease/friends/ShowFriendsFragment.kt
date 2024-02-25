@@ -34,7 +34,7 @@ class ShowFriendsFragment : Fragment() {
         val params = gridLayout.layoutParams as ViewGroup.MarginLayoutParams
         params.topMargin = resources.getDimensionPixelSize(R.dimen.grid_top_margin)
 
-        username = (activity as BaseActivity).username!!
+        username = (activity as BaseActivity).user?.username!!
         requestsDatabaseHelper.getFriendsWithImages(username) { friends ->
             updateGridLayout(friends)
         }

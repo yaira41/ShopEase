@@ -47,10 +47,10 @@ class ShopListAdapter(
 
     private fun toggleStrikeThrough(
         tvShopListItem: StrikeThroughTextView,
-        isChecked: Boolean,
+        checked: Boolean,
         pencilImageView: ImageView
     ) {
-        if (isChecked) {
+        if (checked) {
             animateCrayonMark(pencilImageView, tvShopListItem)
             tvShopListItem.setStrikeThrough(true)
         } else {
@@ -69,12 +69,12 @@ class ShopListAdapter(
             val pencilImageView: ImageView = findViewById(R.id.pencilImageView)
 
             tvShopListItem.text = curItem.title
-            cbCheckBox.isChecked = curItem.isChecked
+            cbCheckBox.isChecked = curItem.checked
             countItem.text = "${curItem.count} ${curItem.unit}"
             tvShopListItem.setStrikeThroughTextFlag(cbCheckBox.isChecked)
-            cbCheckBox.setOnCheckedChangeListener { _, isChecked ->
-                toggleStrikeThrough(tvShopListItem, isChecked, pencilImageView)
-                curItem.isChecked = !curItem.isChecked
+            cbCheckBox.setOnCheckedChangeListener { _, checked ->
+                toggleStrikeThrough(tvShopListItem, checked, pencilImageView)
+                curItem.checked = !curItem.checked
             }
         }
 
@@ -114,7 +114,6 @@ class ShopListAdapter(
         })
         movePencil.start()
     }
-
     override fun getItemCount(): Int {
         return items.size
     }

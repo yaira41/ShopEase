@@ -39,7 +39,7 @@ class FriendRequestsFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
 
-        username = (activity as BaseActivity).username!!
+        username = (activity as BaseActivity).user?.username!!
 
         // Retrieve friend requests for the current user
         requestsDatabaseHelper.getFriendRequests(username) { friendRequests ->

@@ -7,17 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.BaseActivity
 import com.example.shopease.R
+import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
-import com.example.shopease.wishLists.ShopListFragment
-import com.example.shopease.wishLists.WishlistsAdapter
+import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class WishlistsFragment : Fragment() {
@@ -25,18 +24,20 @@ class WishlistsFragment : Fragment() {
     private val shopLists: MutableList<ShopList> = mutableListOf()
     private lateinit var wishlistsAdapter: WishlistsAdapter
     private lateinit var username: String
-    private lateinit var dbHelper: ShopListsDatabaseHelper
+    private lateinit var shopListsDatabaseHelper: ShopListsDatabaseHelper
+    private lateinit var requestsDatabaseHelper: RequestsDatabaseHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as BaseActivity?)?.updateTitle("Wishlists")
+        (activity as BaseActivity?)?.updateTitle("רשימות קניה")
         val view = inflater.inflate(R.layout.fragment_wishlists, container, false)
         username = arguments?.getString("USERNAME_KEY") ?: ""
-        dbHelper = ShopListsDatabaseHelper()
-
+        shopListsDatabaseHelper = ShopListsDatabaseHelper()
+        requestsDatabaseHelper = RequestsDatabaseHelper()
 // Add a long-press listener in your adapter
+
         wishlistsAdapter = WishlistsAdapter(
             shopLists,
             itemClickListener = object : WishlistsAdapter.OnItemClickListener {
@@ -55,6 +56,7 @@ class WishlistsFragment : Fragment() {
                     showUpdateItemDialog(shopLists[position], position)
                 }
             },
+
             view
         )
 
@@ -77,6 +79,56 @@ class WishlistsFragment : Fragment() {
         rvShopLists.layoutManager = LinearLayoutManager(requireContext())
     }
 
+    private fun showShareListDialog(selectedList: ShopList) {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("בחר עם מי לשתף.")
+
+        // Use the asynchronous getFriendsFromUsername function
+        requestsDatabaseHelper.getFriendsFromUsername(username) { friendUsernames ->
+            val checkedFriends = BooleanArray(friendUsernames.size) { false }
+
+            builder.setMultiChoiceItems(
+                friendUsernames.toTypedArray(),
+                checkedFriends
+            ) { _, which, checked ->
+                checkedFriends[which] = checked
+            }
+
+            builder.setPositiveButton("שתף") { _, _ ->
+                val selectedFriends = mutableListOf<String>()
+                selectedFriends.add(username) // Add itself first
+                for (i in checkedFriends.indices) {
+                    if (checkedFriends[i]) {
+                        selectedFriends.add(friendUsernames[i])
+                    }
+                }
+
+                shareListWithFriends(selectedList, selectedFriends)
+            }
+
+            builder.setNegativeButton("ביטול") { dialog, _ ->
+                dialog.cancel()
+            }
+
+            builder.show()
+        }
+    }
+
+    private fun shareListWithFriends(selectedList: ShopList, selectedFriends: List<String>) {
+        shopListsDatabaseHelper.updateShopList(selectedList.id!!,
+            selectedList.name,
+            selectedList.items!!,
+            selectedFriends,
+            object : ShopListsDatabaseHelper.InsertShopListCallback {
+                override fun onShopListInserted(shopList: ShopList?) {
+                    if (shopList != null) {
+                        showToast("הרשימה שותפה בהצלחה.")
+                    } else {
+                        showToast("משהו השתבש.")
+                    }
+                }
+            })
+    }
     private fun showUpdateItemDialog(selectedList: ShopList, position: Int) {
         val builder = AlertDialog.Builder(requireContext())
         val inflater = LayoutInflater.from(requireContext())
@@ -84,7 +136,7 @@ class WishlistsFragment : Fragment() {
         val editText = dialogView.findViewById<EditText>(R.id.changeWishlistName)
         val confirmButton = dialogView.findViewById<Button>(R.id.updateWishlistName)
         val deleteButton = dialogView.findViewById<Button>(R.id.deleteWishlistButton)
-
+        val shareListButton = dialogView.findViewById<Button>(R.id.sharedListButton)
         editText.setText(selectedList.name)
 
         builder.setView(dialogView)
@@ -95,10 +147,13 @@ class WishlistsFragment : Fragment() {
             if (updatedName.isNotEmpty()) {
                 shopLists[position].name = updatedName
                 val id = shopLists[position].id
-                dbHelper.updateWishlistName(id!!, updatedName)
+                shopListsDatabaseHelper.updateWishlistName(id!!, updatedName)
                 wishlistsAdapter.notifyItemChanged(position)
             }
             alertDialog.dismiss()
+        }
+        shareListButton.setOnClickListener {
+            showShareListDialog(selectedList)
         }
 
         deleteButton.setOnClickListener {
@@ -110,7 +165,7 @@ class WishlistsFragment : Fragment() {
     }
 
     private fun fetchUserLists(userName: String) {
-        dbHelper.getAllUserLists(userName) { allLists ->
+        shopListsDatabaseHelper.getAllUserLists(userName) { allLists ->
             wishlistsAdapter.clear()
             if (allLists.isEmpty()) {
                 Toast.makeText(requireContext(), "נראה שאין לך רשימות", Toast.LENGTH_SHORT).show()
@@ -124,7 +179,7 @@ class WishlistsFragment : Fragment() {
         val selectedList = shopLists[position]
         Toast.makeText(requireContext(), "Delete ${selectedList.name}", Toast.LENGTH_SHORT).show()
         if (!selectedList.id.isNullOrEmpty()) {
-            dbHelper.deleteShopListForSpecificUser(selectedList.id, username)
+            shopListsDatabaseHelper.deleteShopListForSpecificUser(selectedList.id, username)
         }
 
         // Remove the item from the data source
@@ -158,7 +213,7 @@ class WishlistsFragment : Fragment() {
             if (listName.isEmpty()) {
                 showToast("הכנס שם לרשימה")
             } else {
-                dbHelper.insertNewList(
+                shopListsDatabaseHelper.insertNewList(
                     listName,
                     null,
                     listOf(username),
@@ -166,7 +221,7 @@ class WishlistsFragment : Fragment() {
                         override fun onShopListInserted(shopList: ShopList?) {
                             if (shopList != null) {
                                 showToast("הרשימה נוצרה בהצלחה.")
-                                fetchUserLists(username)
+                                wishlistsAdapter.addShopList(shopList)
                             } else {
                                 showToast("משהו השתבש.")
                             }

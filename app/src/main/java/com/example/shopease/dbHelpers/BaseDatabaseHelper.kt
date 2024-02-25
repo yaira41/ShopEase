@@ -12,4 +12,8 @@ object FirebaseManager {
 open class BaseDatabaseHelper {
     protected val databaseReference: DatabaseReference = FirebaseManager.databaseReference
     protected val auth: FirebaseAuth = FirebaseManager.auth
+//    init {
+//        // Enable offline persistence
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+//    }
 }

@@ -9,9 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
-import com.example.shopease.utils.LoginCallback
-import com.example.shopease.utils.Utils.base64ToByteArray
-import com.example.shopease.utils.Utils.hashPassword
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
@@ -19,7 +17,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
     private lateinit var signupButton: Button
-
+    private lateinit var auth: FirebaseAuth
     private lateinit var dbHelper: UsersDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,32 +28,42 @@ class LoginActivity : AppCompatActivity() {
         passwordEditText = findViewById(R.id.passwordLoginEditText)
         loginButton = findViewById(R.id.loginButton)
         signupButton = findViewById(R.id.signupButton)
+        auth = FirebaseAuth.getInstance()
+        dbHelper = UsersDatabaseHelper(applicationContext)
 
-        dbHelper = UsersDatabaseHelper()
+        // Check for locally stored user credentials
+        checkForLocallyStoredUser()
+    }
+
+    private fun checkForLocallyStoredUser() {
+        val locallyStoredUser = dbHelper.getLocallyStoredUser()
+
+        if (locallyStoredUser != null) {
+            showToast("היי, ראינו שיש לנו מידע שלך מההתחברות האחרונה.")
+            navigateToHomeActivity(locallyStoredUser)
+            finish()
+        }
     }
 
     fun onLoginButtonClick(view: View) {
-        val username = usernameEditText.text.toString()
+        val email = usernameEditText.text.toString()
         val password = passwordEditText.text.toString()
 
         // Check if the login is valid
-        dbHelper.isValidLogin(username, hashPassword(password), object : LoginCallback {
+        dbHelper.login(email, password, object : UsersDatabaseHelper.LoginCallback {
             // Fetch user information from the database
             override fun onLoginResult(user: User?) {
                 if (user != null) {
-                    // Login successful, user object is not null
-                    // You can access user properties here
-                    showToast("Login successful. Welcome, ${user.username}!")
+                    showToast("התחברת בהצלחה.${user.username}!")
                     navigateToHomeActivity(user)
                     finish()
                 } else {
                     // Login failed, user object is null
-                    showToast("Invalid login credentials.")
+                    showToast("בעיה בהתחברות")
                 }
             }
         })
     }
-
     fun onSignUpButtonClick(view: View) {
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)
@@ -65,13 +73,12 @@ class LoginActivity : AppCompatActivity() {
     fun navigateToHomeActivity(user: User) {
         // Pass user information to HomeActivity
         val intent = Intent(this, HomeActivity::class.java).apply {
-            putExtra("USERNAME_KEY", user.username)
-            putExtra("EMAIL_KEY", user.email)
-            putExtra("PROFILE_IMAGE_KEY", base64ToByteArray(user.profileImage))
+            putExtra("USER_KEY", user)
         }
         startActivity(intent)
-        finish()
+        finish() // Ensure no operations are performed after this line
     }
+
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }

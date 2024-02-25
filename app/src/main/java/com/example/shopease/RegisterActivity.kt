@@ -15,8 +15,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
-import com.example.shopease.utils.Utils.hashPassword
 import java.io.ByteArrayOutputStream
 
 class RegisterActivity : AppCompatActivity() {
@@ -40,7 +40,7 @@ class RegisterActivity : AppCompatActivity() {
         imageProfile = findViewById(R.id.imageProfile)
         btnSelectImage = findViewById(R.id.btnSelectImage)
 
-        usersDatabaseHelper = UsersDatabaseHelper()
+        usersDatabaseHelper = UsersDatabaseHelper(applicationContext)
 
         // Initialize image picker launcher
         imagePickerLauncher =
@@ -69,41 +69,52 @@ class RegisterActivity : AppCompatActivity() {
             val imageByteArray = convertImageToByteArray()
 
             // Call your addUser function to save the user to the database
-//            val user = User(username, email, hashPassword(password), imageByteArray)
-            usersDatabaseHelper.addUser(username, email, imageByteArray, hashPassword(password)) { success ->
-                if (success) {
-                    Toast.makeText(this, "Registration Successful", Toast.LENGTH_SHORT).show()
-
-                } else {
-                    // Registration failed
-                    Toast.makeText(this, "Registration Failed", Toast.LENGTH_SHORT).show()
+            usersDatabaseHelper.registerUser(username, email, password, imageByteArray, object : UsersDatabaseHelper.RegistrationCallback {
+                override fun onRegistrationResult(success: Boolean, user: User?) {
+                    if (success) {
+                        Toast.makeText(this@RegisterActivity, "נרשמת בהצלחה.", Toast.LENGTH_SHORT).show()
+                        navigateToLoginActivity()
+                    } else {
+                        // Registration failed
+                        Toast.makeText(this@RegisterActivity, "משהו השתבש", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
-            finish()
+            })
+
+
         }
     }
 
     private fun isRegistrationValid(username: String, email: String): Boolean {
-        var result = true
         // Check if the email is valid
         if (!isValidEmail(email)) {
+            showToast("מייל בנוי בצורה שגויה.")
             return false
         }
 
         // Check if the username and email are not empty
         if (username.isEmpty() || email.isEmpty()) {
+            showToast("ערכים לא יכולים להיות ריקים.")
             return false
         }
 
-        // Check if the username and email do not already exist in the database
+        if (passwordEditText.text.length < 6) {
+            showToast("סיסמה קצרה מידי.")
+            return false
+        }
+
+        // Check if the email do not already exist in the database
+        var result = true
         usersDatabaseHelper.isUsernameExists(username) { exist ->
             if (exist) {
                 result = false
+                showToast("היוזר כבר בשימוש")
             }
         }
         usersDatabaseHelper.isEmailExists(email) { exist ->
             if (exist) {
                 result = false
+                showToast("המייל כבר בשימוש")
             }
         }
 
@@ -152,5 +163,15 @@ class RegisterActivity : AppCompatActivity() {
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         return byteArrayOutputStream.toByteArray()
+    }
+
+    private fun navigateToLoginActivity() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
