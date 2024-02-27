@@ -23,12 +23,15 @@ import com.example.shopease.utils.Utils
 import com.example.shopease.utils.Utils.base64ToByteArray
 import com.example.shopease.utils.Utils.byteArrayToBase64
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 class ProfileFragment : Fragment() {
 
     private lateinit var usernameTextView: TextView
     private lateinit var emailTextView: TextView
-    private lateinit var imageProfileView: ImageButton
+    private lateinit var imageProfileView: ShapeableImageView
     private lateinit var changePasswordButton: Button
     private lateinit var logoutButton: Button
     private lateinit var dbHelper: UsersDatabaseHelper
@@ -77,8 +80,8 @@ class ProfileFragment : Fragment() {
 
     private fun showChangePasswordDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_change_password, null)
-        val newPasswordEditText: EditText = dialogView.findViewById(R.id.newPasswordEditText)
-        val confirmNewPasswordEditText: EditText =
+        val newPasswordEditText: TextInputEditText = dialogView.findViewById(R.id.newPasswordEditText)
+        val confirmNewPasswordEditText: TextInputEditText =
             dialogView.findViewById(R.id.confirmNewPasswordEditText)
 
         val dialog = AlertDialog.Builder(requireContext())
@@ -118,7 +121,7 @@ class ProfileFragment : Fragment() {
 
     private fun showProfileImageDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_profile_image, null)
-        val profileImageView: ImageView = dialogView.findViewById(R.id.ivProfile)
+        val profileImageView: ShapeableImageView = dialogView.findViewById(R.id.ivProfile)
         val changeImageButton: Button = dialogView.findViewById(R.id.changeProfileImageButton)
 
         // Set the profile image in the dialog

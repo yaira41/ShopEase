@@ -10,8 +10,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -20,6 +18,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
@@ -148,8 +148,8 @@ class BarcodeScannerFragment : Fragment() {
         val dialogView = inflater.inflate(R.layout.dialog_add_to_shop_list, null)
         builder.setView(dialogView)
 
-        val countItemEditText = dialogView.findViewById<EditText>(R.id.countItemEditText)
-        val addToShopListButton = dialogView.findViewById<Button>(R.id.addToShopListButton)
+        val countItemEditText = dialogView.findViewById<TextInputEditText>(R.id.countItemEditText)
+        val addToShopListButton = dialogView.findViewById<MaterialButton>(R.id.addToShopListButton)
 
         addToShopListButton.setOnClickListener {
             val countItem = countItemEditText.text.toString().toIntOrNull() ?: 1

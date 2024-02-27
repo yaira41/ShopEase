@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import com.example.shopease.BaseActivity
 import com.example.shopease.R
+import com.google.android.material.imageview.ShapeableImageView
 
 class FriendsFragment : Fragment() {
 
@@ -15,9 +16,9 @@ class FriendsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         (activity as BaseActivity?)?.updateTitle("Friends")
         val view = inflater.inflate(R.layout.fragment_friends, container, false)
-        val friendRequestsButton: ImageButton = view.findViewById(R.id.requestFriendImgButton)
-        val searchFriendButton: ImageButton = view.findViewById(R.id.searchFriendImgButton)
-        val myFriendsButton: ImageButton = view.findViewById(R.id.myFriendsImgButton)
+        val friendRequestsButton: ShapeableImageView = view.findViewById(R.id.requestFriendImgButton)
+        val searchFriendButton: ShapeableImageView = view.findViewById(R.id.searchFriendImgButton)
+        val myFriendsButton: ShapeableImageView = view.findViewById(R.id.myFriendsImgButton)
 
         searchFriendButton.setOnClickListener {
             navigateToSearchFriends(view)

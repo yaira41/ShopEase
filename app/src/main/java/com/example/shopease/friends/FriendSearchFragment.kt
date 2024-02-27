@@ -17,14 +17,17 @@ import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.utils.Utils.base64ToByteArray
 import com.example.shopease.utils.Utils.byteArrayToBitmap
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textfield.TextInputEditText
 
 class FriendSearchFragment : Fragment() {
 
-    private lateinit var usernameEditText: EditText
-    private lateinit var searchUserButton: Button
+    private lateinit var usernameEditText: TextInputEditText
+    private lateinit var searchUserButton: MaterialButton
     private lateinit var resultTextView: TextView
-    private lateinit var profileImageView: ImageView
-    private lateinit var sendFriendRequestButton: Button
+    private lateinit var profileImageView: ShapeableImageView
+    private lateinit var sendFriendRequestButton: MaterialButton
     private lateinit var requestDatabaseHelper: RequestsDatabaseHelper
 
     override fun onCreateView(

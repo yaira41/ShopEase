@@ -5,16 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import androidx.gridlayout.widget.GridLayout
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.gridlayout.widget.GridLayout
 import com.example.shopease.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.FriendInfo
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.utils.Utils.byteArrayToBitmap
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.imageview.ShapeableImageView
 
 class ShowFriendsFragment : Fragment() {
 
@@ -86,7 +86,7 @@ class ShowFriendsFragment : Fragment() {
             val dialog = Dialog(requireContext())
             dialog.setContentView(R.layout.dialog_show_user_detail)
 
-            val imageViewFriendDetails = dialog.findViewById<ImageView>(R.id.imageShowDialogViewProfile)
+            val imageViewFriendDetails = dialog.findViewById<ShapeableImageView>(R.id.imageShowDialogViewProfile)
             val textViewUsernameDetails = dialog.findViewById<TextView>(R.id.textShowDialogViewUsername)
             val textViewOtherDetails = dialog.findViewById<TextView>(R.id.textShowDialogViewEmail)
 
@@ -97,7 +97,7 @@ class ShowFriendsFragment : Fragment() {
             textViewUsernameDetails.text = friend.username
             textViewOtherDetails.text = user?.email
 
-            val buttonClose = dialog.findViewById<Button>(R.id.btnShowDialogClose)
+            val buttonClose = dialog.findViewById<MaterialButton>(R.id.btnShowDialogClose)
             buttonClose.setOnClickListener {
                 dialog.dismiss()
             }
