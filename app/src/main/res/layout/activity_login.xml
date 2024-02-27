@@ -1,5 +1,5 @@
-<!-- res/layout/activity_login.xml -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,21 +17,33 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <EditText
-            android:id="@+id/usernameLoginEditText"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/usernameLoginTextInputLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint='דוא"ל'
-            android:padding="10dp" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/passwordLoginEditText"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/usernameLoginEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint='דוא"ל'
+                android:padding="10dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordLoginTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:hint="סיסמה"
-            android:inputType="textPassword"
-            android:padding="10dp" />
+            android:layout_marginTop="20dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordLoginEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="סיסמה"
+                android:inputType="textPassword"
+                android:padding="10dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

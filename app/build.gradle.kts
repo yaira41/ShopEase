@@ -67,7 +67,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
-
+    implementation("com.google.android.material:material:1.5.0")
 
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.gridlayout:gridlayout:1.0.0")

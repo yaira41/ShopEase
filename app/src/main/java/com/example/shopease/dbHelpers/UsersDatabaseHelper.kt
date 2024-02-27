@@ -156,10 +156,10 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
                 }
             })
     }
-    fun updateImage(uid: String, newImageUrl: ByteArray?, callback: (Boolean) -> Unit) {
+    fun updateImage(username: String, newImageUrl: ByteArray?, callback: (Boolean) -> Unit) {
         val base64ImageProfile = byteArrayToBase64(newImageUrl)
         val usersRef = databaseReference.child("users")
-        usersRef.orderByChild("uid").equalTo(uid)
+        usersRef.orderByChild("username").equalTo(username)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {

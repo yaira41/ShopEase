@@ -24,7 +24,10 @@
         <item name="itemIconTint">@color/bottom_nav_icon_color</item>
         <item name="itemTextColor">@color/bottom_nav_text_color</item>
     </style>
-
+    <style name="ShapeAppearance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20%</item>
+    </style>
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

@@ -17,13 +17,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.google.android.material.textfield.TextInputEditText
 import java.io.ByteArrayOutputStream
 
 class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var usernameEditText: EditText
-    private lateinit var emailEditText: EditText
-    private lateinit var passwordEditText: EditText
+    private lateinit var usernameEditText: TextInputEditText
+    private lateinit var emailEditText: TextInputEditText
+    private lateinit var passwordEditText: TextInputEditText
     private lateinit var imageProfile: ImageView
     private lateinit var btnSelectImage: Button
     private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
@@ -98,7 +99,7 @@ class RegisterActivity : AppCompatActivity() {
             return false
         }
 
-        if (passwordEditText.text.length < 6) {
+        if (passwordEditText.text!!.length < 6) {
             showToast("סיסמה קצרה מידי.")
             return false
         }

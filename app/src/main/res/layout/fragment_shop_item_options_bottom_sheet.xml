@@ -1,4 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -7,23 +8,30 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/etItemTitleUpdate"
-            android:layout_width="220dp"
-            android:layout_height="45dp" />
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:hint="Product Title"
+            android:inputType="text" />
 
         <EditText
             android:id="@+id/etQuantityUpdate"
-            android:layout_width="50dp"
+            android:layout_width="0dp"
             android:layout_height="45dp"
+            android:layout_weight="1"
+            android:hint="Quantity"
             android:inputType="numberSigned" />
 
         <Spinner
             android:id="@+id/unitSpinnerUpdate"
-            android:layout_width="110dp"
-            android:layout_height="45dp"/>
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"/>
     </LinearLayout>
 
     <LinearLayout
@@ -33,15 +41,18 @@
 
         <Button
             android:id="@+id/btnConfirmUpdate"
-            style="@style/ConfirmButtonStyle"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="עדכן פריט" />
 
         <Button
             android:id="@+id/btnDeleteItem"
-            style="@style/DeleteButtonStyle"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="מחק פריט" />
     </LinearLayout>
-
 </LinearLayout>
