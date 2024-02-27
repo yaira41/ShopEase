@@ -1,21 +1,40 @@
 <!-- Inside dialog_add_to_shop_list.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_margin="16dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
 
-    <EditText
-        android:id="@+id/countItemEditText"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="כמות"
-        android:inputType="numberSigned"/>
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/addToShopListButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="הוסף לרשימה"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/countItemTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="כמות">
 
-</LinearLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/countItemEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberSigned" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addToShopListButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="הוסף לרשימה" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

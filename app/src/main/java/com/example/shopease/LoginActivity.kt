@@ -9,12 +9,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var usernameEditText: EditText
-    private lateinit var passwordEditText: EditText
+    private lateinit var usernameEditText: TextInputEditText
+    private lateinit var passwordEditText: TextInputEditText
     private lateinit var loginButton: Button
     private lateinit var signupButton: Button
     private lateinit var auth: FirebaseAuth

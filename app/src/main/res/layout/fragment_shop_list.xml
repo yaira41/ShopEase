@@ -1,88 +1,71 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fShopListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".wishLists.ShopListFragment">
+    android:orientation="vertical"
+    android:paddingStart="20dp"
+    android:paddingTop="35dp"
+    android:paddingEnd="20dp">
 
     <TextView
         android:id="@+id/tvListName"
-        android:layout_width="300dp"
-        android:layout_height="45dp"
-        android:textAlignment="center"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="28sp"
-        app:layout_constraintBottom_toTopOf="@+id/etItemTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.513"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.916" />
-
-    <Spinner
-        android:id="@+id/unitSpinner"
-        android:layout_width="110dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="148dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/etQuantity"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints" />
-
-    <EditText
-        android:id="@+id/etQuantity"
-        android:layout_width="50dp"
-        android:layout_height="45dp"
-        android:hint="כמות"
-        android:inputType="numberSigned"
-        app:layout_constraintBottom_toTopOf="@+id/bAddButton"
-        app:layout_constraintStart_toEndOf="@+id/etItemTitle"
-        app:layout_constraintTop_toBottomOf="@+id/tvListName" />
-
-    <EditText
-        android:id="@+id/etItemTitle"
-        android:layout_width="200dp"
-        android:layout_height="45dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="148dp"
-        android:hint="הכנס מוצר..."
-        android:inputType="text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvShopListItems"
-        android:layout_width="345dp"
-        android:layout_height="301dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button4" />
-
-    <Button
-        android:id="@+id/bAddButton"
-        android:layout_width="120dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="הוסף"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etItemTitle" />
+        android:textAlignment="center"
+        android:textColor="?attr/colorPrimaryDark"
+        android:textSize="28sp"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/bAddButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:src="@drawable/circle_add"/>
+
+        <EditText
+            android:id="@+id/etItemTitle"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:hint="הכנס מוצר..."
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/etQuantity"
+            android:layout_width="50dp"
+            android:layout_height="45dp"
+            android:hint="כמות"
+            android:inputType="numberSigned" />
+
+        <Spinner
+            android:id="@+id/unitSpinner"
+            android:layout_width="110dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/button4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="264dp"
-        android:text="בחר מיקום"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bAddButton" />
+        android:layout_marginTop="8dp"
+        android:text="בחר מיקום" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvShopListItems"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="8dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

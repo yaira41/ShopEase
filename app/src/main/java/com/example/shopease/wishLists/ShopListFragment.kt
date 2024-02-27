@@ -8,8 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -26,6 +26,7 @@ import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.button.MaterialButton
 
 
 class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.BottomSheetListener {
@@ -78,7 +79,7 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         val rvShopListItem = view.findViewById<RecyclerView>(R.id.rvShopListItems)
         rvShopListItem.adapter = shopListAdapter
         rvShopListItem.layoutManager = LinearLayoutManager(requireContext())
-        val addButton = view.findViewById<Button>(R.id.bAddButton)
+        val addButton = view.findViewById<ImageView>(R.id.bAddButton)
         val itemTitle = view.findViewById<EditText>(R.id.etItemTitle)
         val count = view.findViewById<TextView>(R.id.etQuantity)
         val unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)
@@ -205,8 +206,8 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         builder.setView(dialogView)
         val dialog = builder.create()
 
-        val confirmButton: Button = dialogView.findViewById(R.id.btnConfirmDelete)
-        val cancelButton: Button = dialogView.findViewById(R.id.btnCancelDelete)
+        val confirmButton: MaterialButton = dialogView.findViewById(R.id.btnConfirmDelete)
+        val cancelButton: MaterialButton = dialogView.findViewById(R.id.btnCancelDelete)
 
         confirmButton.setOnClickListener {
             onDeleteButtonClick(position)

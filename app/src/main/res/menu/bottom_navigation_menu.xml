@@ -1,14 +1,21 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
         android:id="@+id/action_wishlist"
         android:icon="@drawable/wishlist_icon"
-        android:title="רשימות" />
+        android:title="רשימות"
+        app:showAsAction="always"/>
+
     <item
         android:id="@+id/action_home"
         android:icon="@drawable/home_icon"
-        android:title="בית" />
+        android:title="בית"
+        app:showAsAction="always"/>
+
     <item
         android:id="@+id/action_friends"
         android:icon="@drawable/friends_icon"
-        android:title="חברים" />
+        android:title="חברים"
+        app:showAsAction="always"/>
 </menu>

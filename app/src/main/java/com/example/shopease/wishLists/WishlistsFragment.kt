@@ -17,6 +17,7 @@ import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class WishlistsFragment : Fragment() {
@@ -134,9 +135,9 @@ class WishlistsFragment : Fragment() {
         val inflater = LayoutInflater.from(requireContext())
         val dialogView = inflater.inflate(R.layout.update_item_dialog, null)
         val editText = dialogView.findViewById<EditText>(R.id.changeWishlistName)
-        val confirmButton = dialogView.findViewById<Button>(R.id.updateWishlistName)
-        val deleteButton = dialogView.findViewById<Button>(R.id.deleteWishlistButton)
-        val shareListButton = dialogView.findViewById<Button>(R.id.sharedListButton)
+        val confirmButton = dialogView.findViewById<MaterialButton>(R.id.updateWishlistName)
+        val deleteButton = dialogView.findViewById<MaterialButton>(R.id.deleteWishlistButton)
+        val shareListButton = dialogView.findViewById<MaterialButton>(R.id.sharedListButton)
         editText.setText(selectedList.name)
 
         builder.setView(dialogView)
