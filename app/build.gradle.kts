@@ -64,6 +64,8 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx:20.3.0")
     //location api for google maps location services
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("com.google.android.gms:play-services-maps:18.0.1")
+
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
