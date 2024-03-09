@@ -1,13 +1,20 @@
 package com.example.shopease
 
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.example.shopease.models.ShopListWithCoordinates
 import com.example.shopease.wishLists.WishlistsFragment
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -24,6 +31,13 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
     private var googleMap: GoogleMap? = null
     private val shopListWithCoordinates: MutableList<ShopListWithCoordinates> = mutableListOf()
     private lateinit var username: String
+    private val PERMISSION_REQUEST_CODE = 123 // Choose any value you prefer
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var btnZoomIn: Button
+    private lateinit var btnZoomOut: Button
+    private lateinit var btnReturnToSavedLocation: Button
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,15 +50,45 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(this)
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+//        btnZoomIn = view.findViewById(R.id.btnZoomIn)
+//        btnZoomOut = view.findViewById(R.id.btnZoomOut)
+        btnReturnToSavedLocation = view.findViewById(R.id.btnReturnToSavedLocation)
+
+//        btnZoomIn.setOnClickListener {
+//            // Call function to zoom in
+//            zoomIn()
+//        }
+//
+//        btnZoomOut.setOnClickListener {
+//            // Call function to zoom out
+//            zoomOut()
+//        }
+
+        btnReturnToSavedLocation.setOnClickListener {
+            // Call function to return to the first saved location from the DB
+            returnToFirstSavedLocation()
+        }
+
         // Fetch lists with coordinates from DB
         fetchListsFromDB()
 
         return view
     }
 
+    private fun zoomIn() {
+        googleMap?.animateCamera(CameraUpdateFactory.zoomIn())
+    }
+
+    private fun zoomOut() {
+        googleMap?.animateCamera(CameraUpdateFactory.zoomOut())
+    }
+
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         googleMap?.setOnMarkerClickListener(this)
+
+        // Add markers for shop lists
         for (location in shopListWithCoordinates) {
             val marker = googleMap?.addMarker(
                 MarkerOptions().position(
@@ -56,14 +100,60 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
             )
             marker?.tag = location // Attach ShopListWithCoordinates object to the marker
         }
+
+        // Zoom to the first location if available
         if (shopListWithCoordinates.isNotEmpty()) {
             val firstLocation = LatLng(
                 shopListWithCoordinates[0].latitude,
                 shopListWithCoordinates[0].longitude
-            ) // Zoom to the first location
+            )
             googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(firstLocation, 10f))
         }
+
+        // Get current location and zoom to it
+        getCurrentLocation()
     }
+
+    private fun getCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Request permission if not granted
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSION_REQUEST_CODE
+            )
+        } else {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    // Got the location
+                    val latitude = location.latitude
+                    val longitude = location.longitude
+                    val latLng = LatLng(latitude, longitude)
+                    Toast.makeText(context, "Latitude: $latitude, Longitude: $longitude", Toast.LENGTH_SHORT).show()
+
+                    googleMap?.addMarker(MarkerOptions().position(latLng).title("My Location"))
+                    googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                } else {
+                    Toast.makeText(context, "Couldn't get location", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    private fun returnToFirstSavedLocation() {
+        // Check if shopListWithCoordinates is not empty
+        if (shopListWithCoordinates.isNotEmpty()) {
+            val firstLocation = LatLng(
+                shopListWithCoordinates[0].latitude,
+                shopListWithCoordinates[0].longitude
+            )
+            googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(firstLocation, 15f))
+        }
+    }
+
 
     private fun fetchListsFromDB() {
         // Replace with your actual code to fetch lists with coordinates from DB
