@@ -1,4 +1,4 @@
-package com.example.shopease.wishLists
+package com.example.shopease.recipes
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -20,23 +20,22 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
+import com.example.shopease.dataClasses.Recipe
 import com.example.shopease.dataClasses.ShopListItem
+import com.example.shopease.dbHelpers.RecipesDatabaseHelper
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
-import com.example.shopease.dbHelpers.ShopList
-import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
+import com.example.shopease.wishLists.ShopItemOptionsBottomSheetDialogFragment
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.button.MaterialButton
 
-
-class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.BottomSheetListener {
-    private lateinit var shopListAdapter: ShopListAdapter
-    private val shopListsDatabaseHelper = ShopListsDatabaseHelper()
+class RecipeFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.BottomSheetListener {
+    private lateinit var recipeAdapter: RecipeAdapter
     private lateinit var id: String
     private lateinit var name: String
     private lateinit var username: String
-    private lateinit var shopListName: TextView
-    private lateinit var dbHelper: ShopListsDatabaseHelper
+    private lateinit var recipeName: TextView
+    private lateinit var dbHelper: RecipesDatabaseHelper
     private lateinit var friendDbHelper: RequestsDatabaseHelper
     private val PERMISSION_REQUEST_CODE = 101
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -48,11 +47,11 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
-        dbHelper = ShopListsDatabaseHelper()
+        val view = inflater.inflate(R.layout.fragment_recipe, container, false)
+        dbHelper = RecipesDatabaseHelper()
         friendDbHelper = RequestsDatabaseHelper()
-        id = arguments?.getString("SHOP_LIST_ID_KEY") ?: ""
-        name = arguments?.getString("SHOP_LIST_NAME_KEY") ?: "New List"
+        id = arguments?.getString("RECIPE_ID_KEY") ?: ""
+        name = arguments?.getString("RECIPE_NAME_KEY") ?: "New Recipe"
         username = arguments?.getString("USERNAME_KEY") ?: ""
         // Ensure correct context for permission request
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -67,8 +66,8 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                 Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
-        shopListAdapter = ShopListAdapter(mutableListOf(),
-            itemLongClickListener = object : ShopListAdapter.OnItemLongClickListener {
+        recipeAdapter = RecipeAdapter(mutableListOf(),
+            itemLongClickListener = object : RecipeAdapter.OnItemLongClickListener {
                 override fun onItemLongClick(position: Int, view: View) {
                     showOptionsBottomSheet(position)
                 }
@@ -76,9 +75,9 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         )
         fetchData()
 
-        val rvShopListItem = view.findViewById<RecyclerView>(R.id.rvShopListItems)
-        rvShopListItem.adapter = shopListAdapter
-        rvShopListItem.layoutManager = LinearLayoutManager(requireContext())
+        val rvRecipeItem = view.findViewById<RecyclerView>(R.id.rvRecipeItems)
+        rvRecipeItem.adapter = recipeAdapter
+        rvRecipeItem.layoutManager = LinearLayoutManager(requireContext())
         val addButton = view.findViewById<ImageView>(R.id.bAddButton)
         val itemTitle = view.findViewById<EditText>(R.id.etItemTitle)
         val count = view.findViewById<TextView>(R.id.etQuantity)
@@ -91,13 +90,16 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         unitSpinner.adapter = unitAdapter
         unitSpinner.setSelection(0)
 
+        val procedureEditText = view.findViewById<EditText>(R.id.etProcedure)
+        procedureEditText.setText(recipeAdapter.procedure)
+
         addButton.setOnClickListener {
             val titleItem = itemTitle.text.toString()
             val countItem = count.text.toString()
             val unit = unitSpinner.selectedItem.toString()
             if (titleItem.isNotEmpty() and countItem.isNotEmpty()) {
                 val newItem = ShopListItem(titleItem, countItem.toInt(), unit)
-                shopListAdapter.addShopListItem(newItem)
+                recipeAdapter.addRecipeItem(newItem)
                 itemTitle.text.clear()
             }else {
                 showToast("נראה שחסר לך שם מוצר ואו כמות.")
@@ -121,21 +123,22 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 //        button4.setOnClickListener {
 //            findNavController().navigate(R.id.action_shopListFragment_to_locationPickerFragment)
 //        }
-        shopListName = view.findViewById(R.id.tvListName)
+        recipeName = view.findViewById(R.id.tvRecipeName)
 
         // Initially, show the TextView and hide the EditText
-        shopListName.text = name
+        recipeName.text = name
 
         return view;
     }
 
-    fun updateList(items: List<ShopListItem>) {
-            shopListsDatabaseHelper.updateShopList(id,
-                shopListName.text.toString(),
+    fun updateRecipe(items: List<ShopListItem>, procedure: String) {
+            dbHelper.updateRecipe(id,
+                recipeName.text.toString(),
                 items,
                 listOf(username),
-                object : ShopListsDatabaseHelper.InsertShopListCallback {
-                    override fun onShopListInserted(shopList: ShopList?) {}
+                procedure,
+                object : RecipesDatabaseHelper.InsertRecipeCallback {
+                    override fun onRecipeInserted(recipe: Recipe?) {}
                 }
             )
     }
@@ -169,27 +172,30 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
     }
 
     private fun onDeleteButtonClick(position: Int) {
-        if (position >= 0 && position < shopListAdapter.items.size) {
-            val selectedItem = shopListAdapter.items[position]
+        if (position >= 0 && position < recipeAdapter.items.size) {
+            val selectedItem = recipeAdapter.items[position]
             Toast.makeText(requireContext(), "Delete ${selectedItem.title}", Toast.LENGTH_SHORT)
                 .show()
 
-            shopListAdapter.items.removeAt(position)
-            shopListAdapter.notifyItemRemoved(position)
+            recipeAdapter.items.removeAt(position)
+            recipeAdapter.notifyItemRemoved(position)
             // Update positions of remaining items
-            shopListAdapter.notifyItemRangeChanged(position, shopListAdapter.items.size)
+            recipeAdapter.notifyItemRangeChanged(position, recipeAdapter.items.size)
         }
     }
 
     private fun fetchData() {
-        dbHelper.getListById(id) { items ->
+        dbHelper.getRecipeById(id) { items, procedure ->
             if (items.isEmpty()) {
-                showToast("נראה שאין לך פריטים ברשימה")
+                showToast("נראה שאין לך פריטים למתכון")
             } else {
-                shopListAdapter.initialList(items)
-                shopListAdapter.notifyDataSetChanged()
-
+                recipeAdapter.initialList(items)
             }
+            recipeAdapter.procedure = procedure ?: ""
+            val procedure2 = view?.findViewById<EditText>(R.id.etProcedure)
+            procedure2?.setText(procedure)
+            recipeAdapter.notifyDataSetChanged()
+
         }
     }
 
@@ -223,7 +229,7 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 
     private fun showOptionsBottomSheet(position: Int) {
         val curItem =
-            shopListAdapter.items[position] // Assuming `items` is the list of ShopListItem
+            recipeAdapter.items[position] // Assuming `items` is the list of ShopListItem
 
         val bottomSheetFragment = ShopItemOptionsBottomSheetDialogFragment.newInstance(
             curItem.title,
@@ -241,10 +247,10 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
     }
 
     override fun onConfirmClicked(position: Int, title: String, count: Int, unit: String) {
-        val shopListItem = ShopListItem(title, count, unit, false)
-        dbHelper.updateShopListItem(id, position, shopListItem)
-        shopListAdapter.items[position] = shopListItem
-        shopListAdapter.notifyItemChanged(position)
+        val recipeItem = ShopListItem(title, count, unit, false)
+        dbHelper.updateRecipeItem(id, position, recipeItem)
+        recipeAdapter.items[position] = recipeItem
+        recipeAdapter.notifyItemChanged(position)
     }
 
     override fun onRequestPermissionsResult(
@@ -263,13 +269,15 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         super.onDestroyView()
 
         // Save the current state and update the list in the database
-        updateList(shopListAdapter.items)
+        val procedure = view?.findViewById<EditText>(R.id.etProcedure)?.text.toString()
+        updateRecipe(recipeAdapter.items, procedure)
     }
 
     override fun onPause() {
         super.onPause()
 
         // Save the current state and update the list in the database
-        updateList(shopListAdapter.items)
+        val procedure = view?.findViewById<EditText>(R.id.etProcedure)?.text.toString()
+        updateRecipe(recipeAdapter.items, procedure)
     }
 }
