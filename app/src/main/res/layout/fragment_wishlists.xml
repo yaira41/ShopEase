@@ -10,7 +10,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:title="הרשימות שלי"
-        android:titleTextColor="@android:color/white" />
+        android:titleTextColor="@android:color/black" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAllLists"

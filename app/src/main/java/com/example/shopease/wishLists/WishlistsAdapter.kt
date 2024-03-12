@@ -3,11 +3,10 @@ package com.example.shopease.wishLists
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
-import com.example.shopease.dbHelpers.ShopList
+import com.example.shopease.dataClasses.ShopList
 
 class WishlistsAdapter(
     val items: MutableList<ShopList>,

@@ -1,8 +1,12 @@
 package com.example.shopease.dataClasses
 
-data class ShopListItem(
-    val title: String = "",
-    val count: Int = 1,
-    val unit: String = "יחידות",
-    var checked: Boolean = false
-)
+data class ShopList(
+    val id: String? = null,
+    var name: String,
+    var items: List<ShopListItem>?,
+    var members: List<String>,
+) {
+    override fun toString(): String {
+        return name
+    }
+}

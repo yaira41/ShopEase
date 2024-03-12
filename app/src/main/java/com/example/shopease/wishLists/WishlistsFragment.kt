@@ -13,10 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.BaseActivity
 import com.example.shopease.R
+import com.example.shopease.dataClasses.ShopList
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
-import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
-import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 

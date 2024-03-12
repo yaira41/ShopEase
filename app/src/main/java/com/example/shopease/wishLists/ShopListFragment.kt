@@ -20,9 +20,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
+import com.example.shopease.dataClasses.ShopList
 import com.example.shopease.dataClasses.ShopListItem
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
-import com.example.shopease.dbHelpers.ShopList
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices

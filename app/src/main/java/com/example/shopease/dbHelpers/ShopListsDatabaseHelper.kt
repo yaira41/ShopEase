@@ -1,6 +1,7 @@
 package com.example.shopease.dbHelpers
 
 import android.util.Log
+import com.example.shopease.dataClasses.ShopList
 import com.example.shopease.dataClasses.ShopListItem
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -274,17 +275,5 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                 Log.e("ShopListsDatabaseHelper", "Error updating shop list item", error.toException())
             }
         })
-    }
-}
-
-// Example data model for a shop list
-data class ShopList(
-    val id: String? = null,
-    var name: String,
-    var items: List<ShopListItem>?,
-    var members: List<String>,
-) {
-    override fun toString(): String {
-        return name
     }
 }
