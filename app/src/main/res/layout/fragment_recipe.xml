@@ -1,5 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fShopListFragment"
+    android:id="@+id/fRecipeFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -8,7 +8,7 @@
     android:paddingEnd="20dp">
 
     <TextView
-        android:id="@+id/tvListName"
+        android:id="@+id/tvRecipeName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
@@ -62,10 +62,19 @@
         android:text="בחר מיקום" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvShopListItems"
+        android:id="@+id/rvRecipeItems"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="324dp"
         android:paddingTop="8dp" />
+
+    <EditText
+        android:id="@+id/etProcedure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="הוסף הוראות כתיבה למתכון"
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:gravity="start|top"
+        android:padding="10dp"/>
 
 </LinearLayout>
