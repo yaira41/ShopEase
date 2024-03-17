@@ -46,7 +46,9 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
                 }
 
                 R.id.action_home -> {
-                    loadFragment(HomeFragment())
+                    val bundle = Bundle()
+                    bundle.putString("USERNAME_KEY", user?.username)
+                    loadFragment(HomeFragment(), bundle)
                     true
                 }
 

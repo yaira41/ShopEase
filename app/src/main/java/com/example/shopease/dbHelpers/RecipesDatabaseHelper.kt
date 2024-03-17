@@ -1,54 +1,46 @@
 package com.example.shopease.dbHelpers
 
 import android.util.Log
-import com.example.shopease.dataClasses.ShopList
+import com.example.shopease.dataClasses.Recipe
 import com.example.shopease.dataClasses.ShopListItem
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.GenericTypeIndicator
-import com.google.firebase.database.MutableData
-import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 
-interface CheckProductExistenceCallback {
-    fun onProductExistenceChecked(exists: Boolean)
-}
+class RecipesDatabaseHelper : BaseDatabaseHelper() {
 
-class ShopListsDatabaseHelper : BaseDatabaseHelper() {
-
-    interface InsertShopListCallback {
-        fun onShopListInserted(shopList: ShopList?)
+    interface InsertRecipeCallback {
+        fun onRecipeInserted(recipe: Recipe?)
     }
 
-    fun getAllUserLists(userName: String, listener: (List<ShopList>) -> Unit) {
+    fun getAllUserRecipes(userName: String, listener: (List<Recipe>) -> Unit) {
         val query =
-            databaseReference.child("shopLists")
+            databaseReference.child("recipes")
 
         // Enable offline persistence for the query
         query.keepSynced(true)
 
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val lists: MutableList<ShopList> = mutableListOf()
+                val recipes: MutableList<Recipe> = mutableListOf()
 
-                for (listSnapshot in dataSnapshot.children) {
+                for (recipeSnapshot in dataSnapshot.children) {
                     // Extracting members
                     val membersList: MutableList<String> = mutableListOf()
-                    val membersSnapshot = listSnapshot.child("members")
+                    val membersSnapshot = recipeSnapshot.child("members")
                     for (memberSnapshot in membersSnapshot.children) {
                         val member = memberSnapshot.getValue(String::class.java)
                         member?.let { membersList.add(it) }
                     }
 
                     if (userName in membersList) {
-                        // Convert each list snapshot to ListObject
-                        val id = listSnapshot.child("id").getValue(String::class.java)
-                        val name = listSnapshot.child("name").getValue(String::class.java) ?: "list"
+                        val id = recipeSnapshot.child("id").getValue(String::class.java)
+                        val name = recipeSnapshot.child("name").getValue(String::class.java) ?: "list"
+                        val procedure = recipeSnapshot.child("procedure").getValue(String::class.java) ?: "procedure"
 
-                        // Extracting items
                         val itemsList: MutableList<ShopListItem> = mutableListOf()
-                        val itemsSnapshot = listSnapshot.child("items")
+                        val itemsSnapshot = recipeSnapshot.child("items")
                         for (itemSnapshot in itemsSnapshot.children) {
                             val itemTitle =
                                 itemSnapshot.child("title").getValue(String::class.java) ?: "asd"
@@ -62,31 +54,31 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                             itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
                         }
 
-                        // Create ShopList object
-                        val shopList = ShopList(id, name, itemsList, membersList)
-                        lists.add(shopList)
+                        // Create recipe object
+                        val recipe = Recipe(id, name, itemsList, membersList, procedure)
+                        recipes.add(recipe)
                     }
                 }
 
-                if (lists.isEmpty()) {
+                if (recipes.isEmpty()) {
                     listener(emptyList())
                 } else {
-                    listener(lists)
+                    listener(recipes)
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("ShopListsDatabaseHelper", "Error getting user lists", error.toException())
+                Log.e("RecipesDatabaseHelper", "Error getting user recipes", error.toException())
                 listener(emptyList())
             }
         })
     }
 
-    fun addProductToList(listId: String, product: String, countItem: Int, unit: String) {
-        val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
+    fun addProductToRecipe(recipeId: String, product: String, countItem: Int, unit: String) {
+        val recipeRef = databaseReference.child("recipes").child(recipeId).child("items")
 
-        // Create a unique key for the new product entry in the shop list
-        val newItemRef = shopListRef.push()
+        // Create a unique key for the new product entry in the recipe
+        val newItemRef = recipeRef.push()
 
         // Construct the product entry
         val productEntry = mapOf(
@@ -96,18 +88,18 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
             "checked" to false
         )
 
-        // Set the product entry in the shop list
+        // Set the product entry in the recipe
         newItemRef.setValue(productEntry)
     }
 
-    fun isExistProductInList(
-        listId: String,
+    fun isExistProductInRecipe(
+        recipeId: String,
         productName: String,
         callback: CheckProductExistenceCallback
     ) {
-        val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
+        val recipeRef = databaseReference.child("recipes").child(recipeId).child("items")
 
-        shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        recipeRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val exists = dataSnapshot.children.any {
                     it.child("title").getValue(String::class.java) == productName
@@ -117,8 +109,8 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e(
-                    "ShopListsDatabaseHelper",
-                    "Error checking product existence in the list",
+                    "recipesDatabaseHelper",
+                    "Error checking product existence in the recipe",
                     error.toException()
                 )
                 callback.onProductExistenceChecked(false)
@@ -126,9 +118,9 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         })
     }
 
-    fun getListById(id: String, listener: (List<ShopListItem>) -> Unit) {
+    fun getRecipeById(id: String, listener: (List<ShopListItem>, String) -> Unit) {
         // Replace "users" with the collection name where user lists are stored in your Firestore
-        databaseReference.child("shopLists").child(id)
+        databaseReference.child("recipes").child(id)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val itemsList: MutableList<ShopListItem> = mutableListOf()
@@ -149,54 +141,57 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                         itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
                     }
 
+                    val procedure = dataSnapshot.child("procedure").getValue(String::class.java)?: "procedure"
+
                     if (itemsList.isEmpty()) {
-                        listener(emptyList())
+                        listener(emptyList(), procedure)
                     } else {
-                        listener(itemsList)
+                        listener(itemsList, procedure)
                     }
 
                 }
 
                 override fun onCancelled(error: DatabaseError) {
                     Log.e(
-                        "ShopListFirebaseHelper",
-                        "Error getting all lists by username",
+                        "RecipesFirebaseHelper",
+                        "Error getting recipe by id",
                         error.toException()
                     )
-                    listener(emptyList())
+                    listener(emptyList(), "")
                 }
             })
     }
 
-    fun updateShopList(
-        listId: String,
-        listName: String,
+    fun updateRecipe(
+        recipeId: String,
+        recipeName: String,
         items: List<ShopListItem>,
         members: List<String>,
-        listener: InsertShopListCallback
+        procedure: String,
+        listener: InsertRecipeCallback
     ) {
-        val shopListRef = databaseReference.child("shopLists").child(listId)
-        shopListRef.keepSynced(true)
-        val updatedList = ShopList(listId, listName, items, members)
+        val recipeRef = databaseReference.child("recipes").child(recipeId)
+        recipeRef.keepSynced(true)
+        val updatedRecipe = Recipe(recipeId, recipeName, items, members, procedure)
 
-        // Update the shop list without using a transaction
-        shopListRef.setValue(updatedList)
+        // Update the recipe without using a transaction
+        recipeRef.setValue(updatedRecipe)
             .addOnSuccessListener {
-                listener.onShopListInserted(updatedList)
+                listener.onRecipeInserted(updatedRecipe)
             }
             .addOnFailureListener { exception ->
-                Log.e("ShopListFirebaseHelper", "Error updating shop list", exception.cause)
+                Log.e("RecipesFirebaseHelper", "Error updating recipe", exception.cause)
             }
     }
 
-    fun updateWishlistName(shopListId: String, newName: String) {
-        databaseReference.child("shopLists").child(shopListId).child("name").setValue(newName)
+    fun updateRecipeName(recipeId: String, newName: String) {
+        databaseReference.child("recipes").child(recipeId).child("name").setValue(newName)
     }
 
-    fun deleteShopListForSpecificUser(shopListId: String, member: String) {
-        val shopListRef = databaseReference.child("shopLists").child(shopListId)
+    fun deleteRecipeForSpecificUser(recipeId: String, member: String) {
+        val recipeRef = databaseReference.child("recipes").child(recipeId)
 
-        shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        recipeRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val membersList: MutableList<String> = mutableListOf()
 
@@ -211,54 +206,55 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                 membersList.remove(member)
 
                 if (membersList.isEmpty()) {
-                    // If the updated members list is empty, delete the shop list
-                    shopListRef.removeValue()
+                    // If the updated members list is empty, delete the recipe
+                    recipeRef.removeValue()
                 } else {
-                    // Update the shop list with the modified members list
-                    shopListRef.child("members").setValue(membersList)
+                    // Update the recipe with the modified members list
+                    recipeRef.child("members").setValue(membersList)
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e(
-                    "ShopListFirebaseHelper",
-                    "Error deleting shop list for specific user",
+                    "RecipesFirebaseHelper",
+                    "Error deleting recipe for specific user",
                     error.toException()
                 )
             }
         })
     }
 
-    fun insertNewList(
-        listName: String,
+    fun insertNewRecipe(
+        recipeName: String,
         items: List<ShopListItem>?,
         members: List<String>,
-        listener: InsertShopListCallback
+        procedure: String,
+        listener: InsertRecipeCallback
     ) {
-        val shopListsRef = databaseReference.child("shopLists")
-        val newShopListRef = shopListsRef.push()
+        val recipesRef = databaseReference.child("recipes")
+        val newRecipeRef = recipesRef.push()
 
-        val newList = ShopList(newShopListRef.key, listName, items, members)
+        val newRecipe = Recipe(newRecipeRef.key, recipeName, items, members, procedure)
 
-        newShopListRef.setValue(newList)
+        newRecipeRef.setValue(newRecipe)
             .addOnSuccessListener {
-                listener.onShopListInserted(newList)
+                listener.onRecipeInserted(newRecipe)
             }
             .addOnFailureListener { exception ->
                 Log.e(
-                    "ShopListFirebaseHelper",
-                    "Error getting all lists by username",
+                    "RecipeFirebaseHelper",
+                    "Error while creating new recipe",
                     exception.cause
                 )
             }
     }
 
-    fun updateShopListItem(listId: String, position: Int, updatedItem: ShopListItem) {
-        val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
-        shopListRef.keepSynced(true)
+    fun updateRecipeItem(recipeId: String, position: Int, updatedItem: ShopListItem) {
+        val recipeRef = databaseReference.child("recipes").child(recipeId).child("items")
+        recipeRef.keepSynced(true)
 
         // Update the specific item in the list without using a transaction
-        shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        recipeRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val currentItems: MutableList<ShopListItem>? =
                     dataSnapshot.getValue(object : GenericTypeIndicator<MutableList<ShopListItem>>() {})
@@ -267,12 +263,12 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                     if (position >= 0 && position < currentItems.size) {
                         currentItems[position] = updatedItem
                     }
-                    shopListRef.setValue(currentItems)
+                    recipeRef.setValue(currentItems)
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("ShopListsDatabaseHelper", "Error updating shop list item", error.toException())
+                Log.e("RecipesDatabaseHelper", "Error updating recipe item", error.toException())
             }
         })
     }

@@ -13,6 +13,12 @@
             android:layout_height="120dp"
             android:layout_centerInParent="true"
             android:text="לסריקת ברקוד" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoToMyRecipes"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:text="התבשילים שלי" />
     </RelativeLayout>
 
 

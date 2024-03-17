@@ -1,4 +1,4 @@
-package com.example.shopease.wishLists
+package com.example.shopease.recipes
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -13,59 +13,58 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.BaseActivity
 import com.example.shopease.R
-import com.example.shopease.dataClasses.ShopList
+import com.example.shopease.dataClasses.Recipe
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
-import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
+import com.example.shopease.dbHelpers.RecipesDatabaseHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class WishlistsFragment : Fragment() {
+class RecipesFragment : Fragment() {
 
-    private val shopLists: MutableList<ShopList> = mutableListOf()
-    private lateinit var wishlistsAdapter: WishlistsAdapter
+    private val recipes: MutableList<Recipe> = mutableListOf()
+    private lateinit var recipesAdapter: RecipesAdapter
     private lateinit var username: String
-    private lateinit var shopListsDatabaseHelper: ShopListsDatabaseHelper
+    private lateinit var recipesDatabaseHelper: RecipesDatabaseHelper
     private lateinit var requestsDatabaseHelper: RequestsDatabaseHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as BaseActivity?)?.updateTitle("רשימות קניה")
-        val view = inflater.inflate(R.layout.fragment_wishlists, container, false)
+        (activity as BaseActivity?)?.updateTitle("התבשילים שלי")
+        val view = inflater.inflate(R.layout.fragment_my_recipes, container, false)
         username = arguments?.getString("USERNAME_KEY") ?: ""
-        shopListsDatabaseHelper = ShopListsDatabaseHelper()
+        recipesDatabaseHelper = RecipesDatabaseHelper()
         requestsDatabaseHelper = RequestsDatabaseHelper()
 // Add a long-press listener in your adapter
 
-        wishlistsAdapter = WishlistsAdapter(
-            shopLists,
-            itemClickListener = object : WishlistsAdapter.OnItemClickListener {
+        recipesAdapter = RecipesAdapter(
+            recipes,
+            itemClickListener = object : RecipesAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int) {
-                    val selectedList = shopLists[position]
+                    val selectedRecipe = recipes[position]
                     val bundle = Bundle()
-                    bundle.putString("SHOP_LIST_ID_KEY", selectedList.id)
-                    bundle.putString("SHOP_LIST_NAME_KEY", selectedList.name)
+                    bundle.putString("RECIPE_ID_KEY", selectedRecipe.id)
+                    bundle.putString("RECIPE_NAME_KEY", selectedRecipe.name)
                     bundle.putString("USERNAME_KEY", username)
-                    replaceWithNewFragment(ShopListFragment(), bundle)
+                    replaceWithNewFragment(RecipeFragment(), bundle)
                 }
             },
-            itemLongClickListener = object : WishlistsAdapter.OnItemLongClickListener {
+            itemLongClickListener = object : RecipesAdapter.OnItemLongClickListener {
                 override fun onItemLongClick(position: Int, view: View) {
                     // Show the update dialog on long press
-                    showUpdateItemDialog(shopLists[position], position)
+                    showUpdateItemDialog(recipes[position], position)
                 }
             },
 
             view
         )
 
+        fetchUserRecipes(username)
 
-        fetchUserLists(username)
-
-        val fab = view.findViewById<FloatingActionButton>(R.id.bMoveToMyShopList)
+        val fab = view.findViewById<FloatingActionButton>(R.id.bCreateRecipe)
         fab.setOnClickListener {
-            showCreateListDialog()
+            showCreateRecipesDialog()
         }
 
         return view
@@ -74,12 +73,12 @@ class WishlistsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val rvShopLists = view.findViewById<RecyclerView>(R.id.rvAllLists)
-        rvShopLists.adapter = wishlistsAdapter
-        rvShopLists.layoutManager = LinearLayoutManager(requireContext())
+        val rvRecipes = view.findViewById<RecyclerView>(R.id.rvAllRecipes)
+        rvRecipes.adapter = recipesAdapter
+        rvRecipes.layoutManager = LinearLayoutManager(requireContext())
     }
 
-    private fun showShareListDialog(selectedList: ShopList) {
+    private fun showShareRecipeDialog(selectedRecipe: Recipe) {
         val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
         builder.setTitle("בחר עם מי לשתף.")
 
@@ -103,7 +102,7 @@ class WishlistsFragment : Fragment() {
                     }
                 }
 
-                shareListWithFriends(selectedList, selectedFriends)
+                shareRecipeWithFriends(selectedRecipe, selectedFriends)
             }
 
             builder.setNegativeButton("ביטול") { dialog, _ ->
@@ -114,14 +113,15 @@ class WishlistsFragment : Fragment() {
         }
     }
 
-    private fun shareListWithFriends(selectedList: ShopList, selectedFriends: List<String>) {
-        shopListsDatabaseHelper.updateShopList(selectedList.id!!,
-            selectedList.name,
-            selectedList.items!!,
+    private fun shareRecipeWithFriends(selectedRecipe: Recipe, selectedFriends: List<String>) {
+        recipesDatabaseHelper.updateRecipe(selectedRecipe.id!!,
+            selectedRecipe.name,
+            selectedRecipe.items!!,
             selectedFriends,
-            object : ShopListsDatabaseHelper.InsertShopListCallback {
-                override fun onShopListInserted(shopList: ShopList?) {
-                    if (shopList != null) {
+            selectedRecipe.procedure,
+            object : RecipesDatabaseHelper.InsertRecipeCallback {
+                override fun onRecipeInserted(recipe: Recipe?) {
+                    if (recipe != null) {
                         showToast("הרשימה שותפה בהצלחה.")
                     } else {
                         showToast("משהו השתבש.")
@@ -129,15 +129,15 @@ class WishlistsFragment : Fragment() {
                 }
             })
     }
-    private fun showUpdateItemDialog(selectedList: ShopList, position: Int) {
+    private fun showUpdateItemDialog(selectedRecipe: Recipe, position: Int) {
         val builder = AlertDialog.Builder(requireContext())
         val inflater = LayoutInflater.from(requireContext())
         val dialogView = inflater.inflate(R.layout.update_item_dialog, null)
         val editText = dialogView.findViewById<EditText>(R.id.changeWishlistName)
         val confirmButton = dialogView.findViewById<MaterialButton>(R.id.updateWishlistName)
         val deleteButton = dialogView.findViewById<MaterialButton>(R.id.deleteWishlistButton)
-        val shareListButton = dialogView.findViewById<MaterialButton>(R.id.sharedListButton)
-        editText.setText(selectedList.name)
+        val shareRecipeButton = dialogView.findViewById<MaterialButton>(R.id.sharedListButton)
+        editText.setText(selectedRecipe.name)
 
         builder.setView(dialogView)
         val alertDialog = builder.create()
@@ -145,15 +145,15 @@ class WishlistsFragment : Fragment() {
         confirmButton.setOnClickListener {
             val updatedName = editText.text.toString()
             if (updatedName.isNotEmpty()) {
-                shopLists[position].name = updatedName
-                val id = shopLists[position].id
-                shopListsDatabaseHelper.updateWishlistName(id!!, updatedName)
-                wishlistsAdapter.notifyItemChanged(position)
+                recipes[position].name = updatedName
+                val id = recipes[position].id
+                recipesDatabaseHelper.updateRecipeName(id!!, updatedName)
+                recipesAdapter.notifyItemChanged(position)
             }
             alertDialog.dismiss()
         }
-        shareListButton.setOnClickListener {
-            showShareListDialog(selectedList)
+        shareRecipeButton.setOnClickListener {
+            showShareRecipeDialog(selectedRecipe)
         }
 
         deleteButton.setOnClickListener {
@@ -164,32 +164,32 @@ class WishlistsFragment : Fragment() {
         alertDialog.show()
     }
 
-    private fun fetchUserLists(userName: String) {
-        shopListsDatabaseHelper.getAllUserLists(userName) { allLists ->
-            wishlistsAdapter.clear()
-            if (allLists.isEmpty()) {
-                Toast.makeText(requireContext(), "נראה שאין לך רשימות", Toast.LENGTH_SHORT).show()
+    private fun fetchUserRecipes(userName: String) {
+        recipesDatabaseHelper.getAllUserRecipes(userName) { allRecipes ->
+            recipesAdapter.clear()
+            if (allRecipes.isEmpty()) {
+                Toast.makeText(requireContext(), "נראה שאין לך תבשילים", Toast.LENGTH_SHORT).show()
             } else {
-                wishlistsAdapter.initialList(allLists)
+                recipesAdapter.initialList(allRecipes)
             }
         }
     }
 
     private fun onDeleteButtonClick(position: Int) {
-        val selectedList = shopLists[position]
-        Toast.makeText(requireContext(), "Delete ${selectedList.name}", Toast.LENGTH_SHORT).show()
-        if (!selectedList.id.isNullOrEmpty()) {
-            shopListsDatabaseHelper.deleteShopListForSpecificUser(selectedList.id, username)
+        val selectedRecipe = recipes[position]
+        Toast.makeText(requireContext(), "Delete ${selectedRecipe.name}", Toast.LENGTH_SHORT).show()
+        if (!selectedRecipe.id.isNullOrEmpty()) {
+            recipesDatabaseHelper.deleteRecipeForSpecificUser(selectedRecipe.id, username)
         }
 
         // Remove the item from the data source
-        shopLists.removeAt(position)
+        recipes.removeAt(position)
         // Notify the adapter about the item removal
-        wishlistsAdapter.notifyItemRemoved(position)
+        recipesAdapter.notifyItemRemoved(position)
 
         // Update the positions in the adapter for items after the deleted one
-        for (i in position until shopLists.size) {
-            wishlistsAdapter.notifyItemChanged(i)
+        for (i in position until recipes.size) {
+            recipesAdapter.notifyItemChanged(i)
         }
     }
 
@@ -200,28 +200,29 @@ class WishlistsFragment : Fragment() {
             .addToBackStack(null).commit()
     }
 
-    private fun showCreateListDialog() {
+    private fun showCreateRecipesDialog() {
         val context = context ?: return  // Check if the fragment is attached to a context
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("שם רשימה")
+        builder.setTitle("שם תבשיל")
 
         val input = EditText(context)
         builder.setView(input)
 
         builder.setPositiveButton("צור") { _, _ ->
-            val listName = input.text.toString()
-            if (listName.isEmpty()) {
-                showToast("הכנס שם לרשימה")
+            val recipeName = input.text.toString()
+            if (recipeName.isEmpty()) {
+                showToast("הכנס שם לתבשיל")
             } else {
-                shopListsDatabaseHelper.insertNewList(
-                    listName,
+                recipesDatabaseHelper.insertNewRecipe(
+                    recipeName,
                     null,
                     listOf(username),
-                    object : ShopListsDatabaseHelper.InsertShopListCallback {
-                        override fun onShopListInserted(shopList: ShopList?) {
-                            if (shopList != null) {
-                                showToast("הרשימה נוצרה בהצלחה.")
-                                wishlistsAdapter.addShopList(shopList)
+                    "ששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששש",
+                    object : RecipesDatabaseHelper.InsertRecipeCallback {
+                        override fun onRecipeInserted(recipe: Recipe?) {
+                            if (recipe != null) {
+                                showToast("התבשיל נוצר בהצלחה.")
+                                recipesAdapter.addRecipe(recipe)
                             } else {
                                 showToast("משהו השתבש.")
                             }
