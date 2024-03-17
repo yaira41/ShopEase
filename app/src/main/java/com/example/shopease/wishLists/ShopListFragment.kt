@@ -2,14 +2,11 @@ package com.example.shopease.wishLists
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,18 +25,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.R
 import com.example.shopease.dataClasses.ShopList
 import com.example.shopease.dataClasses.ShopListItem
+import com.example.shopease.dbHelpers.RecipesDatabaseHelper
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.Places
 import com.google.android.material.button.MaterialButton
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
-import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
-import java.io.IOException
 import java.util.*
 
 class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.BottomSheetListener {
@@ -122,23 +117,11 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
             openLocationPickerOrAddressInput()
         }
 
-        // Location button setup
-//        val button4 = view.findViewById<Button>(R.id.button4) // Replace with your actual button ID
-//        button4.setOnClickListener {
-//            if (ContextCompat.checkSelfPermission(
-//                    requireContext(),
-//                    Manifest.permission.ACCESS_FINE_LOCATION
-//                ) == PackageManager.PERMISSION_GRANTED
-//            ) {
-//                getCurrentLocation()
-//            } else {
-//                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-//            }
-//        }
-//        val button4 = view.findViewById<Button>(R.id.button4)
-//        button4.setOnClickListener {
-//            findNavController().navigate(R.id.action_shopListFragment_to_locationPickerFragment)
-//        }
+        val addRecipesButton = view.findViewById<MaterialButton>(R.id.bAddRecipes)
+        addRecipesButton.setOnClickListener {
+            showAddRecipesDialog()
+        }
+
         shopListName = view.findViewById(R.id.tvListName)
 
         // Initially, show the TextView and hide the EditText
@@ -147,25 +130,6 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         return view;
     }
 
-
-
-//    private fun openLocationPickerOrAddressInput() {
-//        // Logic to decide whether to open a location picker or insert an address
-//        // You can show a dialog to let the user choose between picking a location or entering an address
-//        // For simplicity, let's assume we always open a location picker
-//        // You can replace this with your logic based on user selection
-//
-//        // Open the location picker
-//        if (ActivityCompat.checkSelfPermission(
-//                requireContext(),
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) == PackageManager.PERMISSION_GRANTED
-//        ) {
-//            getCurrentLocation()
-//        } else {
-//            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-//        }
-//    }
     private fun openLocationPickerOrAddressInput() {
         // Show a dialog to let the user choose between picking a location or entering an address
         val builder = AlertDialog.Builder(requireContext())
@@ -358,6 +322,42 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         bottomSheetFragment.position = position
         bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
+
+    private fun showAddRecipesDialog() {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("בחר תבשילים להוספה")
+
+        val recipesDbHelper = RecipesDatabaseHelper();
+        // Use the asynchronous getFriendsFromUsername function
+        recipesDbHelper.getAllUserRecipes(username) { recipes ->
+            val recipeNames = recipes.map { it.name }.toTypedArray()
+            val checkedRecipes = BooleanArray(recipeNames.size) { false }
+
+            builder.setMultiChoiceItems(
+                recipeNames,
+                checkedRecipes
+            ) { _, which, checked ->
+                checkedRecipes[which] = checked
+            }
+
+            builder.setPositiveButton("הוסף") { _, _ ->
+                for (i in checkedRecipes.indices) {
+                    if (checkedRecipes[i]) {
+                        val selectedRecipeItems = recipes[i].items ?: emptyList()
+                        shopListAdapter.items.addAll(selectedRecipeItems)
+                        shopListAdapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            builder.setNegativeButton("ביטול") { dialog, _ ->
+                dialog.cancel()
+            }
+
+            builder.show()
+        }
+    }
+
 
     override fun onDeleteClicked(position: Int) {
         showConfirmationDialog(position)
