@@ -2,8 +2,14 @@ package com.example.shopease.wishLists
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,8 +32,15 @@ import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.Places
 import com.google.android.material.button.MaterialButton
-
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.AutocompleteActivity
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import java.io.IOException
+import java.util.*
 
 class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.BottomSheetListener {
     private lateinit var shopListAdapter: ShopListAdapter
@@ -41,7 +54,7 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
     private val PERMISSION_REQUEST_CODE = 101
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-
+    private val AUTOCOMPLETE_REQUEST_CODE = 1
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -103,6 +116,11 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                 showToast("נראה שחסר לך שם מוצר ואו כמות.")
             }
         }
+        val chooseLocationButton = view.findViewById<MaterialButton>(R.id.button4)
+        chooseLocationButton.setOnClickListener {
+            // Handle choosing a location or inserting an address
+            openLocationPickerOrAddressInput()
+        }
 
         // Location button setup
 //        val button4 = view.findViewById<Button>(R.id.button4) // Replace with your actual button ID
@@ -128,6 +146,111 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 
         return view;
     }
+
+
+
+//    private fun openLocationPickerOrAddressInput() {
+//        // Logic to decide whether to open a location picker or insert an address
+//        // You can show a dialog to let the user choose between picking a location or entering an address
+//        // For simplicity, let's assume we always open a location picker
+//        // You can replace this with your logic based on user selection
+//
+//        // Open the location picker
+//        if (ActivityCompat.checkSelfPermission(
+//                requireContext(),
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//            ) == PackageManager.PERMISSION_GRANTED
+//        ) {
+//            getCurrentLocation()
+//        } else {
+//            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+//        }
+//    }
+    private fun openLocationPickerOrAddressInput() {
+        // Show a dialog to let the user choose between picking a location or entering an address
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Choose Location Method")
+        builder.setItems(arrayOf("Use Current Location", "Enter Address")) { dialog, which ->
+            when (which) {
+                0 -> {
+                    // User wants to use current location
+                    if (ActivityCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        getCurrentLocation()
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
+                }
+                1 -> {
+                    // User wants to enter address
+                    if (ActivityCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        launchAddressInput()
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
+                }
+            }
+        }
+        builder.show()
+    }
+
+    private val addressResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data ?: return@registerForActivityResult
+            val place = Autocomplete.getPlaceFromIntent(data)
+            val address = place.address ?: ""
+
+            // Check if address is empty before geocoding
+            if (address.isEmpty()) {
+                Toast.makeText(requireContext(), "Please enter a valid address.", Toast.LENGTH_SHORT).show()
+                return@registerForActivityResult
+            }
+
+            // Geocode the address to get latitude and longitude
+            val geocoder = Geocoder(requireContext(),Locale.getDefault())
+            var latLng: LatLng? = null
+
+            try {
+                geocoder.getFromLocationName(address, 1)?.let { addresses ->
+                    if (addresses.isNotEmpty()) {
+                        latLng = LatLng(addresses[0].latitude, addresses[0].longitude)
+                    }
+                }
+            } catch (e: Exception) { // Handle various exceptions
+                e.printStackTrace()
+                Toast.makeText(requireContext(), "Failed to retrieve location.", Toast.LENGTH_SHORT).show()
+            }
+
+            if (latLng != null) {
+                // Use the latitude and longitude for your desired purposes
+                Toast.makeText(requireContext(), "Address: $address\nLat/Lng: $latLng", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(requireContext(), "Could not retrieve latitude and longitude.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun launchAddressInput() {
+        // Create a new intent to start the Places Autocomplete Activity
+        val fields = listOf(Place.Field.ADDRESS)
+        val intent = Autocomplete.IntentBuilder(
+            AutocompleteActivityMode.FULLSCREEN, fields
+        ).build(requireActivity())
+
+        addressResultLauncher.launch(intent)
+    }
+
+
 
     fun updateList(items: List<ShopListItem>) {
             shopListsDatabaseHelper.updateShopList(id,

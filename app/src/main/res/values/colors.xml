@@ -20,4 +20,6 @@
     <!-- Bottom Navigation Bar colors -->
     <color name="bottom_nav_icon_color">#757575</color>
     <color name="bottom_nav_text_color">#757575</color>
+    <color name="primaryColor">#12A058</color>
+
 </resources>

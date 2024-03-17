@@ -18,4 +18,10 @@
         android:icon="@drawable/friends_icon"
         android:title="חברים"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_saved_place"
+        android:icon="@drawable/location_icon"
+        android:title="מפה"
+        app:showAsAction="always"/>
 </menu>

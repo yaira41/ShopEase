@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     private lateinit var bottomNavigation: BottomNavigationView
+
     public var user: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +54,13 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
 
                 R.id.action_friends -> {
                     loadFragment(FriendsFragment())
+                    true
+                }
+
+                R.id.action_saved_place -> {
+                    val bundle = Bundle()
+                    bundle.putString("USERNAME_KEY", user?.username)
+                    loadFragment(SavedPlaceFragment())
                     true
                 }
 

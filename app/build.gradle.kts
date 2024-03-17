@@ -64,6 +64,8 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx:20.3.0")
     //location api for google maps location services
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("com.google.android.gms:play-services-maps:18.0.1")
+
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
@@ -73,6 +75,7 @@ dependencies {
     implementation("androidx.gridlayout:gridlayout:1.0.0")
     implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation("androidx.room:room-common:2.6.1")
+    implementation("com.google.android.libraries.places:places:3.3.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
