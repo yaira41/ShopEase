@@ -54,17 +54,11 @@
             android:layout_marginStart="8dp" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="בחר מיקום" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRecipeItems"
         android:layout_width="match_parent"
-        android:layout_height="324dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:paddingTop="8dp" />
 
     <EditText
@@ -74,6 +68,7 @@
         android:hint="הוסף הוראות כתיבה למתכון"
         android:inputType="textMultiLine"
         android:minLines="3"
+        android:maxLines="8"
         android:gravity="start|top"
         android:padding="10dp"/>
 

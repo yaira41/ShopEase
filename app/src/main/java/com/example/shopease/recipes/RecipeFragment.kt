@@ -106,23 +106,6 @@ class RecipeFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bott
             }
         }
 
-        // Location button setup
-//        val button4 = view.findViewById<Button>(R.id.button4) // Replace with your actual button ID
-//        button4.setOnClickListener {
-//            if (ContextCompat.checkSelfPermission(
-//                    requireContext(),
-//                    Manifest.permission.ACCESS_FINE_LOCATION
-//                ) == PackageManager.PERMISSION_GRANTED
-//            ) {
-//                getCurrentLocation()
-//            } else {
-//                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-//            }
-//        }
-//        val button4 = view.findViewById<Button>(R.id.button4)
-//        button4.setOnClickListener {
-//            findNavController().navigate(R.id.action_shopListFragment_to_locationPickerFragment)
-//        }
         recipeName = view.findViewById(R.id.tvRecipeName)
 
         // Initially, show the TextView and hide the EditText

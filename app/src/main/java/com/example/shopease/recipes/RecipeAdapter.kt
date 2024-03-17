@@ -4,13 +4,10 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -71,11 +68,9 @@ class RecipeAdapter(
             val cbCheckBox: CheckBox = findViewById(R.id.cbBought)
             val countItem: TextView = findViewById(R.id.tvItemCount)
             val pencilImageView: ImageView = findViewById(R.id.pencilImageView)
-            val etProcedure: EditText = findViewById(R.id.etProcedure)
 
             tvShopListItem.text = curItem.title
             cbCheckBox.isChecked = curItem.checked
-            etProcedure.setText(procedure)
             countItem.text = "${curItem.count} ${curItem.unit}"
             tvShopListItem.setStrikeThroughTextFlag(cbCheckBox.isChecked)
 
@@ -83,14 +78,6 @@ class RecipeAdapter(
                 toggleStrikeThrough(tvShopListItem, checked, pencilImageView)
                 curItem.checked = !curItem.checked
             }
-
-            etProcedure.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    procedure = s.toString()
-                }
-            })
         }
 
         holder.itemView.setOnLongClickListener {
