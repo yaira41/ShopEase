@@ -55,7 +55,6 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    // Handle errors
                     callback(null)
                 }
             })
@@ -70,7 +69,6 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Handle errors
                 callback(emptyList())
             }
         })
@@ -84,13 +82,11 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
                     val friendsWithImages = mutableListOf<FriendInfo>()
                     var completedTasks = 0
 
-                    // Fetch images for each friend
                     for (friendUsername in friendUsernames) {
                         getUserImageByteArray(friendUsername) { imageByteArray ->
                             friendsWithImages.add(FriendInfo(friendUsername, imageByteArray))
                             completedTasks++
 
-                            // Check if all tasks are completed
                             if (completedTasks == friendUsernames.size) {
                                 callback(friendsWithImages)
                             }
