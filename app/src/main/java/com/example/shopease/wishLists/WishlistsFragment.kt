@@ -47,6 +47,9 @@ class WishlistsFragment : Fragment() {
                     bundle.putString("SHOP_LIST_ID_KEY", selectedList.id)
                     bundle.putString("SHOP_LIST_NAME_KEY", selectedList.name)
                     bundle.putString("USERNAME_KEY", username)
+                    bundle.putStringArrayList("MEMBERS", ArrayList(selectedList.members))
+                    bundle.putDouble("LONGITUDE", selectedList.longitude)
+                    bundle.putDouble("LATITUDE", selectedList.latitude)
                     replaceWithNewFragment(ShopListFragment(), bundle)
                 }
             },
