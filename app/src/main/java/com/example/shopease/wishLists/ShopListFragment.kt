@@ -206,8 +206,8 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
             val addressList = geocoder.getFromLocationName(addressString, 1)
             if (addressList != null && addressList.isNotEmpty()) {
                 val address = addressList[0]
-                val latitude = address.latitude
-                val longitude = address.longitude
+                latitude = address.latitude
+                longitude = address.longitude
                 Toast.makeText(
                     requireContext(),
                     "Latitude: $latitude, Longitude: $longitude",
