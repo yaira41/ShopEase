@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,6 +35,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import java.util.*
+import android.location.Geocoder
 
 class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.BottomSheetListener {
     private lateinit var shopListAdapter: ShopListAdapter
@@ -53,6 +53,8 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private val AUTOCOMPLETE_REQUEST_CODE = 1
+    private lateinit var geocoder:Geocoder
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -70,6 +72,8 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         longitude = arguments?.getDouble("LONGITUDE") ?: 0.0
         // Ensure correct context for permission request
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        geocoder = Geocoder(requireActivity(),Locale.getDefault())
 
         // Create ActivityResultLauncher for permission request
         requestPermissionLauncher = registerForActivityResult(
@@ -162,7 +166,9 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                             Manifest.permission.ACCESS_FINE_LOCATION
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        launchAddressInput()
+//                        launchAddressInput2()
+                        handleEnterAddress()
+
                     } else {
                         requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
@@ -170,6 +176,66 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
             }
         }
         builder.show()
+    }
+    private fun handleEnterAddress() {
+        val editText = EditText(requireContext())
+        editText.hint = "Enter Address"
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Enter Address")
+            .setView(editText)
+            .setPositiveButton("OK") { dialog, _ ->
+                val addressString = editText.text.toString()
+                if (addressString.isNotEmpty()) {
+                    launchAddressInput2(addressString)
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Please enter an address",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+    private fun launchAddressInput2(addressString: String) {
+        try {
+            val addressList = geocoder.getFromLocationName(addressString, 1)
+            if (addressList != null && addressList.isNotEmpty()) {
+                val address = addressList[0]
+                val latitude = address.latitude
+                val longitude = address.longitude
+                Toast.makeText(
+                    requireContext(),
+                    "Latitude: $latitude, Longitude: $longitude",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Address not found",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(
+                requireContext(),
+                "Error: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
+            e.printStackTrace()
+        }
+    }
+
+    private fun launchAddressInput22() {
+        val latitude = 31.884174634758583
+        val longitude = 35.0341130828458
+        val address = geocoder.getFromLocation(latitude,longitude,1)
+        // Do something with the latitude and longitude, e.g., display them
+        Toast.makeText(context, "Address: $address", Toast.LENGTH_SHORT).show()
     }
 
     private val addressResultLauncher = registerForActivityResult(
@@ -210,6 +276,9 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
             }
         }
     }
+
+
+
 
     private fun launchAddressInput() {
         // Create a new intent to start the Places Autocomplete Activity
