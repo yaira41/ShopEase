@@ -65,6 +65,7 @@ dependencies {
     //location api for google maps location services
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation ("com.google.android.gms:play-services-maps:18.0.1")
+    implementation("org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.9.10")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("com.google.android.gms:play-services-maps:18.2.0")

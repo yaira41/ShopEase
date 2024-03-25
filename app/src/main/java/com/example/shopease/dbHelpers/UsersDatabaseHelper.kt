@@ -41,12 +41,9 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     if (user != null) {
-                        // Convert the ByteArray to a base64-encoded string before storing
                         val base64ImageProfile = byteArrayToBase64(imageProfile)
-                        // Create a User object with the provided data
                         val newUser = User(user.uid, username, email, base64ImageProfile)
 
-                        // Store user data in the Realtime Database
                         val userId = user.uid
                         val userRef = databaseReference.child("users").child(userId)
                         userRef.setValue(newUser)
@@ -79,14 +76,12 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
             }
     }
 
-    // Modified login method to use Firebase Authentication
     fun login(username: String, password: String, callback: LoginCallback) {
         auth.signInWithEmailAndPassword(username, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     if (user != null) {
-                        // Fetch user data from the Realtime Database
                         val userId = user.uid
                         val userRef = databaseReference.child("users").child(userId)
                         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -158,6 +153,7 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
     }
     fun updateImage(username: String, newImageUrl: ByteArray?, callback: (Boolean) -> Unit) {
         val base64ImageProfile = byteArrayToBase64(newImageUrl)
+        updateImageLocal(username, base64ImageProfile)
         val usersRef = databaseReference.child("users")
         usersRef.orderByChild("username").equalTo(username)
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -200,16 +196,13 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val userData = snapshot.getValue(User::class.java)
                 if (userData != null) {
-                    // User data retrieved successfully
                     callback.onUserResult(userData)
                 } else {
-                    // User data not found
                     callback.onUserResult(null)
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Handle the error
                 callback.onUserResult(null)
             }
         })
@@ -222,10 +215,7 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
     }
 
     fun logoutUser() {
-        // Clear user data locally on logout
         clearUserLocally()
-
-        // Sign out from Firebase
         FirebaseManager.auth.signOut()
         Log.d("UserDatabaseHelper", "User logged out")
     }
@@ -238,12 +228,17 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
             editor.putString("email", user.email)
             editor.putString("profileImage", user.profileImage)
         } else {
-            // Clear local user data if user is null
             clearUserLocally()
         }
         editor.apply()
     }
-
+    private fun updateImageLocal(username: String, newImageUrl: String) {
+        val editor = sharedPreferences.edit()
+        if (username == sharedPreferences.getString("username", "")) {
+            editor.putString("profileImage", newImageUrl)
+            editor.apply()
+        }
+    }
     private fun clearUserLocally() {
         val editor = sharedPreferences.edit()
         editor.clear()

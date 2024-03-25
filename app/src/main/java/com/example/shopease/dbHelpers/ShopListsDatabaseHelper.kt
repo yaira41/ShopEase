@@ -25,7 +25,6 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         val query =
             databaseReference.child("shopLists")
 
-        // Enable offline persistence for the query
         query.keepSynced(true)
 
         query.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -33,7 +32,6 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                 val lists: MutableList<ShopList> = mutableListOf()
 
                 for (listSnapshot in dataSnapshot.children) {
-                    // Extracting members
                     val membersList: MutableList<String> = mutableListOf()
                     val membersSnapshot = listSnapshot.child("members")
                     for (memberSnapshot in membersSnapshot.children) {
@@ -42,11 +40,9 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                     }
 
                     if (userName in membersList) {
-                        // Convert each list snapshot to ListObject
                         val id = listSnapshot.child("id").getValue(String::class.java)
                         val name = listSnapshot.child("name").getValue(String::class.java) ?: "list"
 
-                        // Extracting items
                         val itemsList: MutableList<ShopListItem> = mutableListOf()
                         val itemsSnapshot = listSnapshot.child("items")
                         for (itemSnapshot in itemsSnapshot.children) {
@@ -62,7 +58,6 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                             itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
                         }
 
-                        // Create ShopList object
                         val shopList = ShopList(id, name, itemsList, membersList)
                         lists.add(shopList)
                     }
@@ -84,19 +79,13 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
 
     fun addProductToList(listId: String, product: String, countItem: Int, unit: String) {
         val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
-
-        // Create a unique key for the new product entry in the shop list
         val newItemRef = shopListRef.push()
-
-        // Construct the product entry
         val productEntry = mapOf(
             "title" to product,
             "count" to countItem,
             "unit" to unit,
             "checked" to false
         )
-
-        // Set the product entry in the shop list
         newItemRef.setValue(productEntry)
     }
 
@@ -127,7 +116,6 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
     }
 
     fun getListById(id: String, listener: (List<ShopListItem>) -> Unit) {
-        // Replace "users" with the collection name where user lists are stored in your Firestore
         databaseReference.child("shopLists").child(id)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -173,13 +161,14 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         listName: String,
         items: List<ShopListItem>,
         members: List<String>,
+        latitude: Double,
+        longitude: Double,
         listener: InsertShopListCallback
     ) {
         val shopListRef = databaseReference.child("shopLists").child(listId)
         shopListRef.keepSynced(true)
-        val updatedList = ShopList(listId, listName, items, members)
+        val updatedList = ShopList(listId, listName, items, members, latitude, longitude)
 
-        // Update the shop list without using a transaction
         shopListRef.setValue(updatedList)
             .addOnSuccessListener {
                 listener.onShopListInserted(updatedList)
@@ -199,22 +188,17 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val membersList: MutableList<String> = mutableListOf()
-
-                // Retrieve the current members list
                 val membersSnapshot = dataSnapshot.child("members")
                 for (memberSnapshot in membersSnapshot.children) {
                     val existingMember = memberSnapshot.getValue(String::class.java)
                     existingMember?.let { membersList.add(it) }
                 }
 
-                // Remove the specific member from the list
                 membersList.remove(member)
 
                 if (membersList.isEmpty()) {
-                    // If the updated members list is empty, delete the shop list
                     shopListRef.removeValue()
                 } else {
-                    // Update the shop list with the modified members list
                     shopListRef.child("members").setValue(membersList)
                 }
             }
@@ -257,7 +241,6 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
         shopListRef.keepSynced(true)
 
-        // Update the specific item in the list without using a transaction
         shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val currentItems: MutableList<ShopListItem>? =

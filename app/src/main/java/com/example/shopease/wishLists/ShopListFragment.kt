@@ -42,6 +42,9 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
     private val shopListsDatabaseHelper = ShopListsDatabaseHelper()
     private lateinit var id: String
     private lateinit var name: String
+    private lateinit var members: List<String>
+    private var latitude: Double? = null
+    private var longitude: Double? = null
     private lateinit var username: String
     private lateinit var shopListName: TextView
     private lateinit var dbHelper: ShopListsDatabaseHelper
@@ -63,7 +66,10 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         friendDbHelper = RequestsDatabaseHelper()
         id = arguments?.getString("SHOP_LIST_ID_KEY") ?: ""
         name = arguments?.getString("SHOP_LIST_NAME_KEY") ?: "New List"
+        members = arguments?.getStringArrayList("MEMBERS")?.toList() ?: listOf(username)
         username = arguments?.getString("USERNAME_KEY") ?: ""
+        latitude = arguments?.getDouble("LATITUDE") ?: 0.0
+        longitude = arguments?.getDouble("LONGITUDE") ?: 0.0
         // Ensure correct context for permission request
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
@@ -148,6 +154,7 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
                         getCurrentLocation()
+
                     } else {
                         requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
@@ -199,8 +206,8 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
             val addressList = geocoder.getFromLocationName(addressString, 1)
             if (addressList != null && addressList.isNotEmpty()) {
                 val address = addressList[0]
-                val latitude = address.latitude
-                val longitude = address.longitude
+                latitude = address.latitude
+                longitude = address.longitude
                 Toast.makeText(
                     requireContext(),
                     "Latitude: $latitude, Longitude: $longitude",
@@ -289,7 +296,9 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
             shopListsDatabaseHelper.updateShopList(id,
                 shopListName.text.toString(),
                 items,
-                listOf(username),
+                members,
+                latitude!!,
+                longitude!!,
                 object : ShopListsDatabaseHelper.InsertShopListCallback {
                     override fun onShopListInserted(shopList: ShopList?) {}
                 }
@@ -313,8 +322,8 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
                     // Got the location
-                    val latitude = location.latitude
-                    val longitude = location.longitude
+                    latitude = location.latitude
+                    longitude = location.longitude
                     // Do something with the latitude and longitude, e.g., display them
                     Toast.makeText(context, "Latitude: $latitude, Longitude: $longitude", Toast.LENGTH_SHORT).show()
                 } else {
@@ -450,12 +459,6 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         } else {
             Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
         }
-    }
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        // Save the current state and update the list in the database
-        updateList(shopListAdapter.items)
     }
 
     override fun onPause() {

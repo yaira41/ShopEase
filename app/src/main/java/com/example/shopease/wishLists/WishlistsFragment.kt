@@ -47,6 +47,9 @@ class WishlistsFragment : Fragment() {
                     bundle.putString("SHOP_LIST_ID_KEY", selectedList.id)
                     bundle.putString("SHOP_LIST_NAME_KEY", selectedList.name)
                     bundle.putString("USERNAME_KEY", username)
+                    bundle.putStringArrayList("MEMBERS", ArrayList(selectedList.members))
+                    bundle.putDouble("LONGITUDE", selectedList.longitude)
+                    bundle.putDouble("LATITUDE", selectedList.latitude)
                     replaceWithNewFragment(ShopListFragment(), bundle)
                 }
             },
@@ -119,6 +122,8 @@ class WishlistsFragment : Fragment() {
             selectedList.name,
             selectedList.items!!,
             selectedFriends,
+            selectedList.latitude,
+            selectedList.longitude,
             object : ShopListsDatabaseHelper.InsertShopListCallback {
                 override fun onShopListInserted(shopList: ShopList?) {
                     if (shopList != null) {
@@ -182,12 +187,8 @@ class WishlistsFragment : Fragment() {
             shopListsDatabaseHelper.deleteShopListForSpecificUser(selectedList.id, username)
         }
 
-        // Remove the item from the data source
         shopLists.removeAt(position)
-        // Notify the adapter about the item removal
         wishlistsAdapter.notifyItemRemoved(position)
-
-        // Update the positions in the adapter for items after the deleted one
         for (i in position until shopLists.size) {
             wishlistsAdapter.notifyItemChanged(i)
         }
@@ -201,7 +202,7 @@ class WishlistsFragment : Fragment() {
     }
 
     private fun showCreateListDialog() {
-        val context = context ?: return  // Check if the fragment is attached to a context
+        val context = context ?: return
         val builder = AlertDialog.Builder(context)
         builder.setTitle("שם רשימה")
 
@@ -217,6 +218,7 @@ class WishlistsFragment : Fragment() {
                     listName,
                     null,
                     listOf(username),
+
                     object : ShopListsDatabaseHelper.InsertShopListCallback {
                         override fun onShopListInserted(shopList: ShopList?) {
                             if (shopList != null) {

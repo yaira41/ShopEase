@@ -18,7 +18,6 @@ class RecipesDatabaseHelper : BaseDatabaseHelper() {
         val query =
             databaseReference.child("recipes")
 
-        // Enable offline persistence for the query
         query.keepSynced(true)
 
         query.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -26,7 +25,6 @@ class RecipesDatabaseHelper : BaseDatabaseHelper() {
                 val recipes: MutableList<Recipe> = mutableListOf()
 
                 for (recipeSnapshot in dataSnapshot.children) {
-                    // Extracting members
                     val membersList: MutableList<String> = mutableListOf()
                     val membersSnapshot = recipeSnapshot.child("members")
                     for (memberSnapshot in membersSnapshot.children) {
@@ -54,7 +52,6 @@ class RecipesDatabaseHelper : BaseDatabaseHelper() {
                             itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
                         }
 
-                        // Create recipe object
                         val recipe = Recipe(id, name, itemsList, membersList, procedure)
                         recipes.add(recipe)
                     }
@@ -77,10 +74,8 @@ class RecipesDatabaseHelper : BaseDatabaseHelper() {
     fun addProductToRecipe(recipeId: String, product: String, countItem: Int, unit: String) {
         val recipeRef = databaseReference.child("recipes").child(recipeId).child("items")
 
-        // Create a unique key for the new product entry in the recipe
         val newItemRef = recipeRef.push()
 
-        // Construct the product entry
         val productEntry = mapOf(
             "title" to product,
             "count" to countItem,
