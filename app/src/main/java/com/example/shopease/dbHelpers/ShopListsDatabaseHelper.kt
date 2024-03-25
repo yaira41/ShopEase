@@ -161,11 +161,13 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         listName: String,
         items: List<ShopListItem>,
         members: List<String>,
+        latitude: Double,
+        longitude: Double,
         listener: InsertShopListCallback
     ) {
         val shopListRef = databaseReference.child("shopLists").child(listId)
         shopListRef.keepSynced(true)
-        val updatedList = ShopList(listId, listName, items, members)
+        val updatedList = ShopList(listId, listName, items, members, latitude, longitude)
 
         shopListRef.setValue(updatedList)
             .addOnSuccessListener {

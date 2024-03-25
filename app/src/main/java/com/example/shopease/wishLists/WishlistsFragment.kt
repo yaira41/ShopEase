@@ -122,6 +122,8 @@ class WishlistsFragment : Fragment() {
             selectedList.name,
             selectedList.items!!,
             selectedFriends,
+            selectedList.latitude,
+            selectedList.longitude,
             object : ShopListsDatabaseHelper.InsertShopListCallback {
                 override fun onShopListInserted(shopList: ShopList?) {
                     if (shopList != null) {
@@ -220,6 +222,7 @@ class WishlistsFragment : Fragment() {
                     listName,
                     null,
                     listOf(username),
+
                     object : ShopListsDatabaseHelper.InsertShopListCallback {
                         override fun onShopListInserted(shopList: ShopList?) {
                             if (shopList != null) {

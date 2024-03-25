@@ -297,6 +297,8 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                 shopListName.text.toString(),
                 items,
                 members,
+                latitude!!,
+                longitude!!,
                 object : ShopListsDatabaseHelper.InsertShopListCallback {
                     override fun onShopListInserted(shopList: ShopList?) {}
                 }
