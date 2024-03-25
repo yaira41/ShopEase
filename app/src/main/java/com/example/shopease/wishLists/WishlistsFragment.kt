@@ -187,12 +187,8 @@ class WishlistsFragment : Fragment() {
             shopListsDatabaseHelper.deleteShopListForSpecificUser(selectedList.id, username)
         }
 
-        // Remove the item from the data source
         shopLists.removeAt(position)
-        // Notify the adapter about the item removal
         wishlistsAdapter.notifyItemRemoved(position)
-
-        // Update the positions in the adapter for items after the deleted one
         for (i in position until shopLists.size) {
             wishlistsAdapter.notifyItemChanged(i)
         }
@@ -206,7 +202,7 @@ class WishlistsFragment : Fragment() {
     }
 
     private fun showCreateListDialog() {
-        val context = context ?: return  // Check if the fragment is attached to a context
+        val context = context ?: return
         val builder = AlertDialog.Builder(context)
         builder.setTitle("שם רשימה")
 
