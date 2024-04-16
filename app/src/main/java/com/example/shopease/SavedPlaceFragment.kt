@@ -42,6 +42,8 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
     private lateinit var btnReturnToSavedLocation: Button
     private lateinit var dbHelper: ShopListsDatabaseHelper
     private lateinit var id: String
+    private var currentLocationIndex = 0 // Initialize the current location index
+
 
 
     override fun onCreateView(
@@ -168,11 +170,15 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
     private fun returnToFirstSavedLocation() {
         // Check if shopListWithCoordinates is not empty
         if (shopListWithCoordinates.isNotEmpty()) {
-            val firstLocation = LatLng(
-                shopListWithCoordinates[0].latitude,
-                shopListWithCoordinates[0].longitude
-            )
-            googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(firstLocation, 15f))
+            // Increment the current location index
+            currentLocationIndex = (currentLocationIndex + 1) % shopListWithCoordinates.size
+
+            // Get the next location
+            val nextLocation = shopListWithCoordinates[currentLocationIndex]
+
+            // Move the map to the next location
+            val nextLatLng = LatLng(nextLocation.latitude, nextLocation.longitude)
+            googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(nextLatLng, 15f))
         }
     }
 
@@ -188,40 +194,69 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
     }
 
     private fun fetchListsFromDB() {
+//        dbHelper.getAllUserLists(username) { items ->
+//            if (items.isEmpty()) {
+//                Toast.makeText(context, "נראה שאין לך פריטים ברשימה", Toast.LENGTH_SHORT).show()
+//
+//            } else {
+//
+//                // Extract required data and populate shopListWithCoordinates
+//                for (shopList in items) {
+//                    // Extract id, name, latitude, and longitude from each shopList
+//                    val id = shopList.id
+//                    val name = shopList.name
+//                    val latitude = String.format("%.4f", shopList.latitude)
+//                    val longitude = String.format("%.4f", shopList.longitude)
+//                    // If latitude or longitude has fewer than four digits after the decimal point, pad with zeros
+//                    val formattedLatitude = "%.${4 - latitude.substringAfter(".").length}f".format(latitude.toDouble())
+//                    val formattedLongitude = "%.${4 - longitude.substringAfter(".").length}f".format(longitude.toDouble())
+//                    Toast.makeText(
+//                        context,
+//                        "Id: $id,name: $name, Latitude: $latitude, Longitude: $longitude",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//
+//                    // Create ShopListWithCoordinates object and add it to the list
+//                    val shopListWithCoordinatesItem =
+//                        ShopListWithCoordinates(id, name, formattedLatitude.toDouble(), formattedLongitude.toDouble())
+//                    shopListWithCoordinates.add(shopListWithCoordinatesItem)
+//
+//                }
+//                googleMap?.let { map ->
+//                    // Update map with markers
+//                    onMapReady(map)
+//                }
+//
+//            }
         dbHelper.getAllUserLists(username) { items ->
             if (items.isEmpty()) {
                 Toast.makeText(context, "נראה שאין לך פריטים ברשימה", Toast.LENGTH_SHORT).show()
-
             } else {
-
                 // Extract required data and populate shopListWithCoordinates
                 for (shopList in items) {
                     // Extract id, name, latitude, and longitude from each shopList
                     val id = shopList.id
                     val name = shopList.name
-                    val latitude = String.format("%.4f", shopList.latitude)
-                    val longitude = String.format("%.4f", shopList.longitude)
-                    // If latitude or longitude has fewer than four digits after the decimal point, pad with zeros
-                    val formattedLatitude = "%.${4 - latitude.substringAfter(".").length}f".format(latitude.toDouble())
-                    val formattedLongitude = "%.${4 - longitude.substringAfter(".").length}f".format(longitude.toDouble())
-                    Toast.makeText(
-                        context,
-                        "Id: $id,name: $name, Latitude: $latitude, Longitude: $longitude",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val latitude = shopList.latitude
+                    val longitude = shopList.longitude
 
-                    // Create ShopListWithCoordinates object and add it to the list
-                    val shopListWithCoordinatesItem =
-                        ShopListWithCoordinates(id, name, formattedLatitude.toDouble(), formattedLongitude.toDouble())
-                    shopListWithCoordinates.add(shopListWithCoordinatesItem)
-
+                    // Check if latitude and longitude are not 0.0
+                    if (latitude != 0.0 && longitude != 0.0) {
+                        // Create ShopListWithCoordinates object and add it to the list
+                        val shopListWithCoordinatesItem =
+                            ShopListWithCoordinates(id, name, latitude, longitude)
+                        shopListWithCoordinates.add(shopListWithCoordinatesItem)
+                    }
                 }
+
+                // Update the map with markers
                 googleMap?.let { map ->
+
                     // Update map with markers
                     onMapReady(map)
                 }
-
             }
+
         }
     }
 
