@@ -79,8 +79,8 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
         }
 
         // Fetch lists with coordinates from DB
-        fetchListsFromDB()
-//        fetchData()
+//        fetchListsFromDB()
+        fetchData()
 
         return view
     }
@@ -193,16 +193,17 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
                 Toast.makeText(context, "נראה שאין לך פריטים ברשימה", Toast.LENGTH_SHORT).show()
 
             } else {
-                // Clear previous data
-                shopListWithCoordinates.clear()
 
                 // Extract required data and populate shopListWithCoordinates
                 for (shopList in items) {
                     // Extract id, name, latitude, and longitude from each shopList
                     val id = shopList.id
                     val name = shopList.name
-                    val latitude = shopList.latitude
-                    val longitude = shopList.longitude
+                    val latitude = String.format("%.4f", shopList.latitude)
+                    val longitude = String.format("%.4f", shopList.longitude)
+                    // If latitude or longitude has fewer than four digits after the decimal point, pad with zeros
+                    val formattedLatitude = "%.${4 - latitude.substringAfter(".").length}f".format(latitude.toDouble())
+                    val formattedLongitude = "%.${4 - longitude.substringAfter(".").length}f".format(longitude.toDouble())
                     Toast.makeText(
                         context,
                         "Id: $id,name: $name, Latitude: $latitude, Longitude: $longitude",
@@ -211,9 +212,12 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
 
                     // Create ShopListWithCoordinates object and add it to the list
                     val shopListWithCoordinatesItem =
-                        ShopListWithCoordinates(id, name, latitude, longitude)
+                        ShopListWithCoordinates(id, name, formattedLatitude.toDouble(), formattedLongitude.toDouble())
                     shopListWithCoordinates.add(shopListWithCoordinatesItem)
+
                 }
+
+
             }
         }
     }
