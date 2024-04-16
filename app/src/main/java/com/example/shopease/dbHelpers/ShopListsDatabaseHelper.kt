@@ -10,6 +10,7 @@ import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.MutableData
 import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 
 interface CheckProductExistenceCallback {
     fun onProductExistenceChecked(exists: Boolean)
@@ -48,16 +49,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                         val itemsList: MutableList<ShopListItem> = mutableListOf()
                         val itemsSnapshot = listSnapshot.child("items")
                         for (itemSnapshot in itemsSnapshot.children) {
-                            val itemTitle =
-                                itemSnapshot.child("title").getValue(String::class.java) ?: "asd"
-                            val itemState =
-                                itemSnapshot.child("checked").getValue(Boolean::class.java)
-                                    ?: false
-                            val itemCount =
-                                itemSnapshot.child("count").getValue(Int::class.java) ?: 1
-                            val itemUnit =
-                                itemSnapshot.child("unit").getValue(String::class.java) ?: "יחידות"
-                            itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
+                            itemsList.add(itemSnapshot.getValue(ShopListItem::class.java)!!)
                         }
 
                         val shopList = ShopList(id, name, itemsList, membersList, latitude, longitude)
@@ -91,32 +83,6 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         newItemRef.setValue(productEntry)
     }
 
-    fun isExistProductInList(
-        listId: String,
-        productName: String,
-        callback: CheckProductExistenceCallback
-    ) {
-        val shopListRef = databaseReference.child("shopLists").child(listId).child("items")
-
-        shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val exists = dataSnapshot.children.any {
-                    it.child("title").getValue(String::class.java) == productName
-                }
-                callback.onProductExistenceChecked(exists)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e(
-                    "ShopListsDatabaseHelper",
-                    "Error checking product existence in the list",
-                    error.toException()
-                )
-                callback.onProductExistenceChecked(false)
-            }
-        })
-    }
-
     fun getListById(id: String, listener: (List<ShopListItem>) -> Unit) {
         databaseReference.child("shopLists").child(id)
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -124,19 +90,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                     val itemsList: MutableList<ShopListItem> = mutableListOf()
                     val itemsSnapshot = dataSnapshot.child("items")
                     for (itemSnapshot in itemsSnapshot.children) {
-                        val itemTitle =
-                            itemSnapshot.child("title").getValue(String::class.java)
-                                ?: "asd"
-                        val itemState =
-                            itemSnapshot.child("checked").getValue(Boolean::class.java)
-                                ?: false
-                        val itemCount =
-                            itemSnapshot.child("count").getValue(Int::class.java)
-                                ?: 1
-                        val itemUnit =
-                            itemSnapshot.child("unit").getValue(String::class.java)
-                                ?: "יחידות"
-                        itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
+                        itemsList.add(itemSnapshot.getValue(ShopListItem::class.java)!!)
                     }
 
                     if (itemsList.isEmpty()) {
