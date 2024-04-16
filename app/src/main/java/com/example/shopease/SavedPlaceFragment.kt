@@ -79,8 +79,8 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
         }
 
         // Fetch lists with coordinates from DB
-//        fetchListsFromDB()
-        fetchData()
+        fetchListsFromDB()
+//        fetchData()
 
         return view
     }
@@ -216,7 +216,10 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
                     shopListWithCoordinates.add(shopListWithCoordinatesItem)
 
                 }
-
+                googleMap?.let { map ->
+                    // Update map with markers
+                    onMapReady(map)
+                }
 
             }
         }
