@@ -60,7 +60,8 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
                 R.id.action_saved_place -> {
                     val bundle = Bundle()
                     bundle.putString("USERNAME_KEY", user?.username)
-                    loadFragment(SavedPlaceFragment())
+
+                    loadFragment(SavedPlaceFragment(),bundle)
                     true
                 }
 
