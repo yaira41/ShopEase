@@ -42,6 +42,8 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                     if (userName in membersList) {
                         val id = listSnapshot.child("id").getValue(String::class.java)
                         val name = listSnapshot.child("name").getValue(String::class.java) ?: "list"
+                        val longitude = listSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
+                        val latitude = listSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
 
                         val itemsList: MutableList<ShopListItem> = mutableListOf()
                         val itemsSnapshot = listSnapshot.child("items")
@@ -58,7 +60,7 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                             itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
                         }
 
-                        val shopList = ShopList(id, name, itemsList, membersList)
+                        val shopList = ShopList(id, name, itemsList, membersList, latitude, longitude)
                         lists.add(shopList)
                     }
                 }
