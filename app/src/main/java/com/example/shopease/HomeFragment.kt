@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.example.shopease.recipes.RecipesFragment
-import com.google.android.material.button.MaterialButton
+import com.example.shopease.wishLists.WishlistsFragment
+import com.google.android.material.imageview.ShapeableImageView
 
-class HomeFragment : Fragment() {
+class  HomeFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -18,18 +18,30 @@ class HomeFragment : Fragment() {
         (activity as BaseActivity?)?.updateTitle("בית")
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        var btnGoToScan = view.findViewById<MaterialButton>(R.id.btnGoToScan)
+        var btnGoToScan = view.findViewById<ShapeableImageView>(R.id.btnGoToScan)
         btnGoToScan.setOnClickListener {
-            (activity as BaseActivity?)?.loadFragment(BarcodeScannerFragment())
+            navigateToFragment(BarcodeScannerFragment())
         }
 
         val bundle = Bundle()
         bundle.putString("USERNAME_KEY", arguments?.getString("USERNAME_KEY") ?: "")
-        var btnGoToMyRecipes = view.findViewById<MaterialButton>(R.id.btnGoToMyRecipes)
+
+        var btnGoToMyRecipes = view.findViewById<ShapeableImageView>(R.id.btnGoToMyRecipes)
         btnGoToMyRecipes.setOnClickListener {
-            (activity as BaseActivity?)?.loadFragment(RecipesFragment(), bundle)
+            navigateToFragment(RecipesFragment(), bundle)
         }
-        return view // Return the view you've inflated
+
+        var btnGoToMyWishlists = view.findViewById<ShapeableImageView>(R.id.btnGoToMyWishlists1)
+        btnGoToMyWishlists.setOnClickListener {
+            navigateToFragment(WishlistsFragment(), bundle)
+            (activity as BaseActivity?)?.updateNavigationBarToWishlists()
+        }
+
+        return view
+    }
+
+    private fun navigateToFragment(fragment: Fragment, bundle: Bundle? = null) {
+        (activity as BaseActivity?)?.loadFragment(fragment, bundle)
     }
 }
 

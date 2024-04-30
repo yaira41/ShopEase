@@ -73,6 +73,10 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
         bottomNavigation.selectedItemId = R.id.action_home
     }
 
+    fun updateNavigationBarToWishlists() {
+        bottomNavigation.selectedItemId = R.id.action_wishlist;
+    }
+
     override fun updateTitle(title: String) {
         // Update the title in your custom upper navigation bar
         val fragmentTitle: TextView = findViewById(R.id.title)
