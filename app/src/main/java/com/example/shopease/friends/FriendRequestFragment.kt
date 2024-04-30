@@ -64,5 +64,3 @@ class FriendRequestsFragment : Fragment() {
         adapter.removeFriendRequest(friendRequest)
     }
 }
-
-

@@ -21,29 +21,22 @@ class FriendsFragment : Fragment() {
         val myFriendsButton: ShapeableImageView = view.findViewById(R.id.myFriendsImgButton)
 
         searchFriendButton.setOnClickListener {
-            navigateToSearchFriends(view)
+            navigateToFragment(FriendSearchFragment())
         }
 
         friendRequestsButton.setOnClickListener {
-            navigateToFriendRequests(view)
+            navigateToFragment(FriendRequestsFragment())
         }
 
         myFriendsButton.setOnClickListener {
-            navigateToFriends(view)
+            navigateToFragment(ShowFriendsFragment())
         }
 
         return view
     }
 
-    private fun navigateToFriendRequests(view: View) {
-        (activity as BaseActivity?)?.loadFragment(FriendRequestsFragment())
+    private fun navigateToFragment(fragment: Fragment) {
+        (activity as BaseActivity?)?.loadFragment(fragment)
     }
 
-    private fun navigateToSearchFriends(view: View) {
-        (activity as BaseActivity?)?.loadFragment(FriendSearchFragment())
-    }
-
-    private fun navigateToFriends(view: View) {
-        (activity as BaseActivity?)?.loadFragment(ShowFriendsFragment())
-    }
 }
