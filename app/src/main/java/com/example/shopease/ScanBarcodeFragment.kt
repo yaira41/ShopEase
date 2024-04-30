@@ -124,6 +124,7 @@ class BarcodeScannerFragment : Fragment() {
         val dialog = builder.create()
         dialog.show()
     }
+
     private fun showChooseListDialog(productName: String) {
         val username = (activity as BaseActivity?)?.user?.username
         shopListsHelper.getAllUserLists(username!!) { shopLists ->
@@ -169,6 +170,7 @@ class BarcodeScannerFragment : Fragment() {
         val dialog = builder.create()
         dialog.show()
     }
+
     private fun addToShopList(listId: String, title: String, countItem: Int, unit: String) {
         val shopListsHelper = ShopListsDatabaseHelper()
         shopListsHelper.addProductToList(listId, title, countItem, unit)
@@ -215,8 +217,8 @@ class BarcodeScannerFragment : Fragment() {
                             val product = jsonResponse.optJSONObject("product")
                             val productNameEn =
                                 product?.optString("product_name", "שם המוצר אינו קיים.")
-                            val frontImage = product?.optString("image_front_url") ?:
-                            product?.optString("image_front_small_url")
+                            val frontImage = product?.optString("image_front_url")
+                                ?: product?.optString("image_front_small_url")
 
                             Log.d("Product Info", "Product Name (English): $productNameEn")
 
@@ -241,9 +243,11 @@ class BarcodeScannerFragment : Fragment() {
         super.onResume()
         checkCameraPermission()
     }
+
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
+
     override fun onPause() {
         super.onPause()
         barcodeView.pause()

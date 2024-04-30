@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imageProfileFragment"
@@ -9,10 +9,10 @@
         android:layout_height="100dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="250dp"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.LargeComponent"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
-        android:src="@drawable/profile_icon" />
+        android:src="@drawable/profile_icon"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.LargeComponent" />
 
     <TableLayout
         android:id="@+id/profileTable"

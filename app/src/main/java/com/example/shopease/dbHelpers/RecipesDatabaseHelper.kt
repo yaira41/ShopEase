@@ -34,8 +34,11 @@ class RecipesDatabaseHelper : BaseDatabaseHelper() {
 
                     if (userName in membersList) {
                         val id = recipeSnapshot.child("id").getValue(String::class.java)
-                        val name = recipeSnapshot.child("name").getValue(String::class.java) ?: "list"
-                        val procedure = recipeSnapshot.child("procedure").getValue(String::class.java) ?: "procedure"
+                        val name =
+                            recipeSnapshot.child("name").getValue(String::class.java) ?: "list"
+                        val procedure =
+                            recipeSnapshot.child("procedure").getValue(String::class.java)
+                                ?: "procedure"
 
                         val itemsList: MutableList<ShopListItem> = mutableListOf()
                         val itemsSnapshot = recipeSnapshot.child("items")
@@ -136,7 +139,8 @@ class RecipesDatabaseHelper : BaseDatabaseHelper() {
                         itemsList.add(ShopListItem(itemTitle, itemCount, itemUnit, itemState))
                     }
 
-                    val procedure = dataSnapshot.child("procedure").getValue(String::class.java)?: "procedure"
+                    val procedure =
+                        dataSnapshot.child("procedure").getValue(String::class.java) ?: "procedure"
 
                     if (itemsList.isEmpty()) {
                         listener(emptyList(), procedure)
@@ -252,7 +256,8 @@ class RecipesDatabaseHelper : BaseDatabaseHelper() {
         recipeRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val currentItems: MutableList<ShopListItem>? =
-                    dataSnapshot.getValue(object : GenericTypeIndicator<MutableList<ShopListItem>>() {})
+                    dataSnapshot.getValue(object :
+                        GenericTypeIndicator<MutableList<ShopListItem>>() {})
 
                 if (currentItems != null) {
                     if (position >= 0 && position < currentItems.size) {

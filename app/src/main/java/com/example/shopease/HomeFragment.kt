@@ -9,7 +9,7 @@ import com.example.shopease.recipes.RecipesFragment
 import com.example.shopease.wishLists.WishlistsFragment
 import com.google.android.material.imageview.ShapeableImageView
 
-class  HomeFragment : Fragment() {
+class HomeFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

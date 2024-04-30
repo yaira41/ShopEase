@@ -133,6 +133,7 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
                 }
             })
     }
+
     fun isUsernameExists(username: String, callback: (Boolean) -> Unit) {
         val usersRef = databaseReference.child("users")
         usersRef.orderByChild("username").equalTo(username)
@@ -151,6 +152,7 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
                 }
             })
     }
+
     fun updateImage(username: String, newImageUrl: ByteArray?, callback: (Boolean) -> Unit) {
         val base64ImageProfile = byteArrayToBase64(newImageUrl)
         updateImageLocal(username, base64ImageProfile)
@@ -207,6 +209,7 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
             }
         })
     }
+
     fun updatePassword(newPassword: String, onCompleteListener: OnCompleteListener<Void>) {
         val user: FirebaseUser? = auth.currentUser
 
@@ -232,6 +235,7 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
         }
         editor.apply()
     }
+
     private fun updateImageLocal(username: String, newImageUrl: String) {
         val editor = sharedPreferences.edit()
         if (username == sharedPreferences.getString("username", "")) {
@@ -239,11 +243,13 @@ class UsersDatabaseHelper(context: Context) : BaseDatabaseHelper() {
             editor.apply()
         }
     }
+
     private fun clearUserLocally() {
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
     }
+
     fun getLocallyStoredUser(): User? {
         val userId = sharedPreferences.getString("userId", null)
         val username = sharedPreferences.getString("username", null)

@@ -60,7 +60,8 @@ class FriendRequestsFragment : Fragment() {
     private fun onIgnoreFriendRequest(friendRequest: FriendRequest) {
         // Handle ignore logic
         requestsDatabaseHelper.ignoreFriendRequest(username, friendRequest.username)
-        Toast.makeText(requireContext(), "$friendRequest.username Ignored.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "$friendRequest.username Ignored.", Toast.LENGTH_SHORT)
+            .show()
         adapter.removeFriendRequest(friendRequest)
     }
 }

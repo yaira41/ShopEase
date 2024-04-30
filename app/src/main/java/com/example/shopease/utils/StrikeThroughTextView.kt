@@ -20,7 +20,11 @@ class StrikeThroughTextView : AppCompatTextView {
         init()
     }
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         init()
     }
 
@@ -33,10 +37,11 @@ class StrikeThroughTextView : AppCompatTextView {
     fun setStrikeThroughTextFlag(enabled: Boolean) {
         if (enabled) {
             paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-        }else{
+        } else {
             paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
     }
+
     fun setStrikeThrough(enabled: Boolean, endPosition: Float = 0f) {
         strikeThroughEnabled = enabled
         if (enabled) {

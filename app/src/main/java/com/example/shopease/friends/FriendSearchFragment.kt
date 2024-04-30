@@ -4,9 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -14,7 +11,6 @@ import com.example.shopease.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
-import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.utils.Utils.base64ToByteArray
 import com.example.shopease.utils.Utils.byteArrayToBitmap
 import com.google.android.material.button.MaterialButton
@@ -87,16 +83,28 @@ class FriendSearchFragment : Fragment() {
             requestDatabaseHelper.areFriends(senderUsername!!, searchedUsername) { areFriends ->
                 if (areFriends) {
                     // Users are already friends
-                    Toast.makeText(requireContext(), "You are already friends!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "You are already friends!", Toast.LENGTH_SHORT)
+                        .show()
                 } else {
                     // Check for duplicate friend request
-                    requestDatabaseHelper.checkDuplicateFriendRequest(senderUsername!!, searchedUsername) { isDuplicate ->
+                    requestDatabaseHelper.checkDuplicateFriendRequest(
+                        senderUsername,
+                        searchedUsername
+                    ) { isDuplicate ->
                         if (!isDuplicate) {
                             // No duplicate request, send friend request
                             requestDatabaseHelper.addFriendRequest(senderUsername, searchedUsername)
-                            Toast.makeText(requireContext(), "Friend request sent!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Friend request sent!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } else {
-                            Toast.makeText(requireContext(), "Friend request already exists", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Friend request already exists",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }

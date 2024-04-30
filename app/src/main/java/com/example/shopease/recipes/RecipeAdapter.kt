@@ -21,6 +21,7 @@ class RecipeAdapter(
 ) : RecyclerView.Adapter<RecipeAdapter.RecipeHolder>() {
 
     var procedure: String = ""
+
     interface OnItemLongClickListener {
         fun onItemLongClick(position: Int, view: View)
     }
@@ -116,6 +117,7 @@ class RecipeAdapter(
         })
         movePencil.start()
     }
+
     override fun getItemCount(): Int {
         return items.size
     }

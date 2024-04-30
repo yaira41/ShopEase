@@ -40,7 +40,7 @@ class RecipesAdapter(
         )
     }
 
-    fun initialList(itemsToAdd: List<Recipe>){
+    fun initialList(itemsToAdd: List<Recipe>) {
         items.addAll(itemsToAdd)
         notifyDataSetChanged()
     }

@@ -81,13 +81,14 @@ class ShowFriendsFragment : Fragment() {
     }
 
     private fun showFriendDetailsDialog(friend: FriendInfo) {
-        requestsDatabaseHelper.getUserByUsername(friend.username) {
-            user ->
+        requestsDatabaseHelper.getUserByUsername(friend.username) { user ->
             val dialog = Dialog(requireContext())
             dialog.setContentView(R.layout.dialog_show_user_detail)
 
-            val imageViewFriendDetails = dialog.findViewById<ShapeableImageView>(R.id.imageShowDialogViewProfile)
-            val textViewUsernameDetails = dialog.findViewById<TextView>(R.id.textShowDialogViewUsername)
+            val imageViewFriendDetails =
+                dialog.findViewById<ShapeableImageView>(R.id.imageShowDialogViewProfile)
+            val textViewUsernameDetails =
+                dialog.findViewById<TextView>(R.id.textShowDialogViewUsername)
             val textViewOtherDetails = dialog.findViewById<TextView>(R.id.textShowDialogViewEmail)
 
             friend.imageProfileByteArray?.let { byteArray ->
@@ -104,6 +105,6 @@ class ShowFriendsFragment : Fragment() {
 
             dialog.show()
         }
-        }
+    }
 
 }

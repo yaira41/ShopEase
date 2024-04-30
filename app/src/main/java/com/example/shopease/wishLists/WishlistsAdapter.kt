@@ -40,7 +40,7 @@ class WishlistsAdapter(
         )
     }
 
-    fun initialList(itemsToAdd: List<ShopList>){
+    fun initialList(itemsToAdd: List<ShopList>) {
         items.addAll(itemsToAdd)
         notifyDataSetChanged()
     }

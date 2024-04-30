@@ -134,6 +134,7 @@ class WishlistsFragment : Fragment() {
                 }
             })
     }
+
     private fun showUpdateItemDialog(selectedList: ShopList, position: Int) {
         val builder = AlertDialog.Builder(requireContext())
         val inflater = LayoutInflater.from(requireContext())
@@ -246,6 +247,7 @@ class WishlistsFragment : Fragment() {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun showConfirmationDialog(position: Int) {
         val dialogView = layoutInflater.inflate(R.layout.confirmation_dialog, null)
         val builder = AlertDialog.Builder(requireContext())

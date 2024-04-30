@@ -8,12 +8,12 @@ import java.io.Serializable
 @Entity
 class Place(
     @ColumnInfo(name = "name")
-    var name : String,
+    var name: String,
     @ColumnInfo(name = "latitude")
-    var latitude : Double,
+    var latitude: Double,
     @ColumnInfo(name = "longitude")
-    var longitude : Double
-    ) : Serializable {
+    var longitude: Double
+) : Serializable {
 
     @PrimaryKey(autoGenerate = true)
     var id = 0

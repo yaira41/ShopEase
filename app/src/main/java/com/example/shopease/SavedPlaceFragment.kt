@@ -44,7 +44,6 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
     private var currentLocationIndex = 0 // Initialize the current location index
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -102,7 +101,8 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
             marker?.tag = location // Attach ShopListWithCoordinates object to the marker
             context?.let { context ->
                 // Load the original bitmap
-                val originalBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.icon_app)
+                val originalBitmap =
+                    BitmapFactory.decodeResource(context.resources, R.drawable.icon_app)
                 // Resize the bitmap to 50x50 pixels
                 val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, 150, 150, false)
                 // Set the resized bitmap as the marker icon

@@ -5,7 +5,6 @@ import com.example.shopease.dataClasses.FriendInfo
 import com.example.shopease.dataClasses.FriendRequest
 import com.example.shopease.dataClasses.User
 import com.example.shopease.utils.Utils.base64ToByteArray
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -59,6 +58,7 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
                 }
             })
     }
+
     fun getFriendsFromUsername(username: String, callback: (List<String>) -> Unit) {
         val friendsRef = databaseReference.child("confirmFriends").child(username).child("friends")
 
@@ -73,6 +73,7 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
             }
         })
     }
+
     fun getFriendsWithImages(username: String, callback: (List<FriendInfo>) -> Unit) {
         val friendsRef = databaseReference.child("confirmFriends").child(username).child("friends")
         friendsRef.orderByValue()
@@ -131,7 +132,11 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
             .setValue(receiverUsername)
     }
 
-    fun checkDuplicateFriendRequest(username1: String, username2: String, callback: (Boolean) -> Unit) {
+    fun checkDuplicateFriendRequest(
+        username1: String,
+        username2: String,
+        callback: (Boolean) -> Unit
+    ) {
         // Check if the friend request already exists in both directions
         val ref1 = databaseReference.child("friendRequests").child(username1)
         ref1.child("receiverRequests").orderByValue().equalTo(username2)
@@ -162,7 +167,8 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
     }
 
     fun areFriends(senderUsername: String, receiverUsername: String, callback: (Boolean) -> Unit) {
-        val friendsRef = databaseReference.child("confirmFriends").child(senderUsername).child("friends")
+        val friendsRef =
+            databaseReference.child("confirmFriends").child(senderUsername).child("friends")
         friendsRef.child(receiverUsername)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -204,7 +210,8 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
     }
 
     private fun removeFriend(senderUsername: String, friendUsername: String) {
-        val senderFriendsRef = databaseReference.child("confirmFriends").child(senderUsername).child("friends")
+        val senderFriendsRef =
+            databaseReference.child("confirmFriends").child(senderUsername).child("friends")
         senderFriendsRef.orderByValue().equalTo(friendUsername)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {

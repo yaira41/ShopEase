@@ -1,4 +1,5 @@
 package com.example.shopease.roomdb
+
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -10,12 +11,12 @@ import io.reactivex.rxjava3.core.Flowable
 interface PlaceDao {
 
     @Query("SELECT * FROM Place")
-    fun getAll() : Flowable<List<Place>>
+    fun getAll(): Flowable<List<Place>>
 
     @Insert
-    fun insert(place: Place) : Completable
+    fun insert(place: Place): Completable
 
     @Delete
-    fun delete(place: Place) : Completable
+    fun delete(place: Place): Completable
 
 }

@@ -26,7 +26,11 @@ class ShopItemOptionsBottomSheetDialogFragment : DialogFragment() {
         const val ARG_COUNT = "arg_count"
         const val ARG_UNIT = "arg_unit"
 
-        fun newInstance(title: String, count: Int, unit: String): ShopItemOptionsBottomSheetDialogFragment {
+        fun newInstance(
+            title: String,
+            count: Int,
+            unit: String
+        ): ShopItemOptionsBottomSheetDialogFragment {
             val fragment = ShopItemOptionsBottomSheetDialogFragment()
             val args = Bundle().apply {
                 putString(ARG_TITLE, title)
@@ -37,10 +41,12 @@ class ShopItemOptionsBottomSheetDialogFragment : DialogFragment() {
             return fragment
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

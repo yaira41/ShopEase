@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -70,17 +69,27 @@ class RegisterActivity : AppCompatActivity() {
             val imageByteArray = convertImageToByteArray()
 
             // Call your addUser function to save the user to the database
-            usersDatabaseHelper.registerUser(username, email, password, imageByteArray, object : UsersDatabaseHelper.RegistrationCallback {
-                override fun onRegistrationResult(success: Boolean, user: User?) {
-                    if (success) {
-                        Toast.makeText(this@RegisterActivity, "נרשמת בהצלחה.", Toast.LENGTH_SHORT).show()
-                        navigateToLoginActivity()
-                    } else {
-                        // Registration failed
-                        Toast.makeText(this@RegisterActivity, "משהו השתבש", Toast.LENGTH_SHORT).show()
+            usersDatabaseHelper.registerUser(
+                username,
+                email,
+                password,
+                imageByteArray,
+                object : UsersDatabaseHelper.RegistrationCallback {
+                    override fun onRegistrationResult(success: Boolean, user: User?) {
+                        if (success) {
+                            Toast.makeText(
+                                this@RegisterActivity,
+                                "נרשמת בהצלחה.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            navigateToLoginActivity()
+                        } else {
+                            // Registration failed
+                            Toast.makeText(this@RegisterActivity, "משהו השתבש", Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     }
-                }
-            })
+                })
 
 
         }
@@ -160,7 +169,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun getDefaultProfileImage(): ByteArray? {
         // Provide a default image if no profile image is selected
         val drawable = resources.getDrawable(R.drawable.profile_icon, theme)
-        val bitmap = (drawable as android.graphics.drawable.BitmapDrawable).bitmap
+        val bitmap = (drawable as BitmapDrawable).bitmap
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         return byteArrayOutputStream.toByteArray()

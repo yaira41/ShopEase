@@ -1,5 +1,4 @@
-<com.google.android.material.appbar.MaterialToolbar
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.appbar.MaterialToolbar xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/upperNavbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
@@ -11,9 +10,9 @@
         android:layout_width="55dp"
         android:layout_height="48dp"
         android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:onClick="onProfileButtonClick"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:onClick="onProfileButtonClick"
         android:src="@drawable/profile_icon" />
 
     <!-- Title -->
@@ -31,11 +30,11 @@
         android:id="@+id/btnBack"
         android:layout_width="81dp"
         android:layout_height="54dp"
+        android:layout_gravity="end"
         android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:onClick="onBackButtonClick"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:onClick="onBackButtonClick"
-        android:src="@drawable/back_icon"
-        android:layout_gravity="end" />
+        android:src="@drawable/back_icon" />
 
 </com.google.android.material.appbar.MaterialToolbar>

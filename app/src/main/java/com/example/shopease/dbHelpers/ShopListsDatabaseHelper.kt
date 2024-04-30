@@ -5,12 +5,8 @@ import com.example.shopease.dataClasses.ShopList
 import com.example.shopease.dataClasses.ShopListItem
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.GenericTypeIndicator
-import com.google.firebase.database.MutableData
-import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
 
 interface CheckProductExistenceCallback {
     fun onProductExistenceChecked(exists: Boolean)
@@ -43,8 +39,10 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                     if (userName in membersList) {
                         val id = listSnapshot.child("id").getValue(String::class.java)
                         val name = listSnapshot.child("name").getValue(String::class.java) ?: "list"
-                        val longitude = listSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
-                        val latitude = listSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
+                        val longitude =
+                            listSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
+                        val latitude =
+                            listSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
 
                         val itemsList: MutableList<ShopListItem> = mutableListOf()
                         val itemsSnapshot = listSnapshot.child("items")
@@ -52,7 +50,8 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
                             itemsList.add(itemSnapshot.getValue(ShopListItem::class.java)!!)
                         }
 
-                        val shopList = ShopList(id, name, itemsList, membersList, latitude, longitude)
+                        val shopList =
+                            ShopList(id, name, itemsList, membersList, latitude, longitude)
                         lists.add(shopList)
                     }
                 }
@@ -200,7 +199,8 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val currentItems: MutableList<ShopListItem>? =
-                    dataSnapshot.getValue(object : GenericTypeIndicator<MutableList<ShopListItem>>() {})
+                    dataSnapshot.getValue(object :
+                        GenericTypeIndicator<MutableList<ShopListItem>>() {})
 
                 if (currentItems != null) {
                     if (position >= 0 && position < currentItems.size) {
@@ -211,7 +211,11 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("ShopListsDatabaseHelper", "Error updating shop list item", error.toException())
+                Log.e(
+                    "ShopListsDatabaseHelper",
+                    "Error updating shop list item",
+                    error.toException()
+                )
             }
         })
     }

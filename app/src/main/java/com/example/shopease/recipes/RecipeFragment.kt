@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
-import android.widget.ImageView
+import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -78,7 +78,7 @@ class RecipeFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bott
         val rvRecipeItem = view.findViewById<RecyclerView>(R.id.rvRecipeItems)
         rvRecipeItem.adapter = recipeAdapter
         rvRecipeItem.layoutManager = LinearLayoutManager(requireContext())
-        val addButton = view.findViewById<ImageView>(R.id.bAddButton)
+        val addButton = view.findViewById<ImageButton>(R.id.bAddButton)
         val itemTitle = view.findViewById<EditText>(R.id.etItemTitle)
         val count = view.findViewById<TextView>(R.id.etQuantity)
         val unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)
@@ -101,7 +101,7 @@ class RecipeFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bott
                 val newItem = ShopListItem(titleItem, countItem.toInt(), unit)
                 recipeAdapter.addRecipeItem(newItem)
                 itemTitle.text.clear()
-            }else {
+            } else {
                 showToast("נראה שחסר לך שם מוצר ואו כמות.")
             }
         }
@@ -115,15 +115,15 @@ class RecipeFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bott
     }
 
     fun updateRecipe(items: List<ShopListItem>, procedure: String) {
-            dbHelper.updateRecipe(id,
-                recipeName.text.toString(),
-                items,
-                listOf(username),
-                procedure,
-                object : RecipesDatabaseHelper.InsertRecipeCallback {
-                    override fun onRecipeInserted(recipe: Recipe?) {}
-                }
-            )
+        dbHelper.updateRecipe(id,
+            recipeName.text.toString(),
+            items,
+            listOf(username),
+            procedure,
+            object : RecipesDatabaseHelper.InsertRecipeCallback {
+                override fun onRecipeInserted(recipe: Recipe?) {}
+            }
+        )
     }
 
     private fun getCurrentLocation() {
@@ -139,14 +139,19 @@ class RecipeFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bott
                 PERMISSION_REQUEST_CODE
             )
         } else {
-            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+            val fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(requireActivity())
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
                     // Got the location
                     val latitude = location.latitude
                     val longitude = location.longitude
                     // Do something with the latitude and longitude, e.g., display them
-                    Toast.makeText(context, "Latitude: $latitude, Longitude: $longitude", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Latitude: $latitude, Longitude: $longitude",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
                     Toast.makeText(context, "Couldn't get location", Toast.LENGTH_SHORT).show()
                 }
@@ -248,6 +253,7 @@ class RecipeFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bott
             Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
 

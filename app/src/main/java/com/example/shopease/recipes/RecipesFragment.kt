@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.shopease.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.Recipe
-import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.RecipesDatabaseHelper
+import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -36,7 +36,6 @@ class RecipesFragment : Fragment() {
         username = arguments?.getString("USERNAME_KEY") ?: ""
         recipesDatabaseHelper = RecipesDatabaseHelper()
         requestsDatabaseHelper = RequestsDatabaseHelper()
-// Add a long-press listener in your adapter
 
         recipesAdapter = RecipesAdapter(
             recipes,
@@ -129,6 +128,7 @@ class RecipesFragment : Fragment() {
                 }
             })
     }
+
     private fun showUpdateItemDialog(selectedRecipe: Recipe, position: Int) {
         val builder = AlertDialog.Builder(requireContext())
         val inflater = LayoutInflater.from(requireContext())
@@ -245,6 +245,7 @@ class RecipesFragment : Fragment() {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun showConfirmationDialog(position: Int) {
         val dialogView = layoutInflater.inflate(R.layout.confirmation_dialog, null)
         val builder = AlertDialog.Builder(requireContext())

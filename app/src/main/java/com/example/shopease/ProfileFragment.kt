@@ -10,14 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.example.shopease.dbHelpers.FirebaseManager.auth
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.utils.Utils
 import com.example.shopease.utils.Utils.base64ToByteArray
@@ -25,7 +22,6 @@ import com.example.shopease.utils.Utils.byteArrayToBase64
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 
 class ProfileFragment : Fragment() {
 
@@ -70,7 +66,7 @@ class ProfileFragment : Fragment() {
         imageProfileView.setOnClickListener {
             showProfileImageDialog()
         }
-        logoutButton.setOnClickListener{
+        logoutButton.setOnClickListener {
             dbHelper.logoutUser()
             (activity as BaseActivity).finish()
         }
@@ -80,7 +76,8 @@ class ProfileFragment : Fragment() {
 
     private fun showChangePasswordDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_change_password, null)
-        val newPasswordEditText: TextInputEditText = dialogView.findViewById(R.id.newPasswordEditText)
+        val newPasswordEditText: TextInputEditText =
+            dialogView.findViewById(R.id.newPasswordEditText)
         val confirmNewPasswordEditText: TextInputEditText =
             dialogView.findViewById(R.id.confirmNewPasswordEditText)
 
@@ -98,7 +95,10 @@ class ProfileFragment : Fragment() {
                             Log.d("UserDatabaseHelper", "Password changed successfully")
                         } else {
                             // Handle the error
-                            Log.e("UserDatabaseHelper", "Error changing password: ${task.exception}")
+                            Log.e(
+                                "UserDatabaseHelper",
+                                "Error changing password: ${task.exception}"
+                            )
                         }
                     })
                 } else {
@@ -172,7 +172,8 @@ class ProfileFragment : Fragment() {
 
                 // Update the image in the ImageView
                 setByteArrayImageOnImageView(selectedImageByteArray, imageProfileView)
-                (activity as BaseActivity).user?.profileImage = byteArrayToBase64(selectedImageByteArray)
+                (activity as BaseActivity).user?.profileImage =
+                    byteArrayToBase64(selectedImageByteArray)
             } else {
                 Toast.makeText(
                     requireContext(),

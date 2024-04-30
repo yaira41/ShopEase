@@ -14,7 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     private lateinit var bottomNavigation: BottomNavigationView
 
-    public var user: User? = null
+    var user: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +61,7 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
                     val bundle = Bundle()
                     bundle.putString("USERNAME_KEY", user?.username)
 
-                    loadFragment(SavedPlaceFragment(),bundle)
+                    loadFragment(SavedPlaceFragment(), bundle)
                     true
                 }
 
@@ -74,7 +74,7 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     }
 
     fun updateNavigationBarToWishlists() {
-        bottomNavigation.selectedItemId = R.id.action_wishlist;
+        bottomNavigation.selectedItemId = R.id.action_wishlist
     }
 
     override fun updateTitle(title: String) {
