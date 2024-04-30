@@ -1,25 +1,93 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:ignore="UselessParent">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnGoToScan"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_centerInParent="true"
-            android:text="לסריקת ברקוד" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnGoToMyRecipes"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:text="התבשילים שלי" />
-    </RelativeLayout>
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/btnGoToScan"
+                style="@style/ButtonRoundedSquare"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="160dp"
+                android:layout_marginEnd="70dp"
+                android:src="@drawable/baseline_barcode_reader_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.LargeComponent" />
 
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/btnGoToMyRecipes"
+                style="@style/ButtonRoundedSquare"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="70dp"
+                android:layout_marginTop="160dp"
+                android:src="@drawable/baseline_edit_note_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.LargeComponent" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/btnGoToMyWishlists1"
+                style="@style/ButtonRoundedSquare"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="176dp"
+                android:src="@drawable/ic_shopping_cart"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnGoToScan"
+                app:layout_constraintVertical_bias="0.287"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.LargeComponent"
+                tools:ignore="UsingOnClickInXml" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="סרוק מוצר"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.774"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnGoToScan" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="התבשילים שלי"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.225"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnGoToMyRecipes"
+                tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="100dp"
+                android:text="הרשימות שלי"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnGoToMyWishlists1" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
 
 </RelativeLayout>
