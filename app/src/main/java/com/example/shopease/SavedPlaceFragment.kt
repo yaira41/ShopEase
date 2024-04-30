@@ -27,7 +27,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
-// Import your DB helper classes here
 
 class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -61,19 +60,10 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
         mapView?.getMapAsync(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-//        btnZoomIn = view.findViewById(R.id.btnZoomIn)
-//        btnZoomOut = view.findViewById(R.id.btnZoomOut)
+
         btnReturnToSavedLocation = view.findViewById(R.id.btnReturnToSavedLocation)
 
-//        btnZoomIn.setOnClickListener {
-//            // Call function to zoom in
-//            zoomIn()
-//        }
-//
-//        btnZoomOut.setOnClickListener {
-//            // Call function to zoom out
-//            zoomOut()
-//        }
+
 
         btnReturnToSavedLocation.setOnClickListener {
             // Call function to return to the first saved location from the DB
@@ -194,40 +184,6 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
     }
 
     private fun fetchListsFromDB() {
-//        dbHelper.getAllUserLists(username) { items ->
-//            if (items.isEmpty()) {
-//                Toast.makeText(context, "נראה שאין לך פריטים ברשימה", Toast.LENGTH_SHORT).show()
-//
-//            } else {
-//
-//                // Extract required data and populate shopListWithCoordinates
-//                for (shopList in items) {
-//                    // Extract id, name, latitude, and longitude from each shopList
-//                    val id = shopList.id
-//                    val name = shopList.name
-//                    val latitude = String.format("%.4f", shopList.latitude)
-//                    val longitude = String.format("%.4f", shopList.longitude)
-//                    // If latitude or longitude has fewer than four digits after the decimal point, pad with zeros
-//                    val formattedLatitude = "%.${4 - latitude.substringAfter(".").length}f".format(latitude.toDouble())
-//                    val formattedLongitude = "%.${4 - longitude.substringAfter(".").length}f".format(longitude.toDouble())
-//                    Toast.makeText(
-//                        context,
-//                        "Id: $id,name: $name, Latitude: $latitude, Longitude: $longitude",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//
-//                    // Create ShopListWithCoordinates object and add it to the list
-//                    val shopListWithCoordinatesItem =
-//                        ShopListWithCoordinates(id, name, formattedLatitude.toDouble(), formattedLongitude.toDouble())
-//                    shopListWithCoordinates.add(shopListWithCoordinatesItem)
-//
-//                }
-//                googleMap?.let { map ->
-//                    // Update map with markers
-//                    onMapReady(map)
-//                }
-//
-//            }
         dbHelper.getAllUserLists(username) { items ->
             if (items.isEmpty()) {
                 Toast.makeText(context, "נראה שאין לך פריטים ברשימה", Toast.LENGTH_SHORT).show()
