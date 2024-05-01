@@ -88,12 +88,9 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
             )
             marker?.tag = location // Attach ShopListWithCoordinates object to the marker
             context?.let { context ->
-                // Load the original bitmap
                 val originalBitmap =
-                    BitmapFactory.decodeResource(context.resources, R.drawable.icon_app)
-                // Resize the bitmap to 50x50 pixels
-                val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, 150, 150, false)
-                // Set the resized bitmap as the marker icon
+                    BitmapFactory.decodeResource(context.resources, R.drawable.wishlist_icon)
+                val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, 100, 100, false)
                 marker?.setIcon(BitmapDescriptorFactory.fromBitmap(resizedBitmap))
             }
         }
