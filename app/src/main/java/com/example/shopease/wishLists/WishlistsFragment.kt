@@ -36,7 +36,6 @@ class WishlistsFragment : Fragment() {
         username = arguments?.getString("USERNAME_KEY") ?: ""
         shopListsDatabaseHelper = ShopListsDatabaseHelper()
         requestsDatabaseHelper = RequestsDatabaseHelper()
-// Add a long-press listener in your adapter
 
         wishlistsAdapter = WishlistsAdapter(
             shopLists,
@@ -45,17 +44,12 @@ class WishlistsFragment : Fragment() {
                     val selectedList = shopLists[position]
                     val bundle = Bundle()
                     bundle.putString("SHOP_LIST_ID_KEY", selectedList.id)
-                    bundle.putString("SHOP_LIST_NAME_KEY", selectedList.name)
                     bundle.putString("USERNAME_KEY", username)
-                    bundle.putStringArrayList("MEMBERS", ArrayList(selectedList.members))
-                    bundle.putDouble("LONGITUDE", selectedList.longitude)
-                    bundle.putDouble("LATITUDE", selectedList.latitude)
                     replaceWithNewFragment(ShopListFragment(), bundle)
                 }
             },
             itemLongClickListener = object : WishlistsAdapter.OnItemLongClickListener {
                 override fun onItemLongClick(position: Int, view: View) {
-                    // Show the update dialog on long press
                     showUpdateItemDialog(shopLists[position], position)
                 }
             },

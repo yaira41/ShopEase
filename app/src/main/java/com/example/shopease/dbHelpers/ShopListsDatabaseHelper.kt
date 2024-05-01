@@ -81,8 +81,33 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
         )
         newItemRef.setValue(productEntry)
     }
+    fun getShopListById(id: String, listener: (ShopList?) -> Unit) {
+        val shopListRef = databaseReference.child("shopLists").child(id)
 
-    fun getListById(id: String, listener: (List<ShopListItem>) -> Unit) {
+        shopListRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                Log.d("FirebaseDebug", "DataSnapshot: $dataSnapshot")
+                if (dataSnapshot.exists()) {
+                    val name = dataSnapshot.child("name").getValue(String::class.java) ?: "List"
+                    val latitude = dataSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
+                    val longitude = dataSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
+                    val members = dataSnapshot.child("members").children.mapNotNull { it.getValue(String::class.java) }
+                    val items = dataSnapshot.child("items").children.mapNotNull { it.getValue(ShopListItem::class.java) }
+                    val shopList = ShopList(id, name, items, members, latitude, longitude)
+                    listener(shopList)
+                } else {
+                    listener(null)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseDebug", "Error getting shop list", error.toException())
+                listener(null)
+            }
+        })
+    }
+
+    fun getListItemsById(id: String, listener: (List<ShopListItem>) -> Unit) {
         databaseReference.child("shopLists").child(id)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {

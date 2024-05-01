@@ -2,7 +2,6 @@ package com.example.shopease.wishLists
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.location.Geocoder
@@ -26,14 +25,9 @@ import com.example.shopease.R
 import com.example.shopease.dataClasses.ShopList
 import com.example.shopease.dataClasses.ShopListItem
 import com.example.shopease.dbHelpers.RecipesDatabaseHelper
-import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.widget.Autocomplete
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.button.MaterialButton
 import java.util.*
 
@@ -41,18 +35,12 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
     private lateinit var shopListAdapter: ShopListAdapter
     private val shopListsDatabaseHelper = ShopListsDatabaseHelper()
     private lateinit var id: String
-    private lateinit var name: String
-    private lateinit var members: List<String>
-    private var latitude: Double? = null
-    private var longitude: Double? = null
+    private lateinit var shopList: ShopList
     private lateinit var username: String
     private lateinit var shopListName: TextView
-    private lateinit var dbHelper: ShopListsDatabaseHelper
-    private lateinit var friendDbHelper: RequestsDatabaseHelper
     private val PERMISSION_REQUEST_CODE = 101
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-    private val AUTOCOMPLETE_REQUEST_CODE = 1
     private lateinit var geocoder: Geocoder
 
     @SuppressLint("ClickableViewAccessibility")
@@ -60,22 +48,19 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
-        dbHelper = ShopListsDatabaseHelper()
-        friendDbHelper = RequestsDatabaseHelper()
         id = arguments?.getString("SHOP_LIST_ID_KEY") ?: ""
-        name = arguments?.getString("SHOP_LIST_NAME_KEY") ?: "New List"
-        members = arguments?.getStringArrayList("MEMBERS")?.toList() ?: listOf(username)
         username = arguments?.getString("USERNAME_KEY") ?: ""
-        latitude = arguments?.getDouble("LATITUDE") ?: 0.0
-        longitude = arguments?.getDouble("LONGITUDE") ?: 0.0
-        // Ensure correct context for permission request
+
+        shopListsDatabaseHelper.getShopListById(id) { sL ->
+            if (sL != null) {
+                shopList = sL
+                initializeUI(view)
+            }
+        }
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
         geocoder = Geocoder(requireActivity(), Locale.getDefault())
-
-        // Create ActivityResultLauncher for permission request
         requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted ->
@@ -85,6 +70,12 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                 Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
+
+        return view
+    }
+
+    private fun initializeUI(view: View) {
+
         shopListAdapter = ShopListAdapter(mutableListOf(),
             itemLongClickListener = object : ShopListAdapter.OnItemLongClickListener {
                 override fun onItemLongClick(position: Int, view: View) {
@@ -123,7 +114,6 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         }
         val chooseLocationButton = view.findViewById<MaterialButton>(R.id.button4)
         chooseLocationButton.setOnClickListener {
-            // Handle choosing a location or inserting an address
             openLocationPickerOrAddressInput()
         }
 
@@ -133,21 +123,15 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         }
 
         shopListName = view.findViewById(R.id.tvListName)
-
-        // Initially, show the TextView and hide the EditText
-        shopListName.text = name
-
-        return view;
+        shopListName.text = shopList.name
     }
 
     private fun openLocationPickerOrAddressInput() {
-        // Show a dialog to let the user choose between picking a location or entering an address
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Choose Location Method")
-        builder.setItems(arrayOf("Use Current Location", "Enter Address")) { dialog, which ->
+        builder.setItems(arrayOf("Use Current Location", "Enter Address")) { _, which ->
             when (which) {
                 0 -> {
-                    // User wants to use current location
                     if (ActivityCompat.checkSelfPermission(
                             requireContext(),
                             Manifest.permission.ACCESS_FINE_LOCATION
@@ -161,13 +145,11 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                 }
 
                 1 -> {
-                    // User wants to enter address
                     if (ActivityCompat.checkSelfPermission(
                             requireContext(),
                             Manifest.permission.ACCESS_FINE_LOCATION
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
-//                        launchAddressInput2()
                         handleEnterAddress()
 
                     } else {
@@ -186,10 +168,10 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         AlertDialog.Builder(requireContext())
             .setTitle("Enter Address")
             .setView(editText)
-            .setPositiveButton("OK") { dialog, _ ->
+            .setPositiveButton("OK") { _, _ ->
                 val addressString = editText.text.toString()
                 if (addressString.isNotEmpty()) {
-                    launchAddressInput2(addressString)
+                    launchAddressInput(addressString)
                 } else {
                     Toast.makeText(
                         requireContext(),
@@ -204,16 +186,16 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
             .show()
     }
 
-    private fun launchAddressInput2(addressString: String) {
+    private fun launchAddressInput(addressString: String) {
         try {
             val addressList = geocoder.getFromLocationName(addressString, 1)
-            if (addressList != null && addressList.isNotEmpty()) {
+            if (!addressList.isNullOrEmpty()) {
                 val address = addressList[0]
-                latitude = address.latitude
-                longitude = address.longitude
+                shopList.latitude = address.latitude
+                shopList.longitude = address.longitude
                 Toast.makeText(
                     requireContext(),
-                    "Latitude: $latitude, Longitude: $longitude",
+                    "Latitude: ${shopList.latitude}, Longitude: ${shopList.longitude}",
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
@@ -233,85 +215,13 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
         }
     }
 
-    private fun launchAddressInput22() {
-        val latitude = 31.884174634758583
-        val longitude = 35.0341130828458
-        val address = geocoder.getFromLocation(latitude, longitude, 1)
-        // Do something with the latitude and longitude, e.g., display them
-        Toast.makeText(context, "Address: $address", Toast.LENGTH_SHORT).show()
-    }
-
-    private val addressResultLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-
-        if (result.resultCode == RESULT_OK) {
-            val data = result.data ?: return@registerForActivityResult
-            val place = Autocomplete.getPlaceFromIntent(data)
-            val address = place.address ?: ""
-
-            // Check if address is empty before geocoding
-            if (address.isEmpty()) {
-                Toast.makeText(
-                    requireContext(),
-                    "Please enter a valid address.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@registerForActivityResult
-            }
-
-            // Geocode the address to get latitude and longitude
-            val geocoder = Geocoder(requireContext(), Locale.getDefault())
-            var latLng: LatLng? = null
-
-            try {
-                geocoder.getFromLocationName(address, 1)?.let { addresses ->
-                    if (addresses.isNotEmpty()) {
-                        latLng = LatLng(addresses[0].latitude, addresses[0].longitude)
-                    }
-                }
-            } catch (e: Exception) { // Handle various exceptions
-                e.printStackTrace()
-                Toast.makeText(requireContext(), "Failed to retrieve location.", Toast.LENGTH_SHORT)
-                    .show()
-            }
-
-            if (latLng != null) {
-                // Use the latitude and longitude for your desired purposes
-                Toast.makeText(
-                    requireContext(),
-                    "Address: $address\nLat/Lng: $latLng",
-                    Toast.LENGTH_LONG
-                ).show()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Could not retrieve latitude and longitude.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-
-    private fun launchAddressInput() {
-        // Create a new intent to start the Places Autocomplete Activity
-        val fields = listOf(Place.Field.ADDRESS)
-        val intent = Autocomplete.IntentBuilder(
-            AutocompleteActivityMode.FULLSCREEN, fields
-        ).build(requireActivity())
-
-        addressResultLauncher.launch(intent)
-    }
-
-
-    fun updateList(items: List<ShopListItem>) {
+    private fun updateList(items: List<ShopListItem>) {
         shopListsDatabaseHelper.updateShopList(id,
             shopListName.text.toString(),
             items,
-            members,
-            latitude!!,
-            longitude!!,
+            shopList.members,
+            shopList.latitude,
+            shopList.longitude,
             object : ShopListsDatabaseHelper.InsertShopListCallback {
                 override fun onShopListInserted(shopList: ShopList?) {}
             }
@@ -335,13 +245,11 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
                 LocationServices.getFusedLocationProviderClient(requireActivity())
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
-                    // Got the location
-                    latitude = location.latitude
-                    longitude = location.longitude
-                    // Do something with the latitude and longitude, e.g., display them
+                    shopList.latitude = location.latitude
+                    shopList.longitude = location.longitude
                     Toast.makeText(
                         context,
-                        "Latitude: $latitude, Longitude: $longitude",
+                        "Latitude: ${shopList.latitude}, Longitude: ${shopList.longitude}",
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
@@ -365,7 +273,7 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
     }
 
     private fun fetchData() {
-        dbHelper.getListById(id) { items ->
+        shopListsDatabaseHelper.getListItemsById(id) { items ->
             if (items.isEmpty()) {
                 showToast("נראה שאין לך פריטים ברשימה")
             } else {
@@ -406,7 +314,7 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 
     private fun showOptionsBottomSheet(position: Int) {
         val curItem =
-            shopListAdapter.items[position] // Assuming `items` is the list of ShopListItem
+            shopListAdapter.items[position]
 
         val bottomSheetFragment = ShopItemOptionsBottomSheetDialogFragment.newInstance(
             curItem.title,
@@ -461,7 +369,7 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 
     override fun onConfirmClicked(position: Int, title: String, count: Int, unit: String) {
         val shopListItem = ShopListItem(title, count, unit, false)
-        dbHelper.updateShopListItem(id, position, shopListItem)
+        shopListsDatabaseHelper.updateShopListItem(id, position, shopListItem)
         shopListAdapter.items[position] = shopListItem
         shopListAdapter.notifyItemChanged(position)
     }
@@ -481,8 +389,6 @@ class ShopListFragment : Fragment(), ShopItemOptionsBottomSheetDialogFragment.Bo
 
     override fun onPause() {
         super.onPause()
-
-        // Save the current state and update the list in the database
         updateList(shopListAdapter.items)
     }
 }
