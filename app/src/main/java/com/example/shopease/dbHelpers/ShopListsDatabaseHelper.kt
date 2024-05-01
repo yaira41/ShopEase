@@ -19,48 +19,28 @@ class ShopListsDatabaseHelper : BaseDatabaseHelper() {
     }
 
     fun getAllUserLists(userName: String, listener: (List<ShopList>) -> Unit) {
-        val query =
-            databaseReference.child("shopLists")
-
-        query.keepSynced(true)
-
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
+        databaseReference.child("shopLists").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val lists: MutableList<ShopList> = mutableListOf()
-
-                for (listSnapshot in dataSnapshot.children) {
-                    val membersList: MutableList<String> = mutableListOf()
-                    val membersSnapshot = listSnapshot.child("members")
-                    for (memberSnapshot in membersSnapshot.children) {
-                        val member = memberSnapshot.getValue(String::class.java)
-                        member?.let { membersList.add(it) }
+                val lists = dataSnapshot.children.mapNotNull { listSnapshot ->
+                    val membersList = listSnapshot.child("members").children.mapNotNull { memberSnapshot ->
+                        memberSnapshot.getValue(String::class.java)
                     }
-
                     if (userName in membersList) {
                         val id = listSnapshot.child("id").getValue(String::class.java)
                         val name = listSnapshot.child("name").getValue(String::class.java) ?: "list"
-                        val longitude =
-                            listSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
-                        val latitude =
-                            listSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
+                        val longitude = listSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
+                        val latitude = listSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
 
-                        val itemsList: MutableList<ShopListItem> = mutableListOf()
-                        val itemsSnapshot = listSnapshot.child("items")
-                        for (itemSnapshot in itemsSnapshot.children) {
-                            itemsList.add(itemSnapshot.getValue(ShopListItem::class.java)!!)
+                        val itemsList = listSnapshot.child("items").children.mapNotNull { itemSnapshot ->
+                            itemSnapshot.getValue(ShopListItem::class.java)
                         }
 
-                        val shopList =
-                            ShopList(id, name, itemsList, membersList, latitude, longitude)
-                        lists.add(shopList)
+                        ShopList(id, name, itemsList, membersList, latitude, longitude)
+                    } else {
+                        null
                     }
                 }
-
-                if (lists.isEmpty()) {
-                    listener(emptyList())
-                } else {
-                    listener(lists)
-                }
+                listener(lists)
             }
 
             override fun onCancelled(error: DatabaseError) {
