@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
+import com.example.shopease.viewModels.UserViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 
@@ -18,6 +20,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginButton: Button
     private lateinit var signupButton: Button
     private lateinit var auth: FirebaseAuth
+    private val userViewModel: UserViewModel by viewModels()
     private lateinit var dbHelper: UsersDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +42,7 @@ class LoginActivity : AppCompatActivity() {
         val locallyStoredUser = dbHelper.getLocallyStoredUser()
 
         if (locallyStoredUser != null) {
-            showToast("היי, ראינו שיש לנו מידע שלך מההתחברות האחרונה.")
+            showToast("היי, ${locallyStoredUser.username}.")
             navigateToHomeActivity(locallyStoredUser)
             finish()
         }
@@ -72,11 +75,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun navigateToHomeActivity(user: User) {
-        // Pass user information to HomeActivity
-        val intent = Intent(this, HomeActivity::class.java).apply {
-            putExtra("USER_KEY", user)
-        }
-        startActivity(intent)
+        userViewModel.user = user
+        startActivity(Intent(this, HomeActivity::class.java))
         finish() // Ensure no operations are performed after this line
     }
 

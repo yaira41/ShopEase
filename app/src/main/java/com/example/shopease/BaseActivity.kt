@@ -4,15 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.shopease.dataClasses.User
 import com.example.shopease.friends.FriendsFragment
+import com.example.shopease.viewModels.UserViewModel
 import com.example.shopease.wishLists.WishlistsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     private lateinit var bottomNavigation: BottomNavigationView
+    private val userViewModel: UserViewModel by viewModels()
 
     var user: User? = null
 
@@ -30,7 +33,10 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     }
 
     internal fun handleIntentExtras() {
-        user = intent.getSerializableExtra("USER_KEY") as User?
+        userViewModel.user?.let { userObj ->
+            user = userObj
+        }
+
     }
 
     internal fun setBottomNavBar() {

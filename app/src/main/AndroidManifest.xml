@@ -29,16 +29,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC_8PFoC9lX33FaMVtmZVdGVm6iGgE16JI" />-->
-<!--            android:value="AIzaSyAR4uPPuXOgG0SrYu7geEOILyS-cxwEanQ" />-->
-
-<!--        android:value="AIzaSyDV2_xy58r15K6TskZy4KWMuhUDVq67jqM" />-->
-
-<!--        android:value="AIzaSyC_8PFoC9lX33FaMVtmZVdGVm6iGgE16JI" />-->
-        <!--            android:value="AIzaSyB6DN98YbbcNAYK2aTGZc6No0sNjs5DpbE" />-->
-
-
-
+            android:value="AIzaSyC_8PFoC9lX33FaMVtmZVdGVm6iGgE16JI" />
 
         <activity
             android:name=".MainActivity"
@@ -78,7 +69,6 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true">
 
-            <!-- Add the following configuration for barcode scanning -->
             <intent-filter>
                 <action android:name="com.google.zxing.client.android.SCAN" />
                 <category android:name="android.intent.category.DEFAULT" />

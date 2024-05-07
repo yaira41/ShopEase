@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.utils.Utils
 import com.example.shopease.utils.Utils.base64ToByteArray
@@ -31,9 +32,7 @@ class ProfileFragment : Fragment() {
     private lateinit var changePasswordButton: Button
     private lateinit var logoutButton: Button
     private lateinit var dbHelper: UsersDatabaseHelper
-    private var username: String? = null
-    private var email: String? = null
-    private var imageProfile: String? = null
+    private var user: User? = null
     private val GALLERY_REQUEST_CODE = 1001
 
     override fun onCreateView(
@@ -41,6 +40,7 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         (activity as BaseActivity?)?.updateTitle("פרופיל")
+        user = (activity as BaseActivity?)?.user
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         usernameTextView = view.findViewById(R.id.tvUsernameProfile)
@@ -48,16 +48,12 @@ class ProfileFragment : Fragment() {
         changePasswordButton = view.findViewById(R.id.changePasswordButton)
         imageProfileView = view.findViewById(R.id.imageProfileFragment)
         logoutButton = view.findViewById(R.id.btnLogout)
-        // Replace these values with the actual username and email
-        username = arguments?.getString("USERNAME_KEY")
-        email = arguments?.getString("EMAIL_KEY")
-        imageProfile = arguments?.getString("PROFILE_IMAGE_KEY")
 
         dbHelper = UsersDatabaseHelper(requireContext())
         // Set username and email in the UI
-        usernameTextView.text = username
-        emailTextView.text = email
-        setByteArrayImageOnImageView(base64ToByteArray(imageProfile!!), imageProfileView)
+        usernameTextView.text = user?.username
+        emailTextView.text = user?.email
+        setByteArrayImageOnImageView(base64ToByteArray(user!!.profileImage), imageProfileView)
 
         // Handle the change password button click
         changePasswordButton.setOnClickListener {
@@ -125,7 +121,7 @@ class ProfileFragment : Fragment() {
         val changeImageButton: Button = dialogView.findViewById(R.id.changeProfileImageButton)
 
         // Set the profile image in the dialog
-        setByteArrayImageOnImageView(base64ToByteArray(imageProfile!!), profileImageView)
+        setByteArrayImageOnImageView(base64ToByteArray(user!!.profileImage), profileImageView)
 
         // Handle the change image button click
         changeImageButton.setOnClickListener {
@@ -161,7 +157,7 @@ class ProfileFragment : Fragment() {
         val selectedImageByteArray = Utils.uriToByteArray(requireContext(), selectedImageUri)
 
         // Update the image in the database
-        dbHelper.updateImage(username.toString(), selectedImageByteArray) { success ->
+        dbHelper.updateImage(user?.username.toString(), selectedImageByteArray) { success ->
             if (success) {
 
                 Toast.makeText(
