@@ -217,7 +217,7 @@ class RecipesFragment : Fragment() {
                     recipeName,
                     null,
                     listOf(username),
-                    "ששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששש",
+                    "",
                     object : RecipesDatabaseHelper.InsertRecipeCallback {
                         override fun onRecipeInserted(recipe: Recipe?) {
                             if (recipe != null) {
