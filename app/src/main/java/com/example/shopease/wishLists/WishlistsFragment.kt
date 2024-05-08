@@ -33,7 +33,7 @@ class WishlistsFragment : Fragment() {
     ): View? {
         (activity as BaseActivity?)?.updateTitle("רשימות קניה")
         val view = inflater.inflate(R.layout.fragment_wishlists, container, false)
-        username = arguments?.getString("USERNAME_KEY") ?: ""
+        username = (activity as BaseActivity?)?.username!!
         shopListsDatabaseHelper = ShopListsDatabaseHelper()
         requestsDatabaseHelper = RequestsDatabaseHelper()
 

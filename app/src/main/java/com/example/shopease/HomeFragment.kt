@@ -24,7 +24,7 @@ class HomeFragment : Fragment() {
         }
 
         val bundle = Bundle()
-        bundle.putString("USERNAME_KEY", arguments?.getString("USERNAME_KEY") ?: "")
+        bundle.putString("USERNAME_KEY", (activity as BaseActivity?)?.username!!)
 
         var btnGoToMyRecipes = view.findViewById<ShapeableImageView>(R.id.btnGoToMyRecipes)
         btnGoToMyRecipes.setOnClickListener {

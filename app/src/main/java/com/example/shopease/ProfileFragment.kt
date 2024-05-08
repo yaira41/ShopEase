@@ -49,9 +49,9 @@ class ProfileFragment : Fragment() {
         imageProfileView = view.findViewById(R.id.imageProfileFragment)
         logoutButton = view.findViewById(R.id.btnLogout)
         // Replace these values with the actual username and email
-        username = arguments?.getString("USERNAME_KEY")
-        email = arguments?.getString("EMAIL_KEY")
-        imageProfile = arguments?.getString("PROFILE_IMAGE_KEY")
+        username = (activity as BaseActivity?)?.username!!
+        email = (activity as BaseActivity?)?.user?.email
+        imageProfile = (activity as BaseActivity?)?.user?.profileImage
 
         dbHelper = UsersDatabaseHelper(requireContext())
         // Set username and email in the UI
@@ -171,9 +171,9 @@ class ProfileFragment : Fragment() {
                 ).show()
 
                 // Update the image in the ImageView
-                setByteArrayImageOnImageView(selectedImageByteArray, imageProfileView)
-                (activity as BaseActivity).user?.profileImage =
-                    byteArrayToBase64(selectedImageByteArray)
+//                setByteArrayImageOnImageView(selectedImageByteArray, imageProfileView)
+//                (activity as BaseActivity).user?.profileImage =
+//                    byteArrayToBase64(selectedImageByteArray)
             } else {
                 Toast.makeText(
                     requireContext(),

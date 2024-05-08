@@ -1,6 +1,7 @@
 package com.example.shopease
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -136,33 +137,36 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun convertImageToByteArray(): ByteArray? {
-        // Convert the image to a byte array (you need to implement this based on your requirements)
-        // For demonstration purposes, let's assume you have a function that converts an image URI to a byte array
-        val selectedImageUri = getSelectedImageUri()
-        return uriToByteArray(selectedImageUri) ?: getDefaultProfileImage()
+        // Retrieve the selected image URI
+        val selectedImageUri = getSelectedImageUri() ?: return getDefaultProfileImage()
+
+        // Convert the URI to a ByteArray
+        return contentResolver.openInputStream(selectedImageUri)?.use { inputStream ->
+            inputStream.readBytes()
+        }
     }
 
     private fun getSelectedImageUri(): Uri? {
         // Retrieve the URI of the selected image from the ImageView
-        val drawable = imageProfile.drawable as? BitmapDrawable
-        return drawable?.bitmap?.let { bitmap ->
-            val bytes = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes)
-            val path =
-                MediaStore.Images.Media.insertImage(contentResolver, bitmap, "Title", null)
-            Uri.parse(path)
-        }
-    }
+        val drawable = imageProfile.drawable as? BitmapDrawable ?: return null
+        val bitmap = drawable.bitmap ?: return null
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes)
 
-    private fun uriToByteArray(uri: Uri?): ByteArray? {
-        // Convert the image URI to a byte array (you need to implement this based on your requirements)
-        // For demonstration purposes, let's assume you have a function that converts an image URI to a byte array
-        uri?.let {
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                return inputStream.readBytes()
+        // Create a ContentValues object with the required fields
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "Title")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.WIDTH, bitmap.width)
+            put(MediaStore.Images.Media.HEIGHT, bitmap.height)
+        }
+
+        // Insert the image into the media store
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)?.also { uri ->
+            contentResolver.openOutputStream(uri)?.use { outputStream ->
+                outputStream.write(bytes.toByteArray())
             }
         }
-        return null
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")

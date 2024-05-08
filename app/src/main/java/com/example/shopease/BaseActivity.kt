@@ -7,17 +7,20 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.shopease.dataClasses.User
+import com.example.shopease.dbHelpers.RequestsDatabaseHelper
 import com.example.shopease.friends.FriendsFragment
 import com.example.shopease.wishLists.WishlistsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var dbHelper: RequestsDatabaseHelper
 
+    var username: String? = null
     var user: User? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        dbHelper = RequestsDatabaseHelper()
         handleIntentExtras()
     }
 
@@ -30,25 +33,29 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     }
 
     internal fun handleIntentExtras() {
-        user = intent.getSerializableExtra("USER_KEY") as User?
+        username = intent.getStringExtra("USER_KEY")
+        username?.let { fetchUserByUsername(it) }
     }
 
+    internal fun fetchUserByUsername(username: String) {
+        dbHelper.getUserByUsername(username) { user ->
+            if (user != null) {
+                this@BaseActivity.user = user
+            }
+        }
+    }
     internal fun setBottomNavBar() {
         bottomNavigation = findViewById(R.id.bottomNavigation)
         bottomNavigation.setOnNavigationItemSelectedListener { menuItem ->
 
             when (menuItem.itemId) {
                 R.id.action_wishlist -> {
-                    val bundle = Bundle()
-                    bundle.putString("USERNAME_KEY", user?.username)
-                    loadFragment(WishlistsFragment(), bundle)
+                    loadFragment(WishlistsFragment())
                     true
                 }
 
                 R.id.action_home -> {
-                    val bundle = Bundle()
-                    bundle.putString("USERNAME_KEY", user?.username)
-                    loadFragment(HomeFragment(), bundle)
+                    loadFragment(HomeFragment())
                     true
                 }
 
@@ -58,10 +65,7 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
                 }
 
                 R.id.action_saved_place -> {
-                    val bundle = Bundle()
-                    bundle.putString("USERNAME_KEY", user?.username)
-
-                    loadFragment(SavedPlaceFragment(), bundle)
+                    loadFragment(SavedPlaceFragment())
                     true
                 }
 
@@ -104,12 +108,7 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
 
     fun onProfileButtonClick(view: View) {
         val profileFragment = ProfileFragment()
-        // Create a Bundle and add data to it
-        val bundle = Bundle()
-        bundle.putString("USERNAME_KEY", user?.username)
-        bundle.putString("EMAIL_KEY", user?.email)
-        bundle.putString("PROFILE_IMAGE_KEY", user?.profileImage)
-        loadFragment(profileFragment, bundle)
+        loadFragment(profileFragment)
     }
 
     fun onBackButtonClick(view: View) {

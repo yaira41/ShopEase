@@ -66,7 +66,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation ("com.google.android.gms:play-services-maps:18.0.1")
     implementation("org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.9.10")
-
+    implementation("com.squareup.picasso:picasso:2.71828")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")

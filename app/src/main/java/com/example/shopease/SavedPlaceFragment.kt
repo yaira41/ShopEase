@@ -45,7 +45,7 @@ class SavedPlaceFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerCli
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_saved_place, container, false)
-        username = arguments?.getString("USERNAME_KEY") ?: ""
+        username = (activity as BaseActivity?)?.username!!
 
         dbHelper = ShopListsDatabaseHelper()
 
