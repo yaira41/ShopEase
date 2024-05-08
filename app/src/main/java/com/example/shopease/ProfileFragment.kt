@@ -177,8 +177,8 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    fun reloadFragment() {
-        val transaction = requireFragmentManager().beginTransaction()
+    private fun reloadFragment() {
+        val transaction = this.requireFragmentManager().beginTransaction()
         transaction.detach(this).attach(this).commit()
     }
 }
