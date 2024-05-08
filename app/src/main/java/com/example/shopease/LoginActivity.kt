@@ -67,9 +67,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun navigateToHomeActivity(user: User) {
         // Pass user information to HomeActivity
-        val intent = Intent(this, HomeActivity::class.java).apply {
-            putExtra("USER_KEY", user.username)
-        }
+        val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
     }
 
