@@ -166,8 +166,7 @@ class ProfileFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
                 (activity as BaseActivity).user = dbHelper.getLocallyStoredUser()
-                notify()
-
+                reloadFragment()
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -176,5 +175,10 @@ class ProfileFragment : Fragment() {
                 ).show()
             }
         }
+    }
+
+    fun reloadFragment() {
+        val transaction = requireFragmentManager().beginTransaction()
+        transaction.detach(this).attach(this).commit()
     }
 }

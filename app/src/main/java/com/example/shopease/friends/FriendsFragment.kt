@@ -14,7 +14,7 @@ class FriendsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        (activity as BaseActivity?)?.updateTitle("Friends")
+        (activity as BaseActivity?)?.updateTitle("חברים")
         val view = inflater.inflate(R.layout.fragment_friends, container, false)
         val friendRequestsButton: ShapeableImageView =
             view.findViewById(R.id.requestFriendImgButton)

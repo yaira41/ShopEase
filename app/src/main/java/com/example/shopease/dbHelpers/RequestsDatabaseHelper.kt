@@ -228,11 +228,7 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
 
     fun confirmFriendRequest(senderUsername: String, receiverUsername: String) {
         removeFriendRequest(senderUsername, receiverUsername)
-
-        // Add sender to receiver's friend list
         addFriend(receiverUsername, senderUsername)
-
-        // Add receiver to sender's friend list
         addFriend(senderUsername, receiverUsername)
     }
 

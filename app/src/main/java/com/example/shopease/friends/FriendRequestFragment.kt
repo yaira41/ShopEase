@@ -41,9 +41,7 @@ class FriendRequestsFragment : Fragment() {
 
         username = (activity as BaseActivity).user?.username!!
 
-        // Retrieve friend requests for the current user
         requestsDatabaseHelper.getFriendRequests(username) { friendRequests ->
-            // Update the adapter with friend requests
             adapter.updateFriendRequests(friendRequests)
         }
 

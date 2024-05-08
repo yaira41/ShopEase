@@ -56,7 +56,7 @@ class FriendSearchFragment : Fragment() {
             if (foundUser != null) {
                 displayUser(foundUser)
             } else {
-                resultTextView.text = "User not found"
+                resultTextView.text = "המשתמש אינו נמצא."
                 profileImageView.visibility = View.GONE
                 sendFriendRequestButton.visibility = View.GONE
             }
@@ -89,7 +89,7 @@ class FriendSearchFragment : Fragment() {
                     ) { isDuplicate ->
                         sleep(1000)
                         if (!isDuplicate) {
-                            // No duplicate request, send friend request
+                            sleep(1000)
                             requestDatabaseHelper.addFriendRequest(senderUsername, searchedUsername)
                             Toast.makeText(
                                 requireContext(),
