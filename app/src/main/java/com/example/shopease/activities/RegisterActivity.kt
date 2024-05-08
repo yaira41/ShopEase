@@ -1,4 +1,4 @@
-package com.example.shopease
+package com.example.shopease.activities
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.shopease.R
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.google.android.material.textfield.TextInputEditText

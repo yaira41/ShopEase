@@ -1,4 +1,4 @@
-package com.example.shopease
+package com.example.shopease.fragments
 
 
 import android.Manifest
@@ -13,6 +13,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import com.example.shopease.activities.BaseActivity
+import com.example.shopease.R
 import com.example.shopease.dbHelpers.ShopListsDatabaseHelper
 import com.example.shopease.models.ShopListWithCoordinates
 import com.example.shopease.wishLists.ShopListFragment

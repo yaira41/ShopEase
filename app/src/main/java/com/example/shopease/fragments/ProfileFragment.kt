@@ -1,11 +1,10 @@
-package com.example.shopease
+package com.example.shopease.fragments
 
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,14 +14,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.shopease.activities.BaseActivity
+import com.example.shopease.R
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.utils.Utils
 import com.example.shopease.utils.Utils.base64ToByteArray
-import com.example.shopease.utils.Utils.byteArrayToBase64
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
-import okhttp3.internal.notify
 
 class ProfileFragment : Fragment() {
 

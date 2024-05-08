@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
-import com.example.shopease.BaseActivity
+import com.example.shopease.activities.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.FriendInfo
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper

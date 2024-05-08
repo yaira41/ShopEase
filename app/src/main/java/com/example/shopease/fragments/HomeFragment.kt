@@ -1,10 +1,12 @@
-package com.example.shopease
+package com.example.shopease.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.shopease.activities.BaseActivity
+import com.example.shopease.R
 import com.example.shopease.recipes.RecipesFragment
 import com.example.shopease.wishLists.WishlistsFragment
 import com.google.android.material.imageview.ShapeableImageView

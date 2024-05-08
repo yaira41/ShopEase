@@ -1,6 +1,7 @@
-package com.example.shopease
+package com.example.shopease.activities
 
 import android.os.Bundle
+import com.example.shopease.R
 
 class HomeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

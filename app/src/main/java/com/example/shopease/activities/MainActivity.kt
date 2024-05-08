@@ -1,9 +1,10 @@
-package com.example.shopease
+package com.example.shopease.activities
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.example.shopease.R
 
 class MainActivity : AppCompatActivity() {
 
