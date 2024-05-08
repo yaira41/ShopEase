@@ -22,6 +22,7 @@ import com.example.shopease.utils.Utils.byteArrayToBase64
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
+import okhttp3.internal.notify
 
 class ProfileFragment : Fragment() {
 
@@ -91,14 +92,15 @@ class ProfileFragment : Fragment() {
                 if (newPassword == confirmNewPassword) {
                     dbHelper.updatePassword(newPassword, OnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            // Password changed successfully
-                            Log.d("UserDatabaseHelper", "Password changed successfully")
-                        } else {
-                            // Handle the error
-                            Log.e(
-                                "UserDatabaseHelper",
-                                "Error changing password: ${task.exception}"
-                            )
+                            Toast.makeText(
+                                requireContext(),
+                                "הסיסמה שונתה בהצלחה.", Toast.LENGTH_SHORT
+                            ).show()
+                          } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "משהו השתבש.", Toast.LENGTH_SHORT
+                            ).show()
                         }
                     })
                 } else {
@@ -124,10 +126,7 @@ class ProfileFragment : Fragment() {
         val profileImageView: ShapeableImageView = dialogView.findViewById(R.id.ivProfile)
         val changeImageButton: Button = dialogView.findViewById(R.id.changeProfileImageButton)
 
-        // Set the profile image in the dialog
         setByteArrayImageOnImageView(base64ToByteArray(imageProfile!!), profileImageView)
-
-        // Handle the change image button click
         changeImageButton.setOnClickListener {
             openGalleryForImage()
         }
@@ -149,9 +148,7 @@ class ProfileFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == GALLERY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            // Handle the selected image here
             val selectedImageUri: Uri = data.data!!
-            // Update the image in the database and the ImageView
             updateImage(selectedImageUri)
         }
     }
@@ -169,6 +166,8 @@ class ProfileFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
                 (activity as BaseActivity).user = dbHelper.getLocallyStoredUser()
+                notify()
+
             } else {
                 Toast.makeText(
                     requireContext(),

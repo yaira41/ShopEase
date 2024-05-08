@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
     private fun checkForLocallyStoredUser() {
         dbHelper.getLocallyStoredUser()?.let { user ->
             showToast("ברוכים השבים, $${user.username}!")
-            navigateToHomeActivity(user)
+            navigateToHomeActivity()
             finish()
         }
     }
@@ -49,7 +49,7 @@ class LoginActivity : AppCompatActivity() {
             override fun onLoginResult(user: User?) {
                 if (user != null) {
                     showToast("התחברת בהצלחה, ${user.username}!")
-                    navigateToHomeActivity(user)
+                    navigateToHomeActivity()
                     finish()
                 } else {
                     // Login failed, user object is null
@@ -65,7 +65,7 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun navigateToHomeActivity(user: User) {
+    private fun navigateToHomeActivity() {
         // Pass user information to HomeActivity
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)

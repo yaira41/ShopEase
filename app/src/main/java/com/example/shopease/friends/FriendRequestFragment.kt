@@ -53,7 +53,7 @@ class FriendRequestsFragment : Fragment() {
     private fun onAcceptFriendRequest(friendRequest: FriendRequest) {
         // Handle acceptance logic
         requestsDatabaseHelper.confirmFriendRequest(friendRequest.username, username)
-        Toast.makeText(requireContext(), "Friend request Accepted.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "הבקשה אושרה בהצלחה.", Toast.LENGTH_SHORT).show()
         adapter.removeFriendRequest(friendRequest)
     }
 

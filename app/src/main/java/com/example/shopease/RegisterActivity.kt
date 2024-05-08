@@ -64,12 +64,8 @@ class RegisterActivity : AppCompatActivity() {
         val email = emailEditText.text.toString()
         val password = passwordEditText.text.toString()
 
-        // Check if registration is valid
         if (isRegistrationValid(username, email)) {
-            // Convert the image to a byte array
             val imageByteArray = convertImageToByteArray()
-
-            // Call your addUser function to save the user to the database
             usersDatabaseHelper.registerUser(
                 username,
                 email,
@@ -85,7 +81,6 @@ class RegisterActivity : AppCompatActivity() {
                             ).show()
                             navigateToLoginActivity()
                         } else {
-                            // Registration failed
                             Toast.makeText(this@RegisterActivity, "משהו השתבש", Toast.LENGTH_SHORT)
                                 .show()
                         }
@@ -137,10 +132,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun convertImageToByteArray(): ByteArray? {
-        // Retrieve the selected image URI
         val selectedImageUri = getSelectedImageUri() ?: return getDefaultProfileImage()
-
-        // Convert the URI to a ByteArray
         return contentResolver.openInputStream(selectedImageUri)?.use { inputStream ->
             inputStream.readBytes()
         }

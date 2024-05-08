@@ -16,6 +16,7 @@ import com.example.shopease.utils.Utils.byteArrayToBitmap
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
+import java.lang.Thread.sleep
 
 class FriendSearchFragment : Fragment() {
 
@@ -74,35 +75,31 @@ class FriendSearchFragment : Fragment() {
     }
 
     private fun sendFriendRequest() {
-        // Get the user being searched for
         val searchedUsername = usernameEditText.text.toString()
         val senderUsername = (activity as BaseActivity).user?.username
-
-        // Check if the user is not sending a request to themselves
         if (senderUsername != searchedUsername) {
             requestDatabaseHelper.areFriends(senderUsername!!, searchedUsername) { areFriends ->
                 if (areFriends) {
-                    // Users are already friends
-                    Toast.makeText(requireContext(), "You are already friends!", Toast.LENGTH_SHORT)
+                    Toast.makeText(requireContext(), "נראה שאתם כבר חברים.", Toast.LENGTH_SHORT)
                         .show()
                 } else {
-                    // Check for duplicate friend request
                     requestDatabaseHelper.checkDuplicateFriendRequest(
                         senderUsername,
                         searchedUsername
                     ) { isDuplicate ->
+                        sleep(1000)
                         if (!isDuplicate) {
                             // No duplicate request, send friend request
                             requestDatabaseHelper.addFriendRequest(senderUsername, searchedUsername)
                             Toast.makeText(
                                 requireContext(),
-                                "Friend request sent!",
+                                "נשלחה בקשת חברות.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
                             Toast.makeText(
                                 requireContext(),
-                                "Friend request already exists",
+                                "כבר קיימת במערכת בקשת חברות.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -112,7 +109,7 @@ class FriendSearchFragment : Fragment() {
         } else {
             Toast.makeText(
                 requireContext(),
-                "Cannot send a friend request to yourself",
+                "לא ניתן לשלוח לעצמך בקשת חברות.",
                 Toast.LENGTH_SHORT
             ).show()
         }
