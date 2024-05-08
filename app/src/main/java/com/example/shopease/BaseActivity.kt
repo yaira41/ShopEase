@@ -23,6 +23,7 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
         super.onCreate(savedInstanceState)
         dbHelper = UsersDatabaseHelper(this)
         user = dbHelper.getLocallyStoredUser()
+        username = user?.username
     }
 
     internal fun setUpUpperNavBar() {

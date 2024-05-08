@@ -56,13 +56,8 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
-    implementation ("com.google.firebase:firebase-firestore:24.10.2")
-    implementation (platform("com.google.firebase:firebase-bom:32.7.2"))
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
     implementation("com.google.firebase:firebase-database:20.3.0")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
-    implementation("com.google.firebase:firebase-database-ktx:20.3.0")
-    //location api for google maps location services
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation ("com.google.android.gms:play-services-maps:18.0.1")
     implementation("org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.9.10")
