@@ -163,17 +163,12 @@ class ProfileFragment : Fragment() {
         // Update the image in the database
         dbHelper.updateImage(username.toString(), selectedImageByteArray) { success ->
             if (success) {
-
                 Toast.makeText(
                     requireContext(),
                     "התמונה עודכנה בהצלחה",
                     Toast.LENGTH_SHORT
                 ).show()
-
-                // Update the image in the ImageView
-//                setByteArrayImageOnImageView(selectedImageByteArray, imageProfileView)
-//                (activity as BaseActivity).user?.profileImage =
-//                    byteArrayToBase64(selectedImageByteArray)
+                (activity as BaseActivity).user = dbHelper.getLocallyStoredUser()
             } else {
                 Toast.makeText(
                     requireContext(),

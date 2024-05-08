@@ -8,20 +8,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
+import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.friends.FriendsFragment
 import com.example.shopease.wishLists.WishlistsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
     private lateinit var bottomNavigation: BottomNavigationView
-    private lateinit var dbHelper: RequestsDatabaseHelper
+    private lateinit var dbHelper: UsersDatabaseHelper
 
     var username: String? = null
     var user: User? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dbHelper = RequestsDatabaseHelper()
-        handleIntentExtras()
+        dbHelper = UsersDatabaseHelper(this)
+        user = dbHelper.getLocallyStoredUser()
     }
 
     internal fun setUpUpperNavBar() {
@@ -32,18 +33,6 @@ open class BaseActivity : AppCompatActivity(), InterfaceFragmentTitle {
         supportActionBar?.customView = customUpperNavBar
     }
 
-    internal fun handleIntentExtras() {
-        username = intent.getStringExtra("USER_KEY")
-        username?.let { fetchUserByUsername(it) }
-    }
-
-    internal fun fetchUserByUsername(username: String) {
-        dbHelper.getUserByUsername(username) { user ->
-            if (user != null) {
-                this@BaseActivity.user = user
-            }
-        }
-    }
     internal fun setBottomNavBar() {
         bottomNavigation = findViewById(R.id.bottomNavigation)
         bottomNavigation.setOnNavigationItemSelectedListener { menuItem ->
