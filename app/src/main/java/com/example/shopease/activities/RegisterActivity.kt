@@ -112,17 +112,17 @@ class RegisterActivity : AppCompatActivity() {
 
         // Check if the email do not already exist in the database
         var result = true
-        usersDatabaseHelper.isUsernameExists(username) { exist ->
-            if (exist) {
-                result = false
+        usersDatabaseHelper.isUsernameExists(username) { userExist ->
+            if (userExist) {
                 showToast("המשתמש כבר בשימוש")
-            }
-        }
-        if (!result) {return false}
-        usersDatabaseHelper.isEmailExists(email) { exist ->
-            if (exist) {
                 result = false
-                showToast("המייל כבר בשימוש")
+            } else {
+                usersDatabaseHelper.isEmailExists(email) { mailExist ->
+                    if (mailExist) {
+                        showToast("המייל כבר בשימוש")
+                        result = false
+                    }
+                }
             }
         }
 
@@ -156,11 +156,12 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         // Insert the image into the media store
-        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)?.also { uri ->
-            contentResolver.openOutputStream(uri)?.use { outputStream ->
-                outputStream.write(bytes.toByteArray())
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            ?.also { uri ->
+                contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.write(bytes.toByteArray())
+                }
             }
-        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
