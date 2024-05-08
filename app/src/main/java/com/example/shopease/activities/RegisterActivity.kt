@@ -115,9 +115,10 @@ class RegisterActivity : AppCompatActivity() {
         usersDatabaseHelper.isUsernameExists(username) { exist ->
             if (exist) {
                 result = false
-                showToast("היוזר כבר בשימוש")
+                showToast("המשתמש כבר בשימוש")
             }
         }
+        if (result) {return true}
         usersDatabaseHelper.isEmailExists(email) { exist ->
             if (exist) {
                 result = false
