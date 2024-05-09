@@ -1,6 +1,7 @@
-package com.example.shopease
+package com.example.shopease.activities
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.shopease.R
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.google.android.material.textfield.TextInputEditText
@@ -63,12 +65,8 @@ class RegisterActivity : AppCompatActivity() {
         val email = emailEditText.text.toString()
         val password = passwordEditText.text.toString()
 
-        // Check if registration is valid
         if (isRegistrationValid(username, email)) {
-            // Convert the image to a byte array
             val imageByteArray = convertImageToByteArray()
-
-            // Call your addUser function to save the user to the database
             usersDatabaseHelper.registerUser(
                 username,
                 email,
@@ -84,7 +82,6 @@ class RegisterActivity : AppCompatActivity() {
                             ).show()
                             navigateToLoginActivity()
                         } else {
-                            // Registration failed
                             Toast.makeText(this@RegisterActivity, "משהו השתבש", Toast.LENGTH_SHORT)
                                 .show()
                         }
@@ -115,16 +112,17 @@ class RegisterActivity : AppCompatActivity() {
 
         // Check if the email do not already exist in the database
         var result = true
-        usersDatabaseHelper.isUsernameExists(username) { exist ->
-            if (exist) {
+        usersDatabaseHelper.isUsernameExists(username) { userExist ->
+            if (userExist) {
+                showToast("המשתמש כבר בשימוש")
                 result = false
-                showToast("היוזר כבר בשימוש")
-            }
-        }
-        usersDatabaseHelper.isEmailExists(email) { exist ->
-            if (exist) {
-                result = false
-                showToast("המייל כבר בשימוש")
+            } else {
+                usersDatabaseHelper.isEmailExists(email) { mailExist ->
+                    if (mailExist) {
+                        showToast("המייל כבר בשימוש")
+                        result = false
+                    }
+                }
             }
         }
 
@@ -136,33 +134,34 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun convertImageToByteArray(): ByteArray? {
-        // Convert the image to a byte array (you need to implement this based on your requirements)
-        // For demonstration purposes, let's assume you have a function that converts an image URI to a byte array
-        val selectedImageUri = getSelectedImageUri()
-        return uriToByteArray(selectedImageUri) ?: getDefaultProfileImage()
+        val selectedImageUri = getSelectedImageUri() ?: return getDefaultProfileImage()
+        return contentResolver.openInputStream(selectedImageUri)?.use { inputStream ->
+            inputStream.readBytes()
+        }
     }
 
     private fun getSelectedImageUri(): Uri? {
         // Retrieve the URI of the selected image from the ImageView
-        val drawable = imageProfile.drawable as? BitmapDrawable
-        return drawable?.bitmap?.let { bitmap ->
-            val bytes = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes)
-            val path =
-                MediaStore.Images.Media.insertImage(contentResolver, bitmap, "Title", null)
-            Uri.parse(path)
-        }
-    }
+        val drawable = imageProfile.drawable as? BitmapDrawable ?: return null
+        val bitmap = drawable.bitmap ?: return null
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes)
 
-    private fun uriToByteArray(uri: Uri?): ByteArray? {
-        // Convert the image URI to a byte array (you need to implement this based on your requirements)
-        // For demonstration purposes, let's assume you have a function that converts an image URI to a byte array
-        uri?.let {
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                return inputStream.readBytes()
-            }
+        // Create a ContentValues object with the required fields
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "Title")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.WIDTH, bitmap.width)
+            put(MediaStore.Images.Media.HEIGHT, bitmap.height)
         }
-        return null
+
+        // Insert the image into the media store
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            ?.also { uri ->
+                contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.write(bytes.toByteArray())
+                }
+            }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")

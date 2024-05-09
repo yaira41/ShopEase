@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.shopease.BaseActivity
+import com.example.shopease.activities.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.User
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
@@ -16,6 +16,7 @@ import com.example.shopease.utils.Utils.byteArrayToBitmap
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
+import java.lang.Thread.sleep
 
 class FriendSearchFragment : Fragment() {
 
@@ -55,7 +56,7 @@ class FriendSearchFragment : Fragment() {
             if (foundUser != null) {
                 displayUser(foundUser)
             } else {
-                resultTextView.text = "User not found"
+                resultTextView.text = "המשתמש אינו נמצא."
                 profileImageView.visibility = View.GONE
                 sendFriendRequestButton.visibility = View.GONE
             }
@@ -74,48 +75,40 @@ class FriendSearchFragment : Fragment() {
     }
 
     private fun sendFriendRequest() {
-        // Get the user being searched for
         val searchedUsername = usernameEditText.text.toString()
         val senderUsername = (activity as BaseActivity).user?.username
 
-        // Check if the user is not sending a request to themselves
-        if (senderUsername != searchedUsername) {
-            requestDatabaseHelper.areFriends(senderUsername!!, searchedUsername) { areFriends ->
-                if (areFriends) {
-                    // Users are already friends
-                    Toast.makeText(requireContext(), "You are already friends!", Toast.LENGTH_SHORT)
-                        .show()
-                } else {
-                    // Check for duplicate friend request
-                    requestDatabaseHelper.checkDuplicateFriendRequest(
-                        senderUsername,
-                        searchedUsername
-                    ) { isDuplicate ->
-                        if (!isDuplicate) {
-                            // No duplicate request, send friend request
-                            requestDatabaseHelper.addFriendRequest(senderUsername, searchedUsername)
-                            Toast.makeText(
-                                requireContext(),
-                                "Friend request sent!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Friend request already exists",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+        if (senderUsername == searchedUsername) {
+            showToast("לא ניתן לשלוח לעצמך בקשת חברות.")
+            return
+        }
+
+        checkFriendshipStatus(senderUsername!!, searchedUsername)
+    }
+
+    private fun checkFriendshipStatus(senderUsername: String, searchedUsername: String) {
+        requestDatabaseHelper.checkDuplicateFriendRequest(senderUsername, searchedUsername) { isDuplicate ->
+            if (isDuplicate) {
+                showToast("כבר קיימת במערכת בקשת חברות.")
+            } else {
+                requestDatabaseHelper.areFriends(senderUsername, searchedUsername) { areFriends ->
+                    if (areFriends) {
+                        showToast("נראה שאתם כבר חברים.")
+                    } else {
+                        sendFriendRequest(senderUsername, searchedUsername)
                     }
                 }
             }
-        } else {
-            Toast.makeText(
-                requireContext(),
-                "Cannot send a friend request to yourself",
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
-}
 
+    private fun sendFriendRequest(senderUsername: String, searchedUsername: String) {
+        requestDatabaseHelper.addFriendRequest(senderUsername, searchedUsername)
+        showToast("נשלחה בקשת חברות.")
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+}

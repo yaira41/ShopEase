@@ -11,7 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.shopease.BaseActivity
+import com.example.shopease.activities.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.Recipe
 import com.example.shopease.dbHelpers.RecipesDatabaseHelper

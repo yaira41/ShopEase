@@ -11,7 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.shopease.BaseActivity
+import com.example.shopease.activities.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.ShopList
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
@@ -33,7 +33,7 @@ class WishlistsFragment : Fragment() {
     ): View? {
         (activity as BaseActivity?)?.updateTitle("רשימות קניה")
         val view = inflater.inflate(R.layout.fragment_wishlists, container, false)
-        username = arguments?.getString("USERNAME_KEY") ?: ""
+        username = (activity as BaseActivity?)?.username!!
         shopListsDatabaseHelper = ShopListsDatabaseHelper()
         requestsDatabaseHelper = RequestsDatabaseHelper()
 

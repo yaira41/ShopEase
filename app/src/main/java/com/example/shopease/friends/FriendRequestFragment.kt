@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.shopease.BaseActivity
+import com.example.shopease.activities.BaseActivity
 import com.example.shopease.R
 import com.example.shopease.dataClasses.FriendRequest
 import com.example.shopease.dbHelpers.RequestsDatabaseHelper
@@ -41,9 +41,7 @@ class FriendRequestsFragment : Fragment() {
 
         username = (activity as BaseActivity).user?.username!!
 
-        // Retrieve friend requests for the current user
         requestsDatabaseHelper.getFriendRequests(username) { friendRequests ->
-            // Update the adapter with friend requests
             adapter.updateFriendRequests(friendRequests)
         }
 
@@ -53,7 +51,7 @@ class FriendRequestsFragment : Fragment() {
     private fun onAcceptFriendRequest(friendRequest: FriendRequest) {
         // Handle acceptance logic
         requestsDatabaseHelper.confirmFriendRequest(friendRequest.username, username)
-        Toast.makeText(requireContext(), "Friend request Accepted.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "הבקשה אושרה בהצלחה.", Toast.LENGTH_SHORT).show()
         adapter.removeFriendRequest(friendRequest)
     }
 

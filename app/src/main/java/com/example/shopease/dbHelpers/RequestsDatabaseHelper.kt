@@ -184,8 +184,20 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
     }
 
     private fun removeFriendRequest(senderUsername: String, receiverUsername: String) {
-        val senderRef = databaseReference.child("friendRequests").child(senderUsername)
-        senderRef.child("receiverRequests").orderByValue().equalTo(receiverUsername)
+        val senderRef1 = databaseReference.child("friendRequests").child(senderUsername)
+        senderRef1.child("receiverRequests").orderByValue().equalTo(receiverUsername)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    dataSnapshot.children.firstOrNull()?.ref?.removeValue()
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle errors
+                }
+            })
+
+        val senderRef2 = databaseReference.child("friendRequests").child(receiverUsername)
+        senderRef2.child("senderRequests").orderByValue().equalTo(senderUsername)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     dataSnapshot.children.firstOrNull()?.ref?.removeValue()
@@ -209,21 +221,6 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
             })
     }
 
-    private fun removeFriend(senderUsername: String, friendUsername: String) {
-        val senderFriendsRef =
-            databaseReference.child("confirmFriends").child(senderUsername).child("friends")
-        senderFriendsRef.orderByValue().equalTo(friendUsername)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    dataSnapshot.children.firstOrNull()?.ref?.removeValue()
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    // Handle errors
-                }
-            })
-    }
-
     private fun addFriend(username: String, friendUsername: String) {
         val friendsRef = databaseReference.child("confirmFriends").child(username).child("friends")
         friendsRef.child(friendUsername).setValue(true)
@@ -231,15 +228,11 @@ class RequestsDatabaseHelper : BaseDatabaseHelper() {
 
     fun confirmFriendRequest(senderUsername: String, receiverUsername: String) {
         removeFriendRequest(senderUsername, receiverUsername)
-
-        // Add sender to receiver's friend list
         addFriend(receiverUsername, senderUsername)
-
-        // Add receiver to sender's friend list
         addFriend(senderUsername, receiverUsername)
     }
 
     fun ignoreFriendRequest(senderUsername: String, receiverUsername: String) {
-        removeFriendRequest(senderUsername, receiverUsername)
+        removeFriendRequest(receiverUsername, senderUsername)
     }
 }

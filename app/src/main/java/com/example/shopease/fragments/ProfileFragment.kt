@@ -1,11 +1,10 @@
-package com.example.shopease
+package com.example.shopease.fragments
 
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,10 +14,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.shopease.activities.BaseActivity
+import com.example.shopease.R
 import com.example.shopease.dbHelpers.UsersDatabaseHelper
 import com.example.shopease.utils.Utils
 import com.example.shopease.utils.Utils.base64ToByteArray
-import com.example.shopease.utils.Utils.byteArrayToBase64
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
@@ -49,9 +49,9 @@ class ProfileFragment : Fragment() {
         imageProfileView = view.findViewById(R.id.imageProfileFragment)
         logoutButton = view.findViewById(R.id.btnLogout)
         // Replace these values with the actual username and email
-        username = arguments?.getString("USERNAME_KEY")
-        email = arguments?.getString("EMAIL_KEY")
-        imageProfile = arguments?.getString("PROFILE_IMAGE_KEY")
+        username = (activity as BaseActivity?)?.username!!
+        email = (activity as BaseActivity?)?.user?.email
+        imageProfile = (activity as BaseActivity?)?.user?.profileImage
 
         dbHelper = UsersDatabaseHelper(requireContext())
         // Set username and email in the UI
@@ -91,14 +91,15 @@ class ProfileFragment : Fragment() {
                 if (newPassword == confirmNewPassword) {
                     dbHelper.updatePassword(newPassword, OnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            // Password changed successfully
-                            Log.d("UserDatabaseHelper", "Password changed successfully")
-                        } else {
-                            // Handle the error
-                            Log.e(
-                                "UserDatabaseHelper",
-                                "Error changing password: ${task.exception}"
-                            )
+                            Toast.makeText(
+                                requireContext(),
+                                "הסיסמה שונתה בהצלחה.", Toast.LENGTH_SHORT
+                            ).show()
+                          } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "משהו השתבש.", Toast.LENGTH_SHORT
+                            ).show()
                         }
                     })
                 } else {
@@ -124,10 +125,7 @@ class ProfileFragment : Fragment() {
         val profileImageView: ShapeableImageView = dialogView.findViewById(R.id.ivProfile)
         val changeImageButton: Button = dialogView.findViewById(R.id.changeProfileImageButton)
 
-        // Set the profile image in the dialog
         setByteArrayImageOnImageView(base64ToByteArray(imageProfile!!), profileImageView)
-
-        // Handle the change image button click
         changeImageButton.setOnClickListener {
             openGalleryForImage()
         }
@@ -149,9 +147,7 @@ class ProfileFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == GALLERY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            // Handle the selected image here
             val selectedImageUri: Uri = data.data!!
-            // Update the image in the database and the ImageView
             updateImage(selectedImageUri)
         }
     }
@@ -163,17 +159,13 @@ class ProfileFragment : Fragment() {
         // Update the image in the database
         dbHelper.updateImage(username.toString(), selectedImageByteArray) { success ->
             if (success) {
-
                 Toast.makeText(
                     requireContext(),
                     "התמונה עודכנה בהצלחה",
                     Toast.LENGTH_SHORT
                 ).show()
-
-                // Update the image in the ImageView
-                setByteArrayImageOnImageView(selectedImageByteArray, imageProfileView)
-                (activity as BaseActivity).user?.profileImage =
-                    byteArrayToBase64(selectedImageByteArray)
+                (activity as BaseActivity).user = dbHelper.getLocallyStoredUser()
+                reloadFragment()
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -182,5 +174,10 @@ class ProfileFragment : Fragment() {
                 ).show()
             }
         }
+    }
+
+    private fun reloadFragment() {
+        val transaction = this.requireFragmentManager().beginTransaction()
+        transaction.detach(this).attach(this).commit()
     }
 }
