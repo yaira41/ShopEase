@@ -112,17 +112,16 @@ class RegisterActivity : AppCompatActivity() {
 
         // Check if the email do not already exist in the database
         var result = true
-        usersDatabaseHelper.isUsernameExists(username) { userExist ->
-            if (userExist) {
-                showToast("המשתמש כבר בשימוש")
+        usersDatabaseHelper.isUsernameExists(username) { exist ->
+            if (exist) {
                 result = false
-            } else {
-                usersDatabaseHelper.isEmailExists(email) { mailExist ->
-                    if (mailExist) {
-                        showToast("המייל כבר בשימוש")
-                        result = false
-                    }
-                }
+                showToast("היוזר כבר בשימוש")
+            }
+        }
+        usersDatabaseHelper.isEmailExists(email) { exist ->
+            if (exist) {
+                result = false
+                showToast("המייל כבר בשימוש")
             }
         }
 
